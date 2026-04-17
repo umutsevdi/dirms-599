@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import { useNominatim } from "../../hooks/useNominatim";
 import {
   AppBar,
   Toolbar,
@@ -272,6 +273,8 @@ const DashboardLayout = () => {
     setView: (coords: Coordinates, zoom: number) => void;
   } | null>(null);
 
+  const { reverseGeocode } = useNominatim();
+
   const disasterMarkers: MapMarker[] = sampleDisasters.map((d) => ({
     id: d.id,
     position: d.location,
@@ -361,7 +364,7 @@ const DashboardLayout = () => {
     }
   };
 
-  const handleMapClick = (coords: Coordinates) => {
+  const handleMapClick = async (coords: Coordinates) => {
     if (addIncidentMode) {
       setPendingCoords(coords);
       setEditingInventoryItem(null);
@@ -369,8 +372,12 @@ const DashboardLayout = () => {
       setAddIncidentMode(false);
     } else if (addPeopleMode) {
       setPendingCoords(coords);
-      setPendingAddress("");
       setEditingPeopleReport(null);
+
+      // Fetch address from coordinates using reverse geocoding
+      const address = await reverseGeocode(coords);
+      setPendingAddress(address);
+
       setPeopleDialog({ open: true, action: "add" });
       setAddPeopleMode(false);
     }

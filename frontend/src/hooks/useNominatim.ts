@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { GeocodeResult } from "../types";
+import type { Coordinates, GeocodeResult } from "../types";
 
 export function useNominatim() {
   const [results, setResults] = useState<GeocodeResult[]>([]);
@@ -50,5 +50,37 @@ export function useNominatim() {
     }
   };
 
-  return { results, loading, error, search };
+  const reverseGeocode = async (coords: Coordinates) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams({
+        lat: coords.lat.toString(),
+        lon: coords.lng.toString(),
+        format: "json",
+      });
+
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?${params}`,
+        {
+          headers: {
+            "Accept-Language": "en",
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Reverse geocoding failed");
+
+      const data = await response.json();
+      return data.display_name || "";
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+      return "";
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { results, loading, error, search, reverseGeocode };
 }
