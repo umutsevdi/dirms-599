@@ -28,7 +28,7 @@ import type { Disaster, PeopleReport } from "../../types";
 
 interface MapInfoBoardProps {
   disaster: Disaster | null;
-  peopleReport: PeopleReport | null;
+  peopleReports: PeopleReport[];
   reports: PeopleReport[];
   onClose: () => void;
 }
@@ -46,28 +46,86 @@ const getContactIcon = (method: string) => {
   return <PhoneIcon fontSize="small" sx={{ color: "text.secondary" }} />;
 };
 
+// Aggregate multiple reports into a single view
+const aggregateReports = (reports: PeopleReport[]): PeopleReport => {
+  if (reports.length === 1) return reports[0];
+
+  // Calculate average location
+  const avgLat =
+    reports.reduce((sum, r) => sum + r.location.lat, 0) / reports.length;
+  const avgLng =
+    reports.reduce((sum, r) => sum + r.location.lng, 0) / reports.length;
+
+  // Collect all unique needs with lowest priority
+  const allNeeds = reports.flatMap((r) => r.needs);
+  const uniqueNeeds = Array.from(new Set(allNeeds.map((n) => n.label))).map(
+    (label) => ({
+      label,
+      priority: Math.min(
+        ...allNeeds.filter((n) => n.label === label).map((n) => n.priority)
+      ),
+    })
+  );
+
+  return {
+    id: `cluster-${Date.now()}`,
+    reporter: reports.map((r) => r.reporter).join(", "),
+    location: { lat: avgLat, lng: avgLng },
+    address: "Multiple locations",
+    needs: uniqueNeeds,
+    counts: {
+      baby: reports.reduce((sum, r) => sum + r.counts.baby, 0),
+      child: reports.reduce((sum, r) => sum + r.counts.child, 0),
+      adult: reports.reduce((sum, r) => sum + r.counts.adult, 0),
+      elderly: reports.reduce((sum, r) => sum + r.counts.elderly, 0),
+    },
+    genderCounts: {
+      women: reports.reduce((sum, r) => sum + (r.genderCounts?.women || 0), 0),
+    },
+    statusCounts: {
+      missing: reports.reduce(
+        (sum, r) => sum + (r.statusCounts?.missing || 0),
+        0
+      ),
+      injured: reports.reduce(
+        (sum, r) => sum + (r.statusCounts?.injured || 0),
+        0
+      ),
+    },
+    details: "", // Not used in aggregated view
+    timestamp: new Date().toISOString(),
+    disasterId: reports[0]?.disasterId || "",
+  };
+};
+
 const MapInfoBoard = ({
   disaster,
-  peopleReport,
+  peopleReports,
   reports,
   onClose,
 }: MapInfoBoardProps) => {
-  if (!disaster && !peopleReport) return null;
+  if (!disaster && peopleReports.length === 0) return null;
 
-  if (peopleReport && !disaster) {
+  if (peopleReports.length > 0 && !disaster) {
+    const isCluster = peopleReports.length > 1;
+    const report = aggregateReports(peopleReports);
+
     const totalPeople =
-      peopleReport.counts.baby +
-      peopleReport.counts.child +
-      peopleReport.counts.adult +
-      peopleReport.counts.elderly;
-    const genderBase = peopleReport.counts.adult + peopleReport.counts.elderly;
-    const womenCount = peopleReport.genderCounts?.women ?? 0;
+      report.counts.baby +
+      report.counts.child +
+      report.counts.adult +
+      report.counts.elderly;
+    const genderBase = report.counts.adult + report.counts.elderly;
+    const womenCount = report.genderCounts?.women ?? 0;
     const menCount = Math.max(0, genderBase - womenCount);
     const pctGender = (count: number) =>
       genderBase > 0 ? Math.round((count / genderBase) * 100) : 0;
-    const sortedNeeds = [...peopleReport.needs].sort(
+    const sortedNeeds = [...report.needs].sort(
       (a, b) => a.priority - b.priority
     );
+
+    // Single report for contact info
+    const firstReport = peopleReports[0];
 
     return (
       <Card
@@ -76,7 +134,7 @@ const MapInfoBoard = ({
           top: 16,
           right: 16,
           zIndex: 1000,
-          width: 340,
+          width: isCluster ? 380 : 340,
           maxHeight: "calc(100% - 32px)",
           overflow: "auto",
           boxShadow: 3,
@@ -95,7 +153,7 @@ const MapInfoBoard = ({
                 People Report
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Reported by {peopleReport.reporter}
+                {`Reported by ${report.reporter}`}
               </Typography>
             </Box>
             <IconButton
@@ -115,54 +173,58 @@ const MapInfoBoard = ({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <LocationOnIcon fontSize="small" color="action" />
               <Typography variant="body2">
-                {peopleReport.address} ({peopleReport.location.lat.toFixed(4)},{" "}
-                {peopleReport.location.lng.toFixed(4)})
+                {report.address} ({report.location.lat.toFixed(4)},{" "}
+                {report.location.lng.toFixed(4)})
               </Typography>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <AccessTimeIcon fontSize="small" color="action" />
               <Typography variant="body2">
-                {new Date(peopleReport.timestamp).toLocaleString()}
+                {new Date(report.timestamp).toLocaleString()}
               </Typography>
             </Box>
           </Box>
 
-          {(peopleReport.phoneNumber || peopleReport.contactMethod) && (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                mb: 2,
-                flexWrap: "wrap",
-              }}
-            >
-              {peopleReport.phoneNumber && (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <PhoneIcon
-                    fontSize="small"
-                    sx={{ color: "text.secondary" }}
-                  />
-                  <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
-                    {peopleReport.phoneNumber}
+          {!isCluster &&
+            (firstReport.phoneNumber || firstReport.contactMethod) && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  mb: 2,
+                  flexWrap: "wrap",
+                }}
+              >
+                {firstReport.phoneNumber && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <PhoneIcon
+                      fontSize="small"
+                      sx={{ color: "text.secondary" }}
+                    />
+                    <Typography
+                      variant="body2"
+                      sx={{ fontFamily: "monospace" }}
+                    >
+                      {firstReport.phoneNumber}
+                    </Typography>
+                  </Box>
+                )}
+                {firstReport.phoneNumber && firstReport.contactMethod && (
+                  <Typography variant="body2" color="text.secondary">
+                    ·
                   </Typography>
-                </Box>
-              )}
-              {peopleReport.phoneNumber && peopleReport.contactMethod && (
-                <Typography variant="body2" color="text.secondary">
-                  ·
-                </Typography>
-              )}
-              {peopleReport.contactMethod && (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  {getContactIcon(peopleReport.contactMethod)}
-                  <Typography variant="body2">
-                    {peopleReport.contactMethod}
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          )}
+                )}
+                {firstReport.contactMethod && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    {getContactIcon(firstReport.contactMethod)}
+                    <Typography variant="body2">
+                      {firstReport.contactMethod}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            )}
 
           <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
             People ({totalPeople})
@@ -184,7 +246,7 @@ const MapInfoBoard = ({
                 Babies
               </Typography>
               <Chip
-                label={peopleReport.counts.baby}
+                label={report.counts.baby}
                 size="small"
                 sx={{
                   height: 20,
@@ -200,7 +262,7 @@ const MapInfoBoard = ({
                 Children
               </Typography>
               <Chip
-                label={peopleReport.counts.child}
+                label={report.counts.child}
                 size="small"
                 sx={{
                   height: 20,
@@ -216,7 +278,7 @@ const MapInfoBoard = ({
                 Adults
               </Typography>
               <Chip
-                label={peopleReport.counts.adult}
+                label={report.counts.adult}
                 size="small"
                 sx={{
                   height: 20,
@@ -232,7 +294,7 @@ const MapInfoBoard = ({
                 Elderly
               </Typography>
               <Chip
-                label={peopleReport.counts.elderly}
+                label={report.counts.elderly}
                 size="small"
                 sx={{
                   height: 20,
@@ -244,8 +306,8 @@ const MapInfoBoard = ({
             </Box>
           </Box>
 
-          {(peopleReport.statusCounts.missing > 0 ||
-            peopleReport.statusCounts.injured > 0 ||
+          {(report.statusCounts.missing > 0 ||
+            report.statusCounts.injured > 0 ||
             genderBase > 0) && (
             <Box
               sx={{
@@ -258,7 +320,7 @@ const MapInfoBoard = ({
               <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                 Status
               </Typography>
-              {peopleReport.statusCounts.missing > 0 && (
+              {report.statusCounts.missing > 0 && (
                 <Box>
                   <Box
                     sx={{
@@ -279,15 +341,14 @@ const MapInfoBoard = ({
                       variant="caption"
                       sx={{ fontWeight: "bold", color: "error.main" }}
                     >
-                      {peopleReport.statusCounts.missing}
+                      {report.statusCounts.missing}
                     </Typography>
                   </Box>
                   <LinearProgress
                     variant="determinate"
                     value={
                       totalPeople > 0
-                        ? (peopleReport.statusCounts.missing / totalPeople) *
-                          100
+                        ? (report.statusCounts.missing / totalPeople) * 100
                         : 0
                     }
                     color="error"
@@ -295,7 +356,7 @@ const MapInfoBoard = ({
                   />
                 </Box>
               )}
-              {peopleReport.statusCounts.injured > 0 && (
+              {report.statusCounts.injured > 0 && (
                 <Box>
                   <Box
                     sx={{
@@ -316,15 +377,14 @@ const MapInfoBoard = ({
                       variant="caption"
                       sx={{ fontWeight: "bold", color: "warning.main" }}
                     >
-                      {peopleReport.statusCounts.injured}
+                      {report.statusCounts.injured}
                     </Typography>
                   </Box>
                   <LinearProgress
                     variant="determinate"
                     value={
                       totalPeople > 0
-                        ? (peopleReport.statusCounts.injured / totalPeople) *
-                          100
+                        ? (report.statusCounts.injured / totalPeople) * 100
                         : 0
                     }
                     color="warning"
@@ -387,14 +447,35 @@ const MapInfoBoard = ({
             </Box>
           )}
 
-          {peopleReport.details && (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ fontStyle: "italic", lineHeight: 1.5 }}
-            >
-              {peopleReport.details}
-            </Typography>
+          {/* Descriptions Section */}
+          {peopleReports.some((r) => r.details) && (
+            <Box sx={{ mt: 2 }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ mb: 1, fontWeight: "bold" }}
+              >
+                {isCluster ? "Reports" : "Details"}
+              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {peopleReports.map(
+                  (r, index) =>
+                    r.details && (
+                      <Typography
+                        key={r.id || index}
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          fontStyle: "italic",
+                          lineHeight: 1.5,
+                          display: "block",
+                        }}
+                      >
+                        {isCluster ? `${r.reporter}: ${r.details}` : r.details}
+                      </Typography>
+                    )
+                )}
+              </Box>
+            </Box>
           )}
         </CardContent>
       </Card>

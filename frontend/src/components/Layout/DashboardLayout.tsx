@@ -222,6 +222,162 @@ const samplePeopleReports: PeopleReport[] = [
     disasterId: "3",
     contactMethod: "Other",
   },
+  // Additional Istanbul area reports for clustering demo
+  {
+    id: "r-5",
+    reporter: "Mehmet Demir",
+    location: { lat: 41.015, lng: 28.985 },
+    address: "Moda, Kadikoy, Istanbul, Turkey",
+    needs: [
+      { label: "Food", priority: 1 },
+      { label: "Water", priority: 1 },
+      { label: "Shelter", priority: 2 },
+    ],
+    counts: { baby: 1, child: 4, adult: 9, elderly: 2 },
+    genderCounts: { women: 8 },
+    statusCounts: { missing: 0, injured: 1 },
+    details: "Neighborhood park gathering point. 3 families need assistance.",
+    timestamp: "2026-04-14T10:30:00Z",
+    disasterId: "2",
+    phoneNumber: "+90 555 333 4455",
+    contactMethod: "WhatsApp",
+  },
+  {
+    id: "r-6",
+    reporter: "Ayse Yildiz",
+    location: { lat: 41.012, lng: 28.982 },
+    address: "Osmanağa, Kadikoy, Istanbul, Turkey",
+    needs: [
+      { label: "Medical", priority: 1 },
+      { label: "Blankets", priority: 2 },
+    ],
+    counts: { baby: 2, child: 3, adult: 7, elderly: 3 },
+    genderCounts: { women: 7 },
+    statusCounts: { missing: 1, injured: 2 },
+    details:
+      "School gymnasium shelter. Elderly residents need medical checkups.",
+    timestamp: "2026-04-14T11:00:00Z",
+    disasterId: "2",
+    phoneNumber: "+90 555 444 5566",
+    contactMethod: "SMS",
+  },
+  {
+    id: "r-7",
+    reporter: "Can Yilmaz",
+    location: { lat: 41.005, lng: 28.975 },
+    address: "Fenerbahce, Kadikoy, Istanbul, Turkey",
+    needs: [
+      { label: "Water", priority: 1 },
+      { label: "Food", priority: 2 },
+      { label: "Clothing", priority: 3 },
+    ],
+    counts: { baby: 0, child: 5, adult: 11, elderly: 1 },
+    genderCounts: { women: 9 },
+    statusCounts: { missing: 0, injured: 0 },
+    details:
+      "Sports stadium evacuation center. All ages present, stable condition.",
+    timestamp: "2026-04-14T12:00:00Z",
+    disasterId: "2",
+    phoneNumber: "+90 555 555 6677",
+    contactMethod: "Call",
+  },
+  {
+    id: "r-8",
+    reporter: "Elif Sahin",
+    location: { lat: 41.018, lng: 28.99 },
+    address: "Goztepe, Kadikoy, Istanbul, Turkey",
+    needs: [
+      { label: "Shelter", priority: 1 },
+      { label: "Medical", priority: 2 },
+      { label: "Water", priority: 2 },
+    ],
+    counts: { baby: 1, child: 2, adult: 5, elderly: 4 },
+    genderCounts: { women: 6 },
+    statusCounts: { missing: 2, injured: 1 },
+    details:
+      "Community center damaged. Families with elderly need urgent relocation.",
+    timestamp: "2026-04-14T12:30:00Z",
+    disasterId: "2",
+    phoneNumber: "+90 555 666 7788",
+    contactMethod: "WhatsApp",
+  },
+  {
+    id: "r-9",
+    reporter: "Burak Korkmaz",
+    location: { lat: 41.022, lng: 28.995 },
+    address: "Erenkoy, Kadikoy, Istanbul, Turkey",
+    needs: [
+      { label: "Food", priority: 1 },
+      { label: "Water", priority: 1 },
+    ],
+    counts: { baby: 3, child: 6, adult: 8, elderly: 2 },
+    genderCounts: { women: 10 },
+    statusCounts: { missing: 0, injured: 3 },
+    details: "Local mosque courtyard. Many children and infants need supplies.",
+    timestamp: "2026-04-14T13:00:00Z",
+    disasterId: "2",
+    phoneNumber: "+90 555 777 8899",
+    contactMethod: "SMS",
+  },
+  {
+    id: "r-10",
+    reporter: "Selin Aydin",
+    location: { lat: 41.01, lng: 28.98 },
+    address: "Kosuyolu, Kadikoy, Istanbul, Turkey",
+    needs: [
+      { label: "Medical", priority: 1 },
+      { label: "Shelter", priority: 2 },
+      { label: "Blankets", priority: 3 },
+    ],
+    counts: { baby: 1, child: 3, adult: 6, elderly: 2 },
+    genderCounts: { women: 6 },
+    statusCounts: { missing: 1, injured: 4 },
+    details:
+      "Hospital parking lot. Several injured patients discharged to make room.",
+    timestamp: "2026-04-14T13:30:00Z",
+    disasterId: "2",
+    phoneNumber: "+90 555 888 9900",
+    contactMethod: "Call",
+  },
+  {
+    id: "r-11",
+    reporter: "Emre Celik",
+    location: { lat: 41.02, lng: 28.985 },
+    address: "Suadiye, Kadikoy, Istanbul, Turkey",
+    needs: [
+      { label: "Water", priority: 1 },
+      { label: "Food", priority: 2 },
+      { label: "Clothing", priority: 2 },
+    ],
+    counts: { baby: 0, child: 4, adult: 10, elderly: 3 },
+    genderCounts: { women: 9 },
+    statusCounts: { missing: 0, injured: 0 },
+    details: "Beach promenade area. Families displaced from nearby residences.",
+    timestamp: "2026-04-14T14:00:00Z",
+    disasterId: "2",
+    phoneNumber: "+90 555 999 0011",
+    contactMethod: "WhatsApp",
+  },
+  {
+    id: "r-12",
+    reporter: "Deniz Yildirim",
+    location: { lat: 41.007, lng: 28.978 },
+    address: "Caddebostan, Kadikoy, Istanbul, Turkey",
+    needs: [
+      { label: "Shelter", priority: 1 },
+      { label: "Medical", priority: 1 },
+      { label: "Blankets", priority: 2 },
+    ],
+    counts: { baby: 2, child: 7, adult: 12, elderly: 4 },
+    genderCounts: { women: 13 },
+    statusCounts: { missing: 3, injured: 5 },
+    details:
+      "Shopping mall parking structure. Multiple injuries from building collapse nearby.",
+    timestamp: "2026-04-14T14:30:00Z",
+    disasterId: "2",
+    phoneNumber: "+90 555 000 1122",
+    contactMethod: "SMS",
+  },
 ];
 
 const MIN_PANEL = 200;
@@ -250,9 +406,10 @@ const DashboardLayout = () => {
   const [addPeopleMode, setAddPeopleMode] = useState(false);
   const [selectedDisasterMarker, setSelectedDisasterMarker] =
     useState<MapMarker | null>(null);
-  const [selectedPeopleReportId, setSelectedPeopleReportId] = useState<
-    string | null
-  >(null);
+  // Unified state for people reports display (single or cluster)
+  const [displayedPeopleReports, setDisplayedPeopleReports] = useState<
+    PeopleReport[]
+  >([]);
 
   const [inventoryDialog, setInventoryDialog] = useState<{
     open: boolean;
@@ -386,9 +543,12 @@ const DashboardLayout = () => {
   const handleMarkerClick = (marker: MapMarker) => {
     if (marker.type === "disaster") {
       setSelectedDisasterMarker(marker);
-      setSelectedPeopleReportId(null);
+      setDisplayedPeopleReports([]);
     } else if (marker.type === "people") {
-      setSelectedPeopleReportId(marker.id);
+      const report = peopleReports.find((r) => r.id === marker.id);
+      if (report) {
+        setDisplayedPeopleReports([report]);
+      }
       setSelectedDisasterMarker(null);
     }
   };
@@ -426,7 +586,7 @@ const DashboardLayout = () => {
 
   const handleSelectPeople = (report: PeopleReport | null) => {
     if (report) {
-      setSelectedPeopleReportId(report.id);
+      setDisplayedPeopleReports([report]);
       setSelectedDisasterMarker(null);
       setMapCenter(report.location);
       setMapZoom(14);
@@ -434,8 +594,15 @@ const DashboardLayout = () => {
         mapRef.current.setView(report.location, 14);
       }
     } else {
-      setSelectedPeopleReportId(null);
+      setDisplayedPeopleReports([]);
     }
+  };
+
+  const handleClusterClick = (reports: PeopleReport[]) => {
+    if (reports.length === 0) return;
+
+    setDisplayedPeopleReports(reports);
+    setSelectedDisasterMarker(null);
   };
 
   const handleSaveInventory = (item: InventoryItem) => {
@@ -522,9 +689,7 @@ const DashboardLayout = () => {
     ? (sampleDisasters.find((d) => d.id === selectedDisasterMarker.id) ?? null)
     : null;
 
-  const selectedPeopleReport = selectedPeopleReportId
-    ? (peopleReports.find((r) => r.id === selectedPeopleReportId) ?? null)
-    : null;
+  // displayedPeopleReports is now the single source of truth for people report display
 
   const selectedReportsFromDisaster = selectedDisasterMarker
     ? peopleReports.filter((r) => r.disasterId === selectedDisasterMarker.id)
@@ -714,6 +879,7 @@ const DashboardLayout = () => {
                     peopleReports={peopleReports}
                     onMapClick={handleMapClick}
                     onMarkerClick={handleMarkerClick}
+                    onClusterClick={handleClusterClick}
                     mapRef={mapRef}
                   />
                   <MapControls
@@ -726,11 +892,11 @@ const DashboardLayout = () => {
                   />
                   <MapInfoBoard
                     disaster={selectedDisasterFromMarker}
-                    peopleReport={selectedPeopleReport}
+                    peopleReports={displayedPeopleReports}
                     reports={selectedReportsFromDisaster}
                     onClose={() => {
                       setSelectedDisasterMarker(null);
-                      setSelectedPeopleReportId(null);
+                      setDisplayedPeopleReports([]);
                     }}
                   />
                 </Box>
