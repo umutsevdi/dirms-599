@@ -4,13 +4,13 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { DataProvider } from "./contexts/DataContext";
-import ProtectedRoute from "./components/Auth/ProtectedRoute";
-import DashboardLayout from "./components/Layout/DashboardLayout";
-import Login from "./pages/Login";
-import MagicLinkHandler from "./pages/MagicLinkHandler";
-import OrganizationSettings from "./pages/OrganizationSettings";
+import { AuthProvider } from "./features/auth/contexts/AuthContext";
+import { DataProvider } from "./features/disasters/contexts/DataContext";
+import ProtectedRoute from "./features/auth/components/ProtectedRoute";
+import DashboardLayout from "./features/layout/components/DashboardLayout";
+import Login from "./features/auth/pages/Login";
+import MagicLinkHandler from "./features/auth/pages/MagicLinkHandler";
+import OrganizationSettings from "./features/organization/pages/OrganizationSettings";
 
 function App() {
   return (
