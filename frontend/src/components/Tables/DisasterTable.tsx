@@ -24,8 +24,7 @@ const DisasterTable = ({ disasters, onRowClick }: DisasterTableProps) => {
       "success" | "warning" | "error"
     > = {
       low: "success",
-      medium: "warning",
-      high: "error",
+      moderate: "warning",
       critical: "error",
     };
     return colors[severity];

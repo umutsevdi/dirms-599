@@ -22,6 +22,7 @@ import DisasterTable from "../Tables/DisasterTable";
 import DisasterStats from "../Charts/DisasterStats";
 import DisasterDialog from "../Dialogs/DisasterDialog";
 import InventoryDialog from "../Dialogs/InventoryDialog";
+import IncidentDialog from "../Dialogs/IncidentDialog";
 import PeopleReportDialog from "../Dialogs/PeopleReportDialog";
 import MapControls from "../Map/MapControls";
 import MapInfoBoard from "../Map/MapInfoBoard";
@@ -55,7 +56,7 @@ const sampleDisasters: Disaster[] = [
     type: "Flood",
     location: { lat: 41.0082, lng: 28.9784 },
     address: "Istanbul, Turkey",
-    severity: "high",
+    severity: "critical",
     status: "contained",
     timestamp: "2026-04-14T08:15:00Z",
     description: "Flash flooding in low-lying areas due to heavy rainfall.",
@@ -66,7 +67,7 @@ const sampleDisasters: Disaster[] = [
     type: "Wildfire",
     location: { lat: 36.8969, lng: 30.7133 },
     address: "Antalya, Turkey",
-    severity: "medium",
+    severity: "moderate",
     status: "active",
     timestamp: "2026-04-13T14:45:00Z",
     description: "Forest fire spreading in mountainous region.",
@@ -87,64 +88,55 @@ const sampleDisasters: Disaster[] = [
 const sampleInventory: InventoryItem[] = [
   {
     id: "inv-1",
-    type: "Water Bottles",
-    location: { lat: 38.4192, lng: 27.1287 },
-    status: "available",
+    name: "Water Bottles",
     quantity: 500,
-    assignedDisaster: "1",
+    resolves: ["Water"],
   },
   {
     id: "inv-2",
-    type: "First Aid Kits",
-    location: { lat: 38.4192, lng: 27.1287 },
-    status: "deployed",
+    name: "First Aid Kits",
     quantity: 120,
-    assignedDisaster: "1",
+    resolves: ["Medical"],
   },
   {
     id: "inv-3",
-    type: "Blankets",
-    location: { lat: 41.0082, lng: 28.9784 },
-    status: "available",
+    name: "Baby Blankets",
     quantity: 300,
-    assignedDisaster: "2",
+    resolves: ["Blankets", "Clothing"],
+    group: "baby",
   },
   {
     id: "inv-4",
-    type: "Food Rations",
-    location: { lat: 41.0082, lng: 28.9784 },
-    status: "deployed",
+    name: "Food Rations",
     quantity: 800,
-    assignedDisaster: "2",
+    resolves: ["Food"],
   },
   {
     id: "inv-5",
-    type: "Generators",
-    location: { lat: 36.8969, lng: 30.7133 },
-    status: "available",
-    quantity: 15,
+    name: "Baby Formula",
+    quantity: 150,
+    resolves: ["Food"],
+    group: "baby",
   },
   {
     id: "inv-6",
-    type: "Tents",
-    location: { lat: 36.8969, lng: 30.7133 },
-    status: "maintenance",
-    quantity: 50,
+    name: "Women's Hygiene Kits",
+    quantity: 200,
+    resolves: ["Medical", "Clothing"],
+    group: "women",
   },
   {
     id: "inv-7",
-    type: "Flashlights",
-    location: { lat: 38.4192, lng: 27.1287 },
-    status: "available",
-    quantity: 200,
+    name: "Elderly Care Supplies",
+    quantity: 100,
+    resolves: ["Medical", "Shelter"],
+    group: "elderly",
   },
   {
     id: "inv-8",
-    type: "Medical Supplies",
-    location: { lat: 40.7486, lng: 29.9243 },
-    status: "deployed",
-    quantity: 75,
-    assignedDisaster: "4",
+    name: "Emergency Generators",
+    quantity: 15,
+    resolves: ["Power", "Shelter"],
   },
 ];
 
@@ -399,6 +391,7 @@ const DashboardLayout = () => {
     useState<InventoryItem[]>(sampleInventory);
   const [peopleReports, setPeopleReports] =
     useState<PeopleReport[]>(samplePeopleReports);
+  const [disasters, setDisasters] = useState<Disaster[]>(sampleDisasters);
   const [leftPanelWidth, setLeftPanelWidth] = useState(DEFAULT_PANEL);
   const [rightPanelWidth, setRightPanelWidth] = useState(DEFAULT_PANEL);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -423,6 +416,7 @@ const DashboardLayout = () => {
   }>({ open: false, action: "add" });
   const [editingPeopleReport, setEditingPeopleReport] =
     useState<PeopleReport | null>(null);
+  const [incidentDialogOpen, setIncidentDialogOpen] = useState(false);
   const [pendingCoords, setPendingCoords] = useState<Coordinates | null>(null);
   const [pendingAddress, setPendingAddress] = useState("");
 
@@ -432,7 +426,7 @@ const DashboardLayout = () => {
 
   const { reverseGeocode } = useNominatim();
 
-  const disasterMarkers: MapMarker[] = sampleDisasters.map((d) => ({
+  const disasterMarkers: MapMarker[] = disasters.map((d) => ({
     id: d.id,
     position: d.location,
     type: "disaster",
@@ -446,7 +440,7 @@ const DashboardLayout = () => {
     popupContent: `<strong>${r.reporter}</strong><br/>${r.address}`,
   }));
 
-  const circles = sampleDisasters
+  const circles = disasters
     .filter((d) => d.affectedRadius)
     .map((d) => ({
       center: d.location,
@@ -454,29 +448,51 @@ const DashboardLayout = () => {
       color:
         d.severity === "critical"
           ? "#ef4444"
-          : d.severity === "high"
+          : d.severity === "moderate"
             ? "#f97316"
             : "#eab308",
     }));
 
   const statsData = {
-    byType: [
-      { name: "Earthquake", count: 1 },
-      { name: "Flood", count: 1 },
-      { name: "Wildfire", count: 1 },
-      { name: "Landslide", count: 1 },
-    ],
-    bySeverity: [
-      { name: "Critical", count: 1 },
-      { name: "High", count: 1 },
-      { name: "Medium", count: 1 },
-      { name: "Low", count: 1 },
-    ],
-    byStatus: [
-      { name: "Active", count: 2 },
-      { name: "Contained", count: 1 },
-      { name: "Resolved", count: 1 },
-    ],
+    byType: disasters.reduce(
+      (acc, d) => {
+        const existing = acc.find((item) => item.name === d.type);
+        if (existing) {
+          existing.count++;
+        } else {
+          acc.push({ name: d.type, count: 1 });
+        }
+        return acc;
+      },
+      [] as { name: string; count: number }[]
+    ),
+    bySeverity: disasters.reduce(
+      (acc, d) => {
+        const severityName =
+          d.severity.charAt(0).toUpperCase() + d.severity.slice(1);
+        const existing = acc.find((item) => item.name === severityName);
+        if (existing) {
+          existing.count++;
+        } else {
+          acc.push({ name: severityName, count: 1 });
+        }
+        return acc;
+      },
+      [] as { name: string; count: number }[]
+    ),
+    byStatus: disasters.reduce(
+      (acc, d) => {
+        const statusName = d.status.charAt(0).toUpperCase() + d.status.slice(1);
+        const existing = acc.find((item) => item.name === statusName);
+        if (existing) {
+          existing.count++;
+        } else {
+          acc.push({ name: statusName, count: 1 });
+        }
+        return acc;
+      },
+      [] as { name: string; count: number }[]
+    ),
   };
 
   const handleLocationSelect = (coords: Coordinates, zoom: number) => {
@@ -524,8 +540,12 @@ const DashboardLayout = () => {
   const handleMapClick = async (coords: Coordinates) => {
     if (addIncidentMode) {
       setPendingCoords(coords);
-      setEditingInventoryItem(null);
-      setInventoryDialog({ open: true, action: "add" });
+
+      // Fetch address from coordinates using reverse geocoding
+      const address = await reverseGeocode(coords);
+      setPendingAddress(address);
+
+      setIncidentDialogOpen(true);
       setAddIncidentMode(false);
     } else if (addPeopleMode) {
       setPendingCoords(coords);
@@ -598,6 +618,25 @@ const DashboardLayout = () => {
     }
   };
 
+  const handleSelectDisaster = (disaster: Disaster | null) => {
+    if (disaster) {
+      setSelectedDisasterMarker({
+        id: disaster.id,
+        position: disaster.location,
+        type: "disaster",
+        popupContent: `<strong>${disaster.type}</strong><br/>${disaster.address}`,
+      });
+      setDisplayedPeopleReports([]);
+      setMapCenter(disaster.location);
+      setMapZoom(12);
+      if (mapRef.current) {
+        mapRef.current.setView(disaster.location, 12);
+      }
+    } else {
+      setSelectedDisasterMarker(null);
+    }
+  };
+
   const handleClusterClick = (reports: PeopleReport[]) => {
     if (reports.length === 0) return;
 
@@ -606,15 +645,11 @@ const DashboardLayout = () => {
   };
 
   const handleSaveInventory = (item: InventoryItem) => {
-    if (pendingCoords) {
-      item.location = pendingCoords;
-    }
     setInventoryItems((prev) => {
       const existing = prev.find((i) => i.id === item.id);
       if (existing) return prev.map((i) => (i.id === item.id ? item : i));
       return [...prev, item];
     });
-    setPendingCoords(null);
   };
 
   const handleSavePeople = (report: PeopleReport) => {
@@ -629,6 +664,12 @@ const DashboardLayout = () => {
       if (existing) return prev.map((r) => (r.id === report.id ? report : r));
       return [...prev, report];
     });
+    setPendingCoords(null);
+    setPendingAddress("");
+  };
+
+  const handleSaveIncident = (incident: Disaster) => {
+    setDisasters((prev) => [...prev, incident]);
     setPendingCoords(null);
     setPendingAddress("");
   };
@@ -686,7 +727,7 @@ const DashboardLayout = () => {
   };
 
   const selectedDisasterFromMarker = selectedDisasterMarker
-    ? (sampleDisasters.find((d) => d.id === selectedDisasterMarker.id) ?? null)
+    ? (disasters.find((d) => d.id === selectedDisasterMarker.id) ?? null)
     : null;
 
   // displayedPeopleReports is now the single source of truth for people report display
@@ -734,10 +775,7 @@ const DashboardLayout = () => {
       </Tabs>
       <Box sx={{ flex: 1, overflow: "auto" }}>
         {activeTab === 0 ? (
-          <DisasterTable
-            disasters={sampleDisasters}
-            onRowClick={handleRowClick}
-          />
+          <DisasterTable disasters={disasters} onRowClick={handleRowClick} />
         ) : (
           <DisasterStats data={statsData} />
         )}
@@ -776,7 +814,7 @@ const DashboardLayout = () => {
               Disaster Management System
             </Typography>
             <DisasterTimer
-              disasters={sampleDisasters.map((d) => ({
+              disasters={disasters.map((d) => ({
                 timestamp: d.timestamp,
                 type: d.type,
               }))}
@@ -901,6 +939,7 @@ const DashboardLayout = () => {
                   />
                 </Box>
                 <BottomPanel
+                  disasters={disasters}
                   inventoryItems={inventoryItems}
                   peopleReports={peopleReports}
                   onAddInventory={handleAddInventory}
@@ -908,6 +947,7 @@ const DashboardLayout = () => {
                   onAddPeople={handleAddPeople}
                   onEditPeople={handleEditPeople}
                   onSelectPeople={handleSelectPeople}
+                  onSelectDisaster={handleSelectDisaster}
                 />
               </Box>
               <Box
@@ -933,7 +973,7 @@ const DashboardLayout = () => {
                   }}
                   onMouseDown={handleRightResizeStart}
                 />
-                <RightPanel disasters={sampleDisasters} />
+                <RightPanel disasters={disasters} />
               </Box>
             </Box>
           </Box>
@@ -943,6 +983,7 @@ const DashboardLayout = () => {
           disaster={selectedDisaster}
           isOpen={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
+          inventoryItems={inventoryItems}
         />
 
         <InventoryDialog
@@ -967,6 +1008,18 @@ const DashboardLayout = () => {
             setPendingAddress("");
           }}
           onSave={handleSavePeople}
+          initialLocation={pendingCoords}
+          initialAddress={pendingAddress}
+        />
+
+        <IncidentDialog
+          isOpen={incidentDialogOpen}
+          onClose={() => {
+            setIncidentDialogOpen(false);
+            setPendingCoords(null);
+            setPendingAddress("");
+          }}
+          onSave={handleSaveIncident}
           initialLocation={pendingCoords}
           initialAddress={pendingAddress}
         />

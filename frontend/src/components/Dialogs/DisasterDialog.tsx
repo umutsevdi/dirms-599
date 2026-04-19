@@ -7,23 +7,31 @@ import {
   Chip,
   Typography,
   Box,
+  Alert,
 } from "@mui/material";
-import type { Disaster } from "../../types";
+import WarningIcon from "@mui/icons-material/Warning";
+import type { Disaster, InventoryItem } from "../../types";
 
 interface DisasterDialogProps {
   disaster: Disaster | null;
   isOpen: boolean;
   onClose: () => void;
+  inventoryItems?: InventoryItem[];
 }
 
-const DisasterDialog = ({ disaster, isOpen, onClose }: DisasterDialogProps) => {
+const DisasterDialog = ({
+  disaster,
+  isOpen,
+  onClose,
+  inventoryItems = [],
+}: DisasterDialogProps) => {
   if (!disaster) return null;
 
   const getSeverityColor = (
     severity: string
   ): "error" | "warning" | "success" => {
-    if (severity === "critical" || severity === "high") return "error";
-    if (severity === "medium") return "warning";
+    if (severity === "critical") return "error";
+    if (severity === "moderate") return "warning";
     return "success";
   };
 
@@ -33,6 +41,9 @@ const DisasterDialog = ({ disaster, isOpen, onClose }: DisasterDialogProps) => {
     return "success";
   };
 
+  // Show cargo warning if there are inventory items available
+  const hasInventory = inventoryItems.length > 0;
+
   return (
     <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{disaster.type}</DialogTitle>
@@ -40,6 +51,14 @@ const DisasterDialog = ({ disaster, isOpen, onClose }: DisasterDialogProps) => {
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
           {disaster.description}
         </Typography>
+
+        {hasInventory && (
+          <Alert severity="warning" icon={<WarningIcon />} sx={{ mt: 2 }}>
+            Check available inventory items that could resolve needs for this
+            incident
+          </Alert>
+        )}
+
         <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 1.5 }}>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="body2" color="text.secondary">
@@ -101,6 +120,20 @@ const DisasterDialog = ({ disaster, isOpen, onClose }: DisasterDialogProps) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
+        {disaster.status === "active" && (
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => {
+              // In a real app, this would update the disaster status
+              // For now, just show an alert
+              alert(`Incident "${disaster.type}" marked as resolved!`);
+              onClose();
+            }}
+          >
+            Resolve
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

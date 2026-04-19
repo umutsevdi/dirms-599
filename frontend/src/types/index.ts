@@ -8,7 +8,7 @@ export interface Disaster {
   type: string;
   location: Coordinates;
   address: string;
-  severity: "low" | "medium" | "high" | "critical";
+  severity: "low" | "moderate" | "critical";
   status: "active" | "contained" | "resolved";
   timestamp: string;
   description: string;
@@ -33,12 +33,19 @@ export interface MapMarker {
 
 export interface InventoryItem {
   id: string;
-  type: string;
-  location: Coordinates;
-  status: "available" | "deployed" | "maintenance";
+  name: string;
   quantity: number;
-  assignedDisaster?: string;
+  resolves: string[]; // e.g., ["Medical", "Water", "Food"]
+  group?: InventoryGroup; // e.g., "baby", "women", "elderly", etc.
 }
+
+export type InventoryGroup =
+  | "baby"
+  | "child"
+  | "adult"
+  | "elderly"
+  | "women"
+  | "general";
 
 export interface Need {
   label: string;

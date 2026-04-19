@@ -15,9 +15,10 @@ import {
   Chip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import type { InventoryItem, PeopleReport } from "../../types";
+import type { InventoryItem, PeopleReport, Disaster } from "../../types";
 
 interface BottomPanelProps {
+  disasters: Disaster[];
   inventoryItems: InventoryItem[];
   peopleReports: PeopleReport[];
   onAddInventory: () => void;
@@ -25,10 +26,12 @@ interface BottomPanelProps {
   onAddPeople: () => void;
   onEditPeople: (report: PeopleReport) => void;
   onSelectPeople: (report: PeopleReport | null) => void;
+  onSelectDisaster: (disaster: Disaster | null) => void;
   initialHeight?: number;
 }
 
 const BottomPanel = ({
+  disasters,
   inventoryItems,
   peopleReports,
   onAddInventory,
@@ -36,12 +39,17 @@ const BottomPanel = ({
   onAddPeople,
   onEditPeople,
   onSelectPeople,
+  onSelectDisaster,
   initialHeight = 180,
 }: BottomPanelProps) => {
   const [activeTab, setActiveTab] = useState(0);
   const [inventorySearch, setInventorySearch] = useState("");
   const [peopleSearch, setPeopleSearch] = useState("");
+  const [disasterSearch, setDisasterSearch] = useState("");
   const [selectedPeopleId, setSelectedPeopleId] = useState<string | null>(null);
+  const [selectedDisasterId, setSelectedDisasterId] = useState<string | null>(
+    null
+  );
   const [height, setHeight] = useState(initialHeight);
   const isDragging = useRef(false);
 
@@ -76,8 +84,9 @@ const BottomPanel = ({
     const q = inventorySearch.toLowerCase();
     return inventoryItems.filter(
       (item) =>
-        item.type.toLowerCase().includes(q) ||
-        item.status.toLowerCase().includes(q)
+        item.name.toLowerCase().includes(q) ||
+        item.resolves.some((r) => r.toLowerCase().includes(q)) ||
+        (item.group && item.group.toLowerCase().includes(q))
     );
   }, [inventoryItems, inventorySearch]);
 
@@ -92,22 +101,60 @@ const BottomPanel = ({
     );
   }, [peopleReports, peopleSearch]);
 
-  const getStatusColor = (
-    status: string
-  ): "success" | "warning" | "error" | "info" => {
-    const colors: Record<string, "success" | "warning" | "error" | "info"> = {
-      available: "success",
-      deployed: "warning",
-      maintenance: "error",
-    };
-    return colors[status] || "default";
-  };
+  const filteredDisasters = useMemo(() => {
+    if (!disasterSearch) return disasters;
+    const q = disasterSearch.toLowerCase();
+    return disasters.filter(
+      (d) =>
+        d.type.toLowerCase().includes(q) ||
+        d.address.toLowerCase().includes(q) ||
+        d.severity.toLowerCase().includes(q) ||
+        d.status.toLowerCase().includes(q)
+    );
+  }, [disasters, disasterSearch]);
 
-  const handleSelectRow = (report: PeopleReport) => {
+  const handleSelectPeopleRow = (report: PeopleReport) => {
     const newId = report.id === selectedPeopleId ? null : report.id;
     setSelectedPeopleId(newId);
+    setSelectedDisasterId(null);
     const selected = newId === report.id ? report : null;
     onSelectPeople(selected);
+    onSelectDisaster(null);
+  };
+
+  const handleSelectDisasterRow = (disaster: Disaster) => {
+    const newId = disaster.id === selectedDisasterId ? null : disaster.id;
+    setSelectedDisasterId(newId);
+    setSelectedPeopleId(null);
+    const selected = newId === disaster.id ? disaster : null;
+    onSelectDisaster(selected);
+    onSelectPeople(null);
+  };
+
+  const getSeverityColor = (
+    severity: Disaster["severity"]
+  ): "success" | "warning" | "error" => {
+    const colors: Record<
+      Disaster["severity"],
+      "success" | "warning" | "error"
+    > = {
+      low: "success",
+      moderate: "warning",
+      critical: "error",
+    };
+    return colors[severity];
+  };
+
+  const getStatusColor = (
+    status: Disaster["status"]
+  ): "success" | "warning" | "error" => {
+    const colors: Record<Disaster["status"], "success" | "warning" | "error"> =
+      {
+        active: "error",
+        contained: "warning",
+        resolved: "success",
+      };
+    return colors[status];
   };
 
   return (
@@ -145,8 +192,9 @@ const BottomPanel = ({
           onChange={(_, v) => setActiveTab(v)}
           sx={{ px: 2, pt: 1 }}
         >
-          <Tab label={`Inventory (${inventoryItems.length})`} />
           <Tab label={`People (${peopleReports.length})`} />
+          <Tab label={`Inventory (${inventoryItems.length})`} />
+          <Tab label={`Incidents (${disasters.length})`} />
         </Tabs>
 
         <Box
@@ -158,93 +206,8 @@ const BottomPanel = ({
             flexDirection: "column",
           }}
         >
+          {/* People Tab */}
           {activeTab === 0 && (
-            <Box
-              sx={{ display: "flex", flexDirection: "column", height: "100%" }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  mb: 2,
-                }}
-              >
-                <TextField
-                  size="small"
-                  placeholder="Search inventory..."
-                  value={inventorySearch}
-                  onChange={(e) => setInventorySearch(e.target.value)}
-                  sx={{ width: 256 }}
-                />
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={onAddInventory}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    disabled={filteredInventory.length !== 1}
-                    onClick={() =>
-                      filteredInventory.length === 1 &&
-                      onEditInventory(filteredInventory[0])
-                    }
-                  >
-                    Edit
-                  </Button>
-                </Box>
-              </Box>
-
-              <TableContainer
-                component={Paper}
-                sx={{ flex: 1, overflow: "auto" }}
-              >
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Type</TableCell>
-                      <TableCell>Quantity</TableCell>
-                      <TableCell>Status</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {filteredInventory.length === 0 ? (
-                      <TableRow>
-                        <TableCell
-                          colSpan={3}
-                          sx={{ textAlign: "center", color: "text.secondary" }}
-                        >
-                          No inventory items
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredInventory.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell sx={{ fontWeight: "medium" }}>
-                            {item.type}
-                          </TableCell>
-                          <TableCell>{item.quantity}</TableCell>
-                          <TableCell>
-                            <Chip
-                              label={item.status}
-                              size="small"
-                              color={getStatusColor(item.status)}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
-          )}
-
-          {activeTab === 1 && (
             <Box
               sx={{ display: "flex", flexDirection: "column", height: "100%" }}
             >
@@ -332,7 +295,7 @@ const BottomPanel = ({
                             key={report.id}
                             hover
                             selected={isSelected}
-                            onClick={() => handleSelectRow(report)}
+                            onClick={() => handleSelectPeopleRow(report)}
                             sx={{ cursor: "pointer" }}
                           >
                             <TableCell sx={{ fontWeight: "medium" }}>
@@ -371,6 +334,222 @@ const BottomPanel = ({
                                   />
                                 ))}
                               </Box>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+          {/* Inventory Tab */}
+          {activeTab === 1 && (
+            <Box
+              sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
+                }}
+              >
+                <TextField
+                  size="small"
+                  placeholder="Search inventory..."
+                  value={inventorySearch}
+                  onChange={(e) => setInventorySearch(e.target.value)}
+                  sx={{ width: 256 }}
+                />
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={onAddInventory}
+                  >
+                    Add
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    disabled={filteredInventory.length !== 1}
+                    onClick={() =>
+                      filteredInventory.length === 1 &&
+                      onEditInventory(filteredInventory[0])
+                    }
+                  >
+                    Edit
+                  </Button>
+                </Box>
+              </Box>
+
+              <TableContainer
+                component={Paper}
+                sx={{ flex: 1, overflow: "auto" }}
+              >
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Quantity</TableCell>
+                      <TableCell>Resolves</TableCell>
+                      <TableCell>Target Group</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredInventory.length === 0 ? (
+                      <TableRow>
+                        <TableCell
+                          colSpan={4}
+                          sx={{ textAlign: "center", color: "text.secondary" }}
+                        >
+                          No inventory items
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredInventory.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell sx={{ fontWeight: "medium" }}>
+                            {item.name}
+                          </TableCell>
+                          <TableCell>{item.quantity}</TableCell>
+                          <TableCell>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: 0.5,
+                              }}
+                            >
+                              {item.resolves.map((need) => (
+                                <Chip
+                                  key={need}
+                                  label={need}
+                                  size="small"
+                                  variant="outlined"
+                                  sx={{ height: 24 }}
+                                />
+                              ))}
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            {item.group ? (
+                              <Chip
+                                label={item.group}
+                                size="small"
+                                color="info"
+                                sx={{ textTransform: "capitalize" }}
+                              />
+                            ) : (
+                              "—"
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+          {/* Incidents Tab */}
+          {activeTab === 2 && (
+            <Box
+              sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
+                }}
+              >
+                <TextField
+                  size="small"
+                  placeholder="Search incidents..."
+                  value={disasterSearch}
+                  onChange={(e) => setDisasterSearch(e.target.value)}
+                  sx={{ width: 256 }}
+                />
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => onSelectDisaster(null)}
+                  >
+                    Clear Selection
+                  </Button>
+                </Box>
+              </Box>
+
+              <TableContainer
+                component={Paper}
+                sx={{ flex: 1, overflow: "auto" }}
+              >
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Type</TableCell>
+                      <TableCell>Location</TableCell>
+                      <TableCell>Severity</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Time</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredDisasters.length === 0 ? (
+                      <TableRow>
+                        <TableCell
+                          colSpan={5}
+                          sx={{ textAlign: "center", color: "text.secondary" }}
+                        >
+                          No incidents
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredDisasters.map((disaster) => {
+                        const isSelected = selectedDisasterId === disaster.id;
+                        return (
+                          <TableRow
+                            key={disaster.id}
+                            hover
+                            selected={isSelected}
+                            onClick={() => handleSelectDisasterRow(disaster)}
+                            sx={{ cursor: "pointer" }}
+                          >
+                            <TableCell sx={{ fontWeight: "medium" }}>
+                              {disaster.type}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                maxWidth: 200,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {disaster.address}
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={disaster.severity}
+                                size="small"
+                                color={getSeverityColor(disaster.severity)}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={disaster.status}
+                                size="small"
+                                color={getStatusColor(disaster.status)}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              {new Date(disaster.timestamp).toLocaleString()}
                             </TableCell>
                           </TableRow>
                         );
