@@ -9,8 +9,8 @@ export interface Disaster {
   type: string;
   location: Coordinates;
   address: string;
-  severity: "low" | "moderate" | "critical";
-  status: "active" | "contained" | "resolved";
+  severity: "düşük" | "orta" | "kritik";
+  status: "aktif" | "kontrol-altında" | "çözüldü";
   timestamp: string;
   description: string;
   affectedRadius?: number;
@@ -20,7 +20,7 @@ export interface Resource {
   id: string;
   type: string;
   location: Coordinates;
-  status: "available" | "deployed" | "maintenance";
+  status: "uygun" | "deployed" | "maintenance";
   quantity: number;
   assignedDisaster?: string;
 }
@@ -41,12 +41,12 @@ export interface InventoryItem {
 }
 
 export type InventoryGroup =
-  | "baby"
-  | "child"
-  | "adult"
-  | "elderly"
-  | "women"
-  | "general";
+  | "bebek"
+  | "çocuk"
+  | "yetişkin"
+  | "yaşlı"
+  | "kadın"
+  | "genel";
 
 export interface Need {
   label: string;
@@ -90,11 +90,11 @@ export interface PeopleReport {
 
 // Account Management Types
 export type EntityType =
-  | "NGO"
-  | "University"
-  | "Company"
-  | "Government"
-  | "Media";
+  | "STK"
+  | "Üniversite"
+  | "Şirket"
+  | "Hükumet"
+  | "Medya";
 
 export type EmployeeRole = "ADMIN" | "USER";
 

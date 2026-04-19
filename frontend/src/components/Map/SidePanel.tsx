@@ -21,19 +21,19 @@ const SidePanel = ({ disasters }: SidePanelProps) => {
     severity: string
   ): "error" | "warning" | "info" | "success" => {
     const colors: Record<string, "error" | "warning" | "info" | "success"> = {
-      critical: "error",
-      high: "warning",
-      medium: "info",
-      low: "success",
+      "kritik": "error",
+      "yüksek": "warning",
+      "orta": "info",
+      "düşük": "success",
     };
     return colors[severity] || "default";
   };
 
   const getStatusColor = (status: string): "error" | "warning" | "success" => {
     const colors: Record<string, "error" | "warning" | "success"> = {
-      active: "error",
-      contained: "warning",
-      resolved: "success",
+      "aktif": "error",
+      "kontrol-altında": "warning",
+      "çözüldü": "success",
     };
     return colors[status] || "default";
   };
@@ -52,8 +52,8 @@ const SidePanel = ({ disasters }: SidePanelProps) => {
         onChange={(_, v) => setActiveTab(v)}
         sx={{ mx: 2, mt: 2 }}
       >
-        <Tab label="Feed" />
-        <Tab label="Info" />
+        <Tab label="Haberler" />
+        <Tab label="Bilgilendirme" />
       </Tabs>
 
       <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
@@ -124,7 +124,7 @@ const SidePanel = ({ disasters }: SidePanelProps) => {
             }}
           >
             <Typography variant="body2" color="text.disabled">
-              Coming soon...
+              Yakında...
             </Typography>
           </Box>
         )}

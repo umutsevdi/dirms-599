@@ -115,15 +115,28 @@ export default function Header({
 
           {user && (
             <>
-              <Tooltip title={user.fullName}>
-                <IconButton onClick={handleUserMenuOpen} sx={{ p: 0 }}>
-                  <Avatar
-                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.fullName.replace(/ /g, "+")}`}
-                    alt={user.fullName}
-                    sx={{ width: sizing.avatar.sm, height: sizing.avatar.sm }}
-                  />
-                </IconButton>
-              </Tooltip>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 500,
+                    display: { xs: "none", sm: "block" },
+                  }}
+                >
+                  {user.fullName}
+                </Typography>
+                <Tooltip title={user.fullName}>
+                  <IconButton onClick={handleUserMenuOpen} sx={{ p: 0 }}>
+                    <Avatar
+                      src={entity?.logoUrl}
+                      alt={entity?.name || user.fullName}
+                      sx={{ width: sizing.avatar.sm, height: sizing.avatar.sm }}
+                    >
+                      {entity?.name?.charAt(0) || user.fullName.charAt(0)}
+                    </Avatar>
+                  </IconButton>
+                </Tooltip>
+              </Box>
 
               <Menu
                 anchorEl={userMenuAnchor}

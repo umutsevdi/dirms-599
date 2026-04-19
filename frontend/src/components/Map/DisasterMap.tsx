@@ -202,6 +202,7 @@ const DisasterMap = ({
         spiderfyOnMaxZoom={true}
         showCoverageOnHover={false}
         maxClusterRadius={80}
+        disableClusteringAtZoom={12}
         onClusterClick={(e: any) => {
           const markers = e.layer.getAllChildMarkers();
           const reports = markers

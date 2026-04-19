@@ -17,6 +17,7 @@ import {
   FormGroup,
 } from "@mui/material";
 import type { InventoryItem, InventoryGroup } from "../../types";
+import { AVAILABLE_NEEDS, GROUP_OPTIONS } from "../../data";
 
 interface InventoryDialogProps {
   action: "add" | "edit";
@@ -25,25 +26,6 @@ interface InventoryDialogProps {
   onClose: () => void;
   onSave: (item: InventoryItem) => void;
 }
-
-const AVAILABLE_NEEDS = [
-  "Water",
-  "Food",
-  "Medical",
-  "Shelter",
-  "Clothing",
-  "Blankets",
-  "Power",
-];
-
-const GROUP_OPTIONS: { value: InventoryGroup; label: string }[] = [
-  { value: "general", label: "General" },
-  { value: "baby", label: "Baby" },
-  { value: "child", label: "Child" },
-  { value: "adult", label: "Adult" },
-  { value: "elderly", label: "Elderly" },
-  { value: "women", label: "Women" },
-];
 
 const InventoryDialog = ({
   action,
@@ -55,19 +37,19 @@ const InventoryDialog = ({
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [resolves, setResolves] = useState<string[]>([]);
-  const [group, setGroup] = useState<InventoryGroup>("general");
+  const [group, setGroup] = useState<InventoryGroup>("genel");
 
   useEffect(() => {
     if (item) {
       setName(item.name);
       setQuantity(item.quantity.toString());
       setResolves(item.resolves || []);
-      setGroup(item.group || "general");
+      setGroup(item.group || "genel");
     } else {
       setName("");
       setQuantity("1");
       setResolves([]);
-      setGroup("general");
+      setGroup("genel");
     }
   }, [item]);
 
@@ -86,7 +68,7 @@ const InventoryDialog = ({
       name,
       quantity: parseInt(quantity) || 1,
       resolves,
-      group: group === "general" ? undefined : group,
+      group: group === "genel" ? undefined : group,
     };
     onSave(newItem);
     onClose();
@@ -94,21 +76,21 @@ const InventoryDialog = ({
 
   return (
     <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{action === "add" ? "Add" : "Edit"} Inventory</DialogTitle>
+      <DialogTitle>Envanter {action === "add" ? "Ekle" : "Düzenle"}</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}
         >
           <TextField
-            label="Name"
+            label="Tür"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Water Bottles, First Aid Kits"
+            placeholder="e.g. Su şişesi, İlk Yardım Kiti"
             required
             fullWidth
           />
           <TextField
-            label="Quantity"
+            label="Miktar"
             type="number"
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
@@ -118,10 +100,10 @@ const InventoryDialog = ({
           />
 
           <FormControl fullWidth>
-            <InputLabel id="group-label">Target Group (Optional)</InputLabel>
+            <InputLabel id="group-label">Hedef Kitle</InputLabel>
             <Select
               labelId="group-label"
-              label="Target Group (Optional)"
+              label="Hedef Kitle"
               value={group}
               onChange={(e) => setGroup(e.target.value as InventoryGroup)}
             >
@@ -134,13 +116,13 @@ const InventoryDialog = ({
           </FormControl>
 
           <Box>
-            <FormLabel component="legend">Resolves Needs</FormLabel>
+            <FormLabel component="legend">İhtiyaçlar</FormLabel>
             <Typography
               variant="caption"
               color="text.secondary"
               sx={{ display: "block", mb: 1 }}
             >
-              Select which needs this inventory item can resolve
+              Bu ürünün giderebileceği ihtiyaçları seçiniz.
             </Typography>
             <FormGroup row sx={{ gap: 1, flexWrap: "wrap" }}>
               {AVAILABLE_NEEDS.map((need) => (
@@ -157,9 +139,9 @@ const InventoryDialog = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}>İptal Et</Button>
           <Button type="submit" variant="contained" color="primary">
-            {action === "edit" ? "Save" : "Add"}
+            Kaydet
           </Button>
         </DialogActions>
       </form>

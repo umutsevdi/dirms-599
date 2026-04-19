@@ -1,127 +1,11 @@
 import type {
-  Entity,
-  Employee,
-  EmployeeRole,
   AuthSession,
   MagicLinkToken,
-  EntityType,
+  Employee,
+  Entity,
+  EmployeeRole,
 } from "../types";
-
-// Mock data storage
-const entities: Entity[] = [
-  {
-    id: "ent-1",
-    name: "Red Cross Disaster Relief",
-    type: "NGO" as EntityType,
-    logoUrl:
-      "https://api.dicebear.com/7.x/initials/svg?seed=RC&backgroundColor=e53935",
-    description:
-      "International humanitarian NGO providing disaster relief and emergency assistance worldwide.",
-    website: "https://www.redcross.org",
-    createdAt: "2024-01-15T00:00:00Z",
-    updatedAt: "2024-01-15T00:00:00Z",
-  },
-  {
-    id: "ent-2",
-    name: "Istanbul Technical University",
-    type: "University" as EntityType,
-    logoUrl:
-      "https://api.dicebear.com/7.x/initials/svg?seed=ITU&backgroundColor=1565c0",
-    description:
-      "Leading technical university conducting disaster research and coordination.",
-    website: "https://www.itu.edu.tr",
-    createdAt: "2024-02-20T00:00:00Z",
-    updatedAt: "2024-02-20T00:00:00Z",
-  },
-  {
-    id: "ent-3",
-    name: "Emergency Response Corp",
-    type: "Company" as EntityType,
-    logoUrl:
-      "https://api.dicebear.com/7.x/initials/svg?seed=ERC&backgroundColor=2e7d32",
-    description:
-      "Private emergency response company providing rapid disaster relief services.",
-    website: "https://www.emergencyresponse.com",
-    createdAt: "2024-03-10T00:00:00Z",
-    updatedAt: "2024-03-10T00:00:00Z",
-  },
-];
-
-const employees: Employee[] = [
-  // Red Cross employees
-  {
-    id: "emp-1",
-    fullName: "Sarah Johnson",
-    email: "sarah.johnson@redcross.org",
-    entityId: "ent-1",
-    role: "ADMIN" as EmployeeRole,
-    enabled: true,
-    createdAt: "2024-01-15T00:00:00Z",
-    lastLoginAt: "2024-04-15T10:30:00Z",
-  },
-  {
-    id: "emp-2",
-    fullName: "Michael Chen",
-    email: "michael.chen@redcross.org",
-    entityId: "ent-1",
-    role: "USER" as EmployeeRole,
-    enabled: true,
-    createdAt: "2024-01-20T00:00:00Z",
-    lastLoginAt: "2024-04-14T14:20:00Z",
-  },
-  {
-    id: "emp-3",
-    fullName: "Emily Rodriguez",
-    email: "emily.rodriguez@redcross.org",
-    entityId: "ent-1",
-    role: "USER" as EmployeeRole,
-    enabled: false, // Disabled employee example
-    createdAt: "2024-02-01T00:00:00Z",
-    lastLoginAt: "2024-03-10T09:15:00Z",
-  },
-  // ITU employees
-  {
-    id: "emp-4",
-    fullName: "Prof. Ahmet Yilmaz",
-    email: "yilmaz@itu.edu.tr",
-    entityId: "ent-2",
-    role: "ADMIN" as EmployeeRole,
-    enabled: true,
-    createdAt: "2024-02-20T00:00:00Z",
-    lastLoginAt: "2024-04-19T08:45:00Z",
-  },
-  {
-    id: "emp-5",
-    fullName: "Dr. Zeynep Kaya",
-    email: "kaya@itu.edu.tr",
-    entityId: "ent-2",
-    role: "USER" as EmployeeRole,
-    enabled: true,
-    createdAt: "2024-02-25T00:00:00Z",
-    lastLoginAt: "2024-04-18T16:30:00Z",
-  },
-  // ERC employees
-  {
-    id: "emp-6",
-    fullName: "James Wilson",
-    email: "james.wilson@emergencyresponse.com",
-    entityId: "ent-3",
-    role: "ADMIN" as EmployeeRole,
-    enabled: true,
-    createdAt: "2024-03-10T00:00:00Z",
-    lastLoginAt: "2024-04-19T11:20:00Z",
-  },
-  {
-    id: "emp-7",
-    fullName: "Lisa Thompson",
-    email: "lisa.thompson@emergencyresponse.com",
-    entityId: "ent-3",
-    role: "USER" as EmployeeRole,
-    enabled: true,
-    createdAt: "2024-03-15T00:00:00Z",
-    lastLoginAt: "2024-04-17T13:45:00Z",
-  },
-];
+import { entities, employees } from "../data";
 
 // Store current session (simulating localStorage)
 let currentSession: AuthSession | null = null;
@@ -478,7 +362,7 @@ export const mockAuthService = {
   getTestCredentials: (): {
     email: string;
     password: null;
-    role: EmployeeRole;
+    role: import("../types").EmployeeRole;
     entity: string;
   }[] => {
     return employees.map((e) => ({

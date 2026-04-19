@@ -280,7 +280,7 @@ export default function OrganizationSettings() {
     >
       {/* Header */}
       <Header
-        title="Organization Settings"
+        title="Kurum"
         showBackButton
         onBack={() => (window.location.href = "/")}
       />
@@ -366,7 +366,7 @@ export default function OrganizationSettings() {
                 )}
               </Box>
               {isAdmin && (
-                <Tooltip title="Edit Organization">
+                <Tooltip title="Düzenle">
                   <IconButton
                     onClick={handleOpenEditOrg}
                     size="small"
@@ -393,7 +393,7 @@ export default function OrganizationSettings() {
                   color="text.secondary"
                   sx={{ display: "block" }}
                 >
-                  Organization ID
+                  Kurum Numarası
                 </Typography>
                 <Typography
                   variant="body2"
@@ -410,7 +410,7 @@ export default function OrganizationSettings() {
                     color="text.secondary"
                     sx={{ display: "block" }}
                   >
-                    Created
+                    Oluşturulma Tarihi
                   </Typography>
                   <Typography variant="body2">
                     {new Date(entity.createdAt).toLocaleDateString()}
@@ -422,7 +422,7 @@ export default function OrganizationSettings() {
                     color="text.secondary"
                     sx={{ display: "block" }}
                   >
-                    Updated
+                    Güncellenme Tarihi
                   </Typography>
                   <Typography variant="body2">
                     {new Date(entity.updatedAt).toLocaleDateString()}
@@ -443,7 +443,7 @@ export default function OrganizationSettings() {
             }}
           >
             <Typography variant="subtitle1" gutterBottom>
-              Your Account
+              Hesabınız
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
               <Avatar
@@ -465,7 +465,7 @@ export default function OrganizationSettings() {
               </Box>
               <Chip
                 icon={getRoleIcon(user.role)}
-                label={user.role}
+                label={user.role==="ADMIN"?"YÖNETİCİ":"ÜYE"}
                 size="small"
                 color={user.role === "ADMIN" ? "primary" : "default"}
                 variant={user.role === "ADMIN" ? "filled" : "outlined"}
@@ -479,7 +479,7 @@ export default function OrganizationSettings() {
               fullWidth
               size="small"
             >
-              Logout
+              Çıkış Yap
             </Button>
           </Paper>
         </Box>
@@ -507,14 +507,14 @@ export default function OrganizationSettings() {
                   bgcolor: "action.hover",
                 }}
               >
-                <Typography variant="subtitle1">Team Members</Typography>
+                <Typography variant="subtitle1">Üyeler</Typography>
                 <Button
                   variant="contained"
                   size="small"
                   startIcon={<AddIcon />}
                   onClick={handleOpenAdd}
                 >
-                  Add
+                  Ekle
                 </Button>
               </Box>
 
@@ -522,13 +522,13 @@ export default function OrganizationSettings() {
                 <Table size="small">
                   <TableHead>
                     <TableRow sx={{ bgcolor: "action.hover" }}>
-                      <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Role</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Last Login</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Ad</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>E-Posta</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Rol</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Durum</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Son Giriş</TableCell>
                       <TableCell align="right" sx={{ fontWeight: 600 }}>
-                        Actions
+                        Menü
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -570,7 +570,7 @@ export default function OrganizationSettings() {
                         <TableCell>
                           <Chip
                             icon={getRoleIcon(member.role)}
-                            label={member.role}
+                            label={member.role==="ADMIN"?"YÖNETİCİ":"ÜYE"}
                             size="small"
                             color={
                               member.role === "ADMIN" ? "primary" : "default"
@@ -584,7 +584,7 @@ export default function OrganizationSettings() {
                         <TableCell>
                           <Chip
                             icon={getStatusIcon(member.enabled)}
-                            label={member.enabled ? "Active" : "Disabled"}
+                            label={member.enabled ? "Açık" : "Kapalı"}
                             size="small"
                             color={member.enabled ? "success" : "error"}
                             variant="outlined"
@@ -632,7 +632,7 @@ export default function OrganizationSettings() {
                       <TableRow>
                         <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                           <Typography variant="body2" color="text.secondary">
-                            No members found
+                            Üye Bulunamadı
                           </Typography>
                         </TableCell>
                       </TableRow>
@@ -652,7 +652,7 @@ export default function OrganizationSettings() {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Edit Organization</DialogTitle>
+        <DialogTitle>Kurumu Düzenle</DialogTitle>
         <DialogContent>
           {orgError && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -662,7 +662,7 @@ export default function OrganizationSettings() {
 
           <TextField
             fullWidth
-            label="Organization Name"
+            label="Kurum Adı"
             value={editOrgForm.name}
             onChange={(e) =>
               setEditOrgForm({ ...editOrgForm, name: e.target.value })
@@ -673,14 +673,14 @@ export default function OrganizationSettings() {
 
           <TextField
             fullWidth
-            label="Logo URL"
+            label="İkon URL"
             value={editOrgForm.logoUrl}
             onChange={(e) =>
               setEditOrgForm({ ...editOrgForm, logoUrl: e.target.value })
             }
             margin="normal"
             placeholder="https://example.com/logo.png"
-            helperText="Enter a URL for your organization logo"
+            helperText="Kurumunuzun logo URL'ini giriniz"
           />
 
           <TextField
@@ -696,7 +696,7 @@ export default function OrganizationSettings() {
 
           <TextField
             fullWidth
-            label="Description"
+            label="Açıklama"
             value={editOrgForm.description}
             onChange={(e) =>
               setEditOrgForm({ ...editOrgForm, description: e.target.value })
@@ -709,14 +709,14 @@ export default function OrganizationSettings() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEditOrg} disabled={isSavingOrg}>
-            Cancel
+            İptal Et
           </Button>
           <Button
             onClick={handleSaveOrg}
             variant="contained"
             disabled={isSavingOrg || !editOrgForm.name?.trim()}
           >
-            {isSavingOrg ? "Saving..." : "Save Changes"}
+            {isSavingOrg ? "Kaydediliyor..." : "Kaydet"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -728,7 +728,7 @@ export default function OrganizationSettings() {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Add New Member</DialogTitle>
+        <DialogTitle>Yeni Üye Ekle</DialogTitle>
         <DialogContent>
           {formError && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -738,7 +738,7 @@ export default function OrganizationSettings() {
 
           <TextField
             fullWidth
-            label="Full Name"
+            label="Ad"
             value={newMember.fullName}
             onChange={(e) =>
               setNewMember({ ...newMember, fullName: e.target.value })
@@ -749,7 +749,7 @@ export default function OrganizationSettings() {
 
           <TextField
             fullWidth
-            label="Email Address"
+            label="E-Posta"
             type="email"
             value={newMember.email}
             onChange={(e) =>
@@ -760,7 +760,7 @@ export default function OrganizationSettings() {
           />
 
           <FormControl fullWidth margin="normal">
-            <InputLabel>Role</InputLabel>
+            <InputLabel>Rol</InputLabel>
             <Select
               value={newMember.role}
               label="Role"
@@ -771,8 +771,8 @@ export default function OrganizationSettings() {
                 })
               }
             >
-              <MenuItem value="USER">User (Regular access)</MenuItem>
-              <MenuItem value="ADMIN">Admin (Can manage members)</MenuItem>
+              <MenuItem value="USER">ÜYE</MenuItem>
+              <MenuItem value="ADMIN">YÖNETİCİ (Diğer Üyeleri Yönetebilir)</MenuItem>
             </Select>
           </FormControl>
 
@@ -781,13 +781,13 @@ export default function OrganizationSettings() {
             color="text.secondary"
             sx={{ mt: 2, display: "block" }}
           >
-            An invitation email with a login link will be sent to this address.
-            The link will be valid for 6 hours.
+            Kayıt linki e-posta adresine gönderilecektir. Kayıt linki 6 saat
+            boyunca geçerlidir.
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseAdd} disabled={isSubmitting}>
-            Cancel
+            İptal Et
           </Button>
           <Button
             onClick={handleAddMember}
@@ -798,7 +798,7 @@ export default function OrganizationSettings() {
               !newMember.email.trim()
             }
           >
-            {isSubmitting ? "Adding..." : "Add Member"}
+            {isSubmitting ? "Ekleniyor..." : "Ekle"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -820,7 +820,7 @@ export default function OrganizationSettings() {
 
           <TextField
             fullWidth
-            label="Full Name"
+            label="Ad"
             value={editForm.fullName}
             onChange={(e) =>
               setEditForm({ ...editForm, fullName: e.target.value })
@@ -830,10 +830,10 @@ export default function OrganizationSettings() {
           />
 
           <FormControl fullWidth margin="normal">
-            <InputLabel>Role</InputLabel>
+            <InputLabel>Rol</InputLabel>
             <Select
               value={editForm.role}
-              label="Role"
+              label="Rol"
               onChange={(e) =>
                 setEditForm({
                   ...editForm,
@@ -841,13 +841,13 @@ export default function OrganizationSettings() {
                 })
               }
             >
-              <MenuItem value="USER">User (Regular access)</MenuItem>
-              <MenuItem value="ADMIN">Admin (Can manage members)</MenuItem>
+              <MenuItem value="USER">ÜYE</MenuItem>
+              <MenuItem value="ADMIN">YÖNETİCİ (Diğer Üyeleri Yönetebilir)</MenuItem>
             </Select>
           </FormControl>
 
           <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
-            <Typography>Account Status:</Typography>
+            <Typography>Hesap Durumu:</Typography>
             <Switch
               checked={editForm.enabled}
               onChange={(e) =>
@@ -855,7 +855,7 @@ export default function OrganizationSettings() {
               }
             />
             <Chip
-              label={editForm.enabled ? "Enabled" : "Disabled"}
+              label={editForm.enabled ? "Açık" : "Kapalı"}
               size="small"
               color={editForm.enabled ? "success" : "error"}
               variant="outlined"
@@ -864,20 +864,20 @@ export default function OrganizationSettings() {
 
           {editingMember?.id === user?.id && (
             <Alert severity="warning" sx={{ mt: 2 }}>
-              You are editing your own account. Be careful with role changes!
+              Şu anda kendi kullanıcını düzenliyorsun. Rol değişikliğine dikkat et!
             </Alert>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEdit} disabled={isSubmitting}>
-            Cancel
+            İptal Et
           </Button>
           <Button
             onClick={handleEditMember}
             variant="contained"
             disabled={isSubmitting || !editForm.fullName.trim()}
           >
-            {isSubmitting ? "Saving..." : "Save Changes"}
+            {isSubmitting ? "Kaydediliyor..." : "Kaydet"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -892,10 +892,10 @@ export default function OrganizationSettings() {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Invitation Sent!</DialogTitle>
+        <DialogTitle>Davet Gönderildi!</DialogTitle>
         <DialogContent>
           <Alert severity="success" sx={{ mb: 2 }}>
-            Member added successfully. An invitation email has been sent.
+            Üye başarılı bir şekilde eklendi. Girilen e-posta adresine davet linki gönderildi.
           </Alert>
 
           <Divider sx={{ my: 2 }} />

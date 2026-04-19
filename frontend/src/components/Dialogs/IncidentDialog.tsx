@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import type { Disaster, Coordinates } from "../../types";
+import { INCIDENT_TYPES } from "../../data";
 
 interface IncidentDialogProps {
   action: "add" | "edit";
@@ -25,17 +26,6 @@ interface IncidentDialogProps {
   initialAddress?: string;
 }
 
-const INCIDENT_TYPES = [
-  "Earthquake",
-  "Flood",
-  "Wildfire",
-  "Landslide",
-  "Hurricane",
-  "Tornado",
-  "Tsunami",
-  "Other",
-];
-
 const IncidentDialog = ({
   action,
   disaster,
@@ -46,8 +36,8 @@ const IncidentDialog = ({
   initialAddress,
 }: IncidentDialogProps) => {
   const [type, setType] = useState("");
-  const [severity, setSeverity] = useState<Disaster["severity"]>("low");
-  const [status, setStatus] = useState<Disaster["status"]>("active");
+  const [severity, setSeverity] = useState<Disaster["severity"]>("düşük");
+  const [status, setStatus] = useState<Disaster["status"]>("aktif");
   const [description, setDescription] = useState("");
   const [affectedRadius, setAffectedRadius] = useState("");
   const [address, setAddress] = useState("");
@@ -67,8 +57,8 @@ const IncidentDialog = ({
       } else {
         // Reset for new incident
         setType("");
-        setSeverity("low");
-        setStatus("active");
+        setSeverity("düşük");
+        setStatus("aktif");
         setDescription("");
         setAffectedRadius("");
         setAddress(initialAddress || "");
@@ -108,7 +98,7 @@ const IncidentDialog = ({
 
   return (
     <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{isEdit ? "Edit" : "Report"} Incident</DialogTitle>
+      <DialogTitle>Hasar {isEdit ? "Düzenle" : "Bildir"}</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}
@@ -116,7 +106,7 @@ const IncidentDialog = ({
           {location && (
             <Box sx={{ mb: 1 }}>
               <Typography variant="body2" color="text.secondary">
-                Location
+                Konum
               </Typography>
               <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
                 {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
@@ -125,7 +115,7 @@ const IncidentDialog = ({
           )}
 
           <FormControl fullWidth required>
-            <InputLabel id="type-label">Incident Type</InputLabel>
+            <InputLabel id="type-label">Hasar</InputLabel>
             <Select
               labelId="type-label"
               label="Incident Type"
@@ -141,72 +131,72 @@ const IncidentDialog = ({
           </FormControl>
 
           <TextField
-            label="Address / Location Description"
+            label="Konum"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            placeholder="e.g. Downtown area, Main Street"
+            placeholder="örn. Şehir merkezi, Ana cadde"
             fullWidth
           />
 
           <FormControl fullWidth required>
-            <InputLabel id="severity-label">Severity Level</InputLabel>
+            <InputLabel id="severity-label">Risk</InputLabel>
             <Select
               labelId="severity-label"
-              label="Severity Level"
+              label="Risk"
               value={severity}
               onChange={(e) =>
                 setSeverity(e.target.value as Disaster["severity"])
               }
             >
-              <MenuItem value="low">Low</MenuItem>
-              <MenuItem value="moderate">Moderate</MenuItem>
-              <MenuItem value="critical">Critical</MenuItem>
+              <MenuItem value="low">Düşük</MenuItem>
+              <MenuItem value="moderate">Orta</MenuItem>
+              <MenuItem value="critical">Kritik</MenuItem>
             </Select>
           </FormControl>
 
           <FormControl fullWidth required>
-            <InputLabel id="status-label">Status</InputLabel>
+            <InputLabel id="status-label">Durum</InputLabel>
             <Select
               labelId="status-label"
-              label="Status"
+              label="Durum"
               value={status}
               onChange={(e) => setStatus(e.target.value as Disaster["status"])}
             >
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="contained">Contained</MenuItem>
-              <MenuItem value="resolved">Resolved</MenuItem>
+              <MenuItem value="active">Aktif</MenuItem>
+              <MenuItem value="contained">Kontrol Altında</MenuItem>
+              <MenuItem value="resolved">Çözüldü</MenuItem>
             </Select>
           </FormControl>
 
           <TextField
-            label="Description"
+            label="Açıklama"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe the incident..."
+            placeholder="Hasarı açıkla..."
             multiline
             rows={3}
             fullWidth
           />
 
           <TextField
-            label="Affected Radius (meters)"
+            label="Etki Alanı"
             type="number"
             value={affectedRadius}
             onChange={(e) => setAffectedRadius(e.target.value)}
-            placeholder="Optional - e.g. 5000"
+            placeholder="İsteğe bağlı - örn. 5000"
             slotProps={{ htmlInput: { min: 0 } }}
             fullWidth
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}>İptal Et</Button>
           <Button
             type="submit"
             variant="contained"
             color="primary"
             disabled={!type || !location}
           >
-            {isEdit ? "Update" : "Report"} Incident
+            Kaydet
           </Button>
         </DialogActions>
       </form>

@@ -28,17 +28,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useNominatim } from "../../hooks/useNominatim";
 import type { Coordinates, PeopleReport, Need } from "../../types";
-
-const NEED_OPTIONS = [
-  "Water",
-  "Food",
-  "Medical",
-  "Shelter",
-  "Clothing",
-  "Blankets",
-  "Other",
-];
-const CONTACT_METHOD_OPTIONS = ["Phone Call", "SMS", "Other"];
+import { NEED_OPTIONS, CONTACT_METHOD_OPTIONS } from "../../data";
 
 interface PeopleReportDialogProps {
   report?: PeopleReport | null;
@@ -65,7 +55,7 @@ const PeopleReportDialog = ({
   }>({
     name: "",
     phoneNumber: "",
-    contactMethod: "Phone Call",
+    contactMethod: "Telefon",
     contactDetails: "",
   });
   const [locationQuery, setLocationQuery] = useState("");
@@ -126,7 +116,7 @@ const PeopleReportDialog = ({
       setReporter({
         name: "",
         phoneNumber: "",
-        contactMethod: "Phone Call",
+        contactMethod: "Telefon",
         contactDetails: "",
       });
       setLocationQuery(initialAddress || "");
@@ -265,28 +255,28 @@ const PeopleReportDialog = ({
 
   return (
     <Dialog open={isOpen} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{report ? "Edit" : "New"} Report</DialogTitle>
+      <DialogTitle>Rapor {report ? "Düzenle" : "Bildir"}</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 2 }}
         >
           <TextField
-            label="Reporter Name"
+            label="Raporlayan"
             value={reporter.name}
             onChange={(e) =>
               setReporter((prev) => ({ ...prev, name: e.target.value }))
             }
-            placeholder="Who is reporting?"
+            placeholder="Kiminle görüşüyorsun?"
             required
             fullWidth
           />
 
           <Box ref={wrapperRef} sx={{ position: "relative" }}>
             <TextField
-              label="Location"
+              label="Konum"
               value={locationQuery}
               onChange={(e) => handleLocationChange(e.target.value)}
-              placeholder="Search for a location..."
+              placeholder="Konum ara..."
               required
               fullWidth
               slotProps={{
@@ -348,7 +338,7 @@ const PeopleReportDialog = ({
               color="text.secondary"
               sx={{ mb: 0.5, display: "block" }}
             >
-              Services Access
+              Hizmet Erişimi
             </Typography>
             <Box sx={{ display: "flex", gap: 3 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -356,7 +346,7 @@ const PeopleReportDialog = ({
                   fontSize="small"
                   sx={{ color: "text.secondary" }}
                 />
-                <Typography variant="body2">Water:</Typography>
+                <Typography variant="body2">Su:</Typography>
                 <Switch
                   checked={servicesAccess.water}
                   onChange={(e) =>
@@ -370,7 +360,7 @@ const PeopleReportDialog = ({
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <BoltIcon fontSize="small" sx={{ color: "text.secondary" }} />
-                <Typography variant="body2">Electric:</Typography>
+                <Typography variant="body2">Elektrik:</Typography>
                 <Switch
                   checked={servicesAccess.electricity}
                   onChange={(e) =>
@@ -387,13 +377,13 @@ const PeopleReportDialog = ({
 
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              Contact Information
+              İletişim Bilgileri
             </Typography>
             <Box
               sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}
             >
               <TextField
-                label="Phone Number"
+                label="Telefon Numarası"
                 value={reporter.phoneNumber}
                 onChange={(e) =>
                   setReporter((prev) => ({
@@ -419,7 +409,7 @@ const PeopleReportDialog = ({
                   fullWidth
                 >
                   <MenuItem value="" disabled>
-                    Select contact method
+                    İletişim yöntemi seçin
                   </MenuItem>
                   {CONTACT_METHOD_OPTIONS.map((option) => (
                     <MenuItem key={option} value={option}>
@@ -427,7 +417,7 @@ const PeopleReportDialog = ({
                     </MenuItem>
                   ))}
                 </Select>
-                {reporter.contactMethod === "Other" && (
+                {reporter.contactMethod === "Diğer" && (
                   <TextField
                     value={reporter.contactDetails}
                     onChange={(e) =>
@@ -436,7 +426,7 @@ const PeopleReportDialog = ({
                         contactDetails: e.target.value,
                       }))
                     }
-                    placeholder="Specify contact method..."
+                    placeholder="İletişim yöntemi giriniz..."
                     size="small"
                     fullWidth
                   />
@@ -447,7 +437,7 @@ const PeopleReportDialog = ({
 
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              People Count ({totalPeople} total)
+              Nüfus ({totalPeople})
             </Typography>
             <Box
               sx={{
@@ -456,16 +446,21 @@ const PeopleReportDialog = ({
                 gap: 2,
               }}
             >
-              {(["baby", "child", "adult", "elderly"] as const).map((group) => (
+              {([
+                { key: "baby", label: "Bebek" },
+                { key: "child", label: "Çocuk" },
+                { key: "adult", label: "Yetişkin" },
+                { key: "elderly", label: "Yaşlı" },
+              ] as const).map(({ key, label }) => (
                 <TextField
-                  key={group}
-                  label={group.charAt(0).toUpperCase() + group.slice(1)}
+                  key={key}
+                  label={label}
                   type="number"
-                  value={counts[group]}
+                  value={counts[key]}
                   onChange={(e) =>
                     setCounts((prev) => ({
                       ...prev,
-                      [group]: Math.max(0, Number(e.target.value)),
+                      [key]: Math.max(0, Number(e.target.value)),
                     }))
                   }
                   slotProps={{ htmlInput: { min: 0 } }}
@@ -478,13 +473,13 @@ const PeopleReportDialog = ({
 
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              Gender Count
+              Cinsiyet
             </Typography>
             <Box
               sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}
             >
               <TextField
-                label="Women"
+                label="Kadın"
                 type="number"
                 value={genderCounts.women}
                 onChange={(e) =>
@@ -497,7 +492,7 @@ const PeopleReportDialog = ({
                 fullWidth
               />
               <TextField
-                label="Men"
+                label="Erkek"
                 type="number"
                 value={derivedMen}
                 size="small"
@@ -515,7 +510,7 @@ const PeopleReportDialog = ({
 
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              Needs
+              İhtiyaçlar
             </Typography>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
               {NEED_OPTIONS.map((need) => (
@@ -542,7 +537,7 @@ const PeopleReportDialog = ({
                   color="text.secondary"
                   sx={{ display: "block", mb: 1 }}
                 >
-                  Priority Order (top = highest priority)
+                  Öncelik Sırası
                 </Typography>
                 {sortedNeeds.map((need, index) => (
                   <Box
@@ -601,7 +596,7 @@ const PeopleReportDialog = ({
 
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              Status
+              Durum
             </Typography>
             <Box
               sx={{
@@ -611,7 +606,7 @@ const PeopleReportDialog = ({
               }}
             >
               <TextField
-                label="Missing"
+                label="Kayıp"
                 type="number"
                 value={statusCounts.missing}
                 onChange={(e) =>
@@ -625,7 +620,7 @@ const PeopleReportDialog = ({
                 fullWidth
               />
               <TextField
-                label="Injured"
+                label="Yaralı"
                 type="number"
                 value={statusCounts.injured}
                 onChange={(e) =>
@@ -639,7 +634,7 @@ const PeopleReportDialog = ({
                 fullWidth
               />
               <TextField
-                label="Disabled"
+                label="Engelli"
                 type="number"
                 value={statusCounts.disabled}
                 onChange={(e) =>
@@ -653,7 +648,7 @@ const PeopleReportDialog = ({
                 fullWidth
               />
               <TextField
-                label="Bedridden"
+                label="Yatalak"
                 type="number"
                 value={statusCounts.bedridden}
                 onChange={(e) =>
@@ -672,7 +667,7 @@ const PeopleReportDialog = ({
           {/* Chronic Diseases Section */}
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              Chronic Diseases (optional)
+              Kronik Hastalıklar
             </Typography>
 
             {/* Existing diseases list */}
@@ -736,7 +731,7 @@ const PeopleReportDialog = ({
               }}
             >
               <TextField
-                label="Disease name"
+                label="Hastalık Adı"
                 value={newDiseaseName}
                 onChange={(e) => setNewDiseaseName(e.target.value)}
                 placeholder="e.g., Diabetes, Asthma..."
@@ -744,7 +739,7 @@ const PeopleReportDialog = ({
                 sx={{ flex: 1 }}
               />
               <TextField
-                label="Count"
+                label="Sayı"
                 type="number"
                 value={newDiseaseCount}
                 onChange={(e) =>
@@ -761,30 +756,30 @@ const PeopleReportDialog = ({
                 disabled={!newDiseaseName.trim()}
                 startIcon={<AddIcon />}
               >
-                Add
+                Ekle
               </Button>
             </Box>
           </Box>
 
           <TextField
-            label="Details"
+            label="Detaylar"
             value={details}
             onChange={(e) => setDetails(e.target.value)}
-            placeholder="Additional information..."
+            placeholder="Ek bilgi..."
             multiline
             rows={3}
             fullWidth
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}>İptal Et</Button>
           <Button
             type="submit"
             variant="contained"
             color="primary"
             disabled={!reporter.name || !locationCoords}
           >
-            {report ? "Update" : "Submit"} Report
+            Kaydet
           </Button>
         </DialogActions>
       </form>

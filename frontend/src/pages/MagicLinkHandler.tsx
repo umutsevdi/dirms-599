@@ -71,10 +71,10 @@ export default function MagicLinkHandler() {
           <>
             <CircularProgress size={48} sx={{ mb: 3 }} />
             <Typography variant="h6" gutterBottom>
-              Verifying your login...
+              Kontrol ediliyor...
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Please wait while we authenticate your session.
+              Lütfen bekleyiniz
             </Typography>
           </>
         ) : error ? (
@@ -83,14 +83,14 @@ export default function MagicLinkHandler() {
               {error}
             </Alert>
             <Typography variant="h6" gutterBottom>
-              Login Failed
+              Giriş Başarısız Oldu
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              The login link may have expired or already been used. Please
-              request a new link.
+              Giriş linkinin süresi dolmuş veya link kullanılmış olabilir. Lütfen
+              yeni bir link isteyiniz.
             </Typography>
             <Button variant="contained" onClick={() => navigate("/login")}>
-              Go to Login
+              Giriş Ekranına Dön
             </Button>
           </>
         ) : null}

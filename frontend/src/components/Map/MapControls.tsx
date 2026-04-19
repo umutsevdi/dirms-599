@@ -91,7 +91,7 @@ const MapControls = ({
               <TextField
                 fullWidth
                 size="small"
-                placeholder="Search location..."
+                placeholder="Konum ara..."
                 value={query}
                 onChange={(e) => handleInputChange(e.target.value)}
                 onFocus={() => results.length > 0 && setIsOpen(true)}
@@ -159,7 +159,7 @@ const MapControls = ({
         </Card>
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-          <Tooltip title="Zoom to my location" placement="right">
+          <Tooltip title="Kendi konumuma yaklaş" placement="right">
             <IconButton
               onClick={onMyLocation}
               sx={{
@@ -175,8 +175,8 @@ const MapControls = ({
           <Tooltip
             title={
               isAddMode
-                ? "Click on map to place incident"
-                : "Add incident on map"
+                ? "Haritada bir noktaya tıklayarak hasar kaydı bırakın"
+                : "Haritaya hasar kaydı ekle"
             }
             placement="right"
           >
@@ -199,8 +199,8 @@ const MapControls = ({
           <Tooltip
             title={
               isAddPeopleMode
-                ? "Click on map to place report"
-                : "Add report on map"
+                ? "Haritada bir noktaya tıklayarak rapor ekle"
+                : "Bir rapor ekle"
             }
             placement="right"
           >

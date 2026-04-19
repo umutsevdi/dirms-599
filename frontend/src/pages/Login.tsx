@@ -96,7 +96,7 @@ export default function Login() {
         }}
       >
         <Typography variant="h4" component="h1" gutterBottom align="center">
-          Disaster Management System
+          Afet Yönetim Sistemi
         </Typography>
         <Typography
           variant="body1"
@@ -104,7 +104,7 @@ export default function Login() {
           align="center"
           sx={{ mb: 4 }}
         >
-          Sign in with your email to access your organization account
+          Giriş yapmak için size verilmiş e-posta adresini girin
         </Typography>
 
         {error && (
@@ -116,7 +116,7 @@ export default function Login() {
         {sentToken ? (
           <Box sx={{ textAlign: "center" }}>
             <Alert severity="success" sx={{ mb: 3 }}>
-              Login link sent! Check your email.
+              Giriş linki gönderildi! E-posta adresinizi kontrol ediniz
             </Alert>
 
             <Button
@@ -127,14 +127,14 @@ export default function Login() {
               }}
               sx={{ mt: 2 }}
             >
-              Use different email
+              Başka bir e-posta adresi kullan
             </Button>
           </Box>
         ) : (
           <form onSubmit={handleSubmit}>
             <TextField
               fullWidth
-              label="Email Address"
+              label="E-posta Adresi"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -150,12 +150,12 @@ export default function Login() {
               disabled={isLoading}
               sx={{ mb: 2 }}
             >
-              {isLoading ? "Sending..." : "Send Login Link"}
+              {isLoading ? "Gönderiliyor..." : "Giriş Linki Gönder"}
             </Button>
 
             <Typography variant="body2" color="text.secondary" align="center">
-              We'll send a secure login link to your email. The link expires in
-              6 hours.
+              Size giriş yapabilmeniz için tek seferlik bir link göndereceğiz. Link 
+              6 saat içerisinde geçersiz olur.
             </Typography>
           </form>
         )}
@@ -234,7 +234,7 @@ export default function Login() {
                   dense
                   sx={{ bgcolor: "background.paper", borderRadius: 1, mb: 2 }}
                 >
-                  {testCredentials.slice(0, 4).map((cred, index) => (
+                  {testCredentials.map((cred, index) => (
                     <ListItem
                       key={index}
                       sx={{

@@ -25,12 +25,11 @@ const DisasterTimer = ({ disasters }: DisasterTimerProps) => {
         (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
       );
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
       let result = "";
-      if (days > 0) result += `${days}d `;
-      if (hours > 0 || days > 0) result += `${hours}h `;
-      result += `${minutes}m ${seconds}s`;
+      if (days > 0) result += `${days} gün `;
+      if (hours > 0 || days > 0) result += `${hours} saat `;
+      result += `${minutes} dakika`;
 
       setElapsed(result);
     };
@@ -65,7 +64,7 @@ const DisasterTimer = ({ disasters }: DisasterTimerProps) => {
           fontSize: "0.875rem",
         }}
       >
-        DISASTER
+        AFET
       </Typography>
       <Typography
         variant="body2"
@@ -85,7 +84,7 @@ const DisasterTimer = ({ disasters }: DisasterTimerProps) => {
           fontSize: "0.75rem",
         }}
       >
-        since earliest report
+        önce başladı
       </Typography>
     </Box>
   );

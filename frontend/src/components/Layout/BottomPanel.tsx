@@ -125,9 +125,9 @@ const BottomPanel = ({
       Disaster["severity"],
       "success" | "warning" | "error"
     > = {
-      low: "success",
-      moderate: "warning",
-      critical: "error",
+      "düşük": "success",
+      "orta": "warning",
+      "kritik": "error",
     };
     return colors[severity];
   };
@@ -137,9 +137,9 @@ const BottomPanel = ({
   ): "success" | "warning" | "error" => {
     const colors: Record<Disaster["status"], "success" | "warning" | "error"> =
       {
-        active: "error",
-        contained: "warning",
-        resolved: "success",
+        aktif: "error",
+        "kontrol-altında": "warning",
+        "çözüldü": "success",
       };
     return colors[status];
   };
@@ -169,9 +169,9 @@ const BottomPanel = ({
           onChange={(_, v) => setActiveTab(v)}
           sx={{ px: 2, pt: 1 }}
         >
-          <Tab label={`People (${peopleReports.length})`} />
-          <Tab label={`Inventory (${inventoryItems.length})`} />
-          <Tab label={`Incidents (${disasters.length})`} />
+          <Tab label={`Raporlar (${peopleReports.length})`} />
+          <Tab label={`Envanter (${inventoryItems.length})`} />
+          <Tab label={`Hasarlar (${disasters.length})`} />
         </Tabs>
 
         <Box
@@ -198,7 +198,7 @@ const BottomPanel = ({
               >
                 <TextField
                   size="small"
-                  placeholder="Search reports..."
+                  placeholder="Rapor ara..."
                   value={peopleSearch}
                   onChange={(e) => setPeopleSearch(e.target.value)}
                   sx={{ width: 256 }}
@@ -210,7 +210,7 @@ const BottomPanel = ({
                     onClick={onAddPeople}
                     startIcon={<AddIcon />}
                   >
-                    Add
+                    Ekle
                   </Button>
                   {selectedPeopleId && (
                     <Button
@@ -224,7 +224,7 @@ const BottomPanel = ({
                         if (report) onEditPeople(report);
                       }}
                     >
-                      Edit
+                      Düzenle
                     </Button>
                   )}
                 </Box>
@@ -237,15 +237,15 @@ const BottomPanel = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Reporter</TableCell>
-                      <TableCell>Location</TableCell>
-                      <TableCell>Total</TableCell>
-                      <TableCell>Injured</TableCell>
-                      <TableCell>Chronic</TableCell>
-                      <TableCell>Baby</TableCell>
-                      <TableCell>Child</TableCell>
-                      <TableCell>Elderly</TableCell>
-                      <TableCell>Needs</TableCell>
+                      <TableCell>Raporlayan</TableCell>
+                      <TableCell>Konum</TableCell>
+                      <TableCell>Toplam</TableCell>
+                      <TableCell>Yaralı</TableCell>
+                      <TableCell>Hasta</TableCell>
+                      <TableCell>Bebek</TableCell>
+                      <TableCell>Çocuk</TableCell>
+                      <TableCell>Yaşlı</TableCell>
+                      <TableCell>İhtiyaçlar</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -255,7 +255,7 @@ const BottomPanel = ({
                           colSpan={9}
                           sx={{ textAlign: "center", color: "text.secondary" }}
                         >
-                          No reports
+                          Rapor bulunamadı
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -342,7 +342,7 @@ const BottomPanel = ({
               >
                 <TextField
                   size="small"
-                  placeholder="Search inventory..."
+                  placeholder="Envanter ara..."
                   value={inventorySearch}
                   onChange={(e) => setInventorySearch(e.target.value)}
                   sx={{ width: 256 }}
@@ -354,7 +354,7 @@ const BottomPanel = ({
                     onClick={onAddInventory}
                     startIcon={<AddIcon />}
                   >
-                    Add
+                    Ekle
                   </Button>
                   {selectedInventoryId && (
                     <Button
@@ -368,7 +368,7 @@ const BottomPanel = ({
                         if (item) onEditInventory(item);
                       }}
                     >
-                      Edit
+                      Düzenle
                     </Button>
                   )}
                 </Box>
@@ -381,10 +381,10 @@ const BottomPanel = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Quantity</TableCell>
-                      <TableCell>Resolves</TableCell>
-                      <TableCell>Target Group</TableCell>
+                      <TableCell>Tür</TableCell>
+                      <TableCell>Miktar</TableCell>
+                      <TableCell>İhtiyaç</TableCell>
+                      <TableCell>Hedef Kitle</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -467,7 +467,7 @@ const BottomPanel = ({
               >
                 <TextField
                   size="small"
-                  placeholder="Search incidents..."
+                  placeholder="Hasar Ara..."
                   value={disasterSearch}
                   onChange={(e) => setDisasterSearch(e.target.value)}
                   sx={{ width: 256 }}
@@ -480,7 +480,7 @@ const BottomPanel = ({
                       onClick={onAddDisaster}
                       startIcon={<AddIcon />}
                     >
-                      Add
+                      Ekle
                     </Button>
                   )}
                   {selectedDisasterId && onEditDisaster && (
@@ -495,7 +495,7 @@ const BottomPanel = ({
                         if (disaster) onEditDisaster(disaster);
                       }}
                     >
-                      Edit
+                      Düzenle
                     </Button>
                   )}
                 </Box>
@@ -508,11 +508,11 @@ const BottomPanel = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Type</TableCell>
-                      <TableCell>Location</TableCell>
-                      <TableCell>Severity</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Time</TableCell>
+                      <TableCell>Hasar</TableCell>
+                      <TableCell>Konum</TableCell>
+                      <TableCell>Risk</TableCell>
+                      <TableCell>Durum</TableCell>
+                      <TableCell>Tarih</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

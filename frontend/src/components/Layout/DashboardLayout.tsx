@@ -3,7 +3,7 @@ import { useNominatim } from "../../hooks/useNominatim";
 import { useData } from "../../contexts/DataContext";
 import { Box } from "@mui/material";
 import { layout, colors } from "../../theme";
-import { peopleReports as actualPeopleReports } from "../../data";
+import { peopleReports as actualPeopleReports, sampleInventory } from "../../data";
 import DisasterMap from "../Map/DisasterMap";
 import Header from "./Header";
 import InventoryDialog from "../Dialogs/InventoryDialog";
@@ -20,61 +20,6 @@ import type {
   InventoryItem,
   PeopleReport,
 } from "../../types";
-
-const sampleInventory: InventoryItem[] = [
-  {
-    id: "inv-1",
-    name: "Water Bottles",
-    quantity: 500,
-    resolves: ["Water"],
-  },
-  {
-    id: "inv-2",
-    name: "First Aid Kits",
-    quantity: 120,
-    resolves: ["Medical"],
-  },
-  {
-    id: "inv-3",
-    name: "Baby Blankets",
-    quantity: 300,
-    resolves: ["Blankets", "Clothing"],
-    group: "baby",
-  },
-  {
-    id: "inv-4",
-    name: "Food Rations",
-    quantity: 800,
-    resolves: ["Food"],
-  },
-  {
-    id: "inv-5",
-    name: "Baby Formula",
-    quantity: 150,
-    resolves: ["Food"],
-    group: "baby",
-  },
-  {
-    id: "inv-6",
-    name: "Women's Hygiene Kits",
-    quantity: 200,
-    resolves: ["Medical", "Clothing"],
-    group: "women",
-  },
-  {
-    id: "inv-7",
-    name: "Elderly Care Supplies",
-    quantity: 100,
-    resolves: ["Medical", "Shelter"],
-    group: "elderly",
-  },
-  {
-    id: "inv-8",
-    name: "Emergency Generators",
-    quantity: 15,
-    resolves: ["Power", "Shelter"],
-  },
-];
 
 // Use theme layout constants for panel sizing
 const MIN_PANEL = layout.panel.minWidth;
@@ -147,9 +92,9 @@ const DashboardLayout = () => {
       center: d.location,
       radius: d.affectedRadius!,
       color:
-        d.severity === "critical"
+        d.severity === "kritik"
           ? colors.disaster.main
-          : d.severity === "moderate"
+          : d.severity === "orta"
             ? colors.warning.main
             : "#eab308", // Keeping yellow as it's not in our semantic palette
     }));
@@ -392,7 +337,7 @@ const DashboardLayout = () => {
         overflow: "hidden",
       }}
     >
-      <Header title="Disaster Management System" />
+      <Header title="Afet Yönetim Sistemi" />
 
       <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
         {/* Left Side Panel */}

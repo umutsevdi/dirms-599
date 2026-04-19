@@ -119,7 +119,7 @@ const aggregateReports = (reports: PeopleReport[]): AggregatedPeopleReport => {
     reporter: {
       name: reports.map((r) => r.reporter.name).join(", "),
     },
-    location: { lat: avgLat, lng: avgLng, address: "Multiple locations" },
+    location: { lat: avgLat, lng: avgLng, address: "Birden Çok Adres" },
     needs: uniqueNeeds,
     counts: {
       baby: reports.reduce((sum, r) => sum + r.counts.baby, 0),
@@ -218,10 +218,10 @@ const MapInfoBoard = ({
           >
             <Box>
               <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                Report
+                Rapor
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {`Reported by ${report.reporter.name}`}
+                {`${report.reporter.name} tarafından bildirildi`}
               </Typography>
             </Box>
             <IconButton
@@ -306,7 +306,7 @@ const MapInfoBoard = ({
             <Box sx={{ mb: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
               <Chip
                 icon={<WaterDropIcon fontSize="small" />}
-                label={`Water: ${firstReport.servicesAccess.water ? "Available" : "Not Available"}`}
+                label={`Su: ${firstReport.servicesAccess.water ? "Var" : "Yok"}`}
                 size="small"
                 color={firstReport.servicesAccess.water ? "success" : "info"}
                 variant={
@@ -315,7 +315,7 @@ const MapInfoBoard = ({
               />
               <Chip
                 icon={<BoltIcon fontSize="small" />}
-                label={`Electric: ${firstReport.servicesAccess.electricity ? "Available" : "Not Available"}`}
+                label={`Elektrik: ${firstReport.servicesAccess.electricity ? "Var" : "Yok"}`}
                 size="small"
                 color={
                   firstReport.servicesAccess.electricity ? "success" : "warning"
@@ -330,12 +330,12 @@ const MapInfoBoard = ({
             <Box sx={{ mb: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
               <Chip
                 icon={<WaterDropIcon fontSize="small" />}
-                label={`Water: ${
+                label={`Su: ${
                   report.servicesAccess.water === "available"
-                    ? "Available"
+                    ? "Var"
                     : report.servicesAccess.water === "partially"
-                      ? "Partially"
-                      : "Not Available"
+                      ? "Kısmen"
+                      : "Yok"
                 }`}
                 size="small"
                 color={
@@ -353,12 +353,12 @@ const MapInfoBoard = ({
               />
               <Chip
                 icon={<BoltIcon fontSize="small" />}
-                label={`Electric: ${
+                label={`Elektrik: ${
                   report.servicesAccess.electricity === "available"
-                    ? "Available"
+                    ? "Var"
                     : report.servicesAccess.electricity === "partially"
-                      ? "Partially"
-                      : "Not Available"
+                      ? "Kısmen"
+                      : "Yok"
                 }`}
                 size="small"
                 color={
@@ -378,7 +378,7 @@ const MapInfoBoard = ({
           )}
 
           <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
-            People ({totalPeople})
+            Nüfus ({totalPeople})
           </Typography>
           <Box
             sx={{
@@ -394,7 +394,7 @@ const MapInfoBoard = ({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <ChildCareIcon fontSize="small" sx={{ color: "pink.main" }} />
               <Typography variant="caption" sx={{ flex: 1 }}>
-                Babies
+                Bebek
               </Typography>
               <Chip
                 label={report.counts.baby}
@@ -405,7 +405,7 @@ const MapInfoBoard = ({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <SchoolIcon fontSize="small" sx={{ color: "info.main" }} />
               <Typography variant="caption" sx={{ flex: 1 }}>
-                Children
+                Çocuk
               </Typography>
               <Chip
                 label={report.counts.child}
@@ -416,7 +416,7 @@ const MapInfoBoard = ({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <PersonIcon fontSize="small" sx={{ color: "success.main" }} />
               <Typography variant="caption" sx={{ flex: 1 }}>
-                Adults
+                Yetişkin
               </Typography>
               <Chip
                 label={report.counts.adult}
@@ -427,7 +427,7 @@ const MapInfoBoard = ({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <ElderlyIcon fontSize="small" sx={{ color: "warning.main" }} />
               <Typography variant="caption" sx={{ flex: 1 }}>
-                Elderly
+                Yaşlı
               </Typography>
               <Chip
                 label={report.counts.elderly}
@@ -449,7 +449,7 @@ const MapInfoBoard = ({
               }}
             >
               <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                Status
+                Durum
               </Typography>
               {report.statusCounts.missing > 0 && (
                 <Box>
@@ -466,7 +466,7 @@ const MapInfoBoard = ({
                       <PersonSearchIcon
                         sx={{ fontSize: sizing.icon.xs, color: "error.main" }}
                       />
-                      <Typography variant="caption">Missing</Typography>
+                      <Typography variant="caption">Kayıp</Typography>
                     </Box>
                     <Typography
                       variant="caption"
@@ -502,7 +502,7 @@ const MapInfoBoard = ({
                       <LocalHospitalIcon
                         sx={{ fontSize: sizing.icon.xs, color: "warning.main" }}
                       />
-                      <Typography variant="caption">Injured</Typography>
+                      <Typography variant="caption">Yaralı</Typography>
                     </Box>
                     <Typography
                       variant="caption"
@@ -538,7 +538,7 @@ const MapInfoBoard = ({
                       <LocalHospitalIcon
                         sx={{ fontSize: sizing.icon.xs, color: "info.main" }}
                       />
-                      <Typography variant="caption">Disabled</Typography>
+                      <Typography variant="caption">Engelli</Typography>
                     </Box>
                     <Typography
                       variant="caption"
@@ -577,7 +577,7 @@ const MapInfoBoard = ({
                           color: "secondary.main",
                         }}
                       />
-                      <Typography variant="caption">Bedridden</Typography>
+                      <Typography variant="caption">Yatalak</Typography>
                     </Box>
                     <Typography
                       variant="caption"
@@ -601,7 +601,7 @@ const MapInfoBoard = ({
                 0 && (
                 <Box sx={{ mt: 1 }}>
                   <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                    Chronic Diseases
+                    Kronik Hasta
                   </Typography>
                   <Box
                     sx={{
@@ -640,13 +640,13 @@ const MapInfoBoard = ({
                       <WomanIcon
                         sx={{ fontSize: sizing.icon.xs, color: "pink.main" }}
                       />
-                      <Typography variant="caption">Gender</Typography>
+                      <Typography variant="caption">Cinsiyet</Typography>
                     </Box>
                     <Typography
                       variant="caption"
                       sx={{ fontWeight: "bold", color: "pink.main" }}
                     >
-                      Women {womenCount} · Men {menCount}
+                      Kadın {womenCount} · Erkek {menCount}
                     </Typography>
                   </Box>
                   <LinearProgress
@@ -666,7 +666,7 @@ const MapInfoBoard = ({
                 variant="subtitle2"
                 sx={{ mb: 1, fontWeight: "bold" }}
               >
-                Needs
+                İhtiyaçlar
               </Typography>
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {sortedNeeds.map((need) => (
@@ -689,7 +689,7 @@ const MapInfoBoard = ({
                 variant="subtitle2"
                 sx={{ mb: 1, fontWeight: "bold" }}
               >
-                {isCluster ? "Reports" : "Details"}
+                Detaylar
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 {peopleReports.map(
@@ -846,7 +846,7 @@ const MapInfoBoard = ({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <LocationOnIcon fontSize="small" color="action" />
               <Typography variant="body2">
-                Radius: {disaster.affectedRadius}m
+                Etki Yarıçapı: {disaster.affectedRadius}m
               </Typography>
             </Box>
           )}
@@ -861,7 +861,7 @@ const MapInfoBoard = ({
             >
               <PeopleIcon fontSize="small" color="primary" />
               <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                Affected People ({totalPeople})
+                Etkilenen İnsanlar ({totalPeople})
               </Typography>
             </Box>
 
@@ -870,7 +870,7 @@ const MapInfoBoard = ({
               color="text.secondary"
               sx={{ display: "block", mb: 0.5 }}
             >
-              Status
+              Durum
             </Typography>
             <Box
               sx={{
@@ -895,7 +895,7 @@ const MapInfoBoard = ({
                       <PersonSearchIcon
                         sx={{ fontSize: sizing.icon.xs, color: "error.main" }}
                       />
-                      <Typography variant="caption">Missing</Typography>
+                      <Typography variant="caption">Kayıp</Typography>
                     </Box>
                     <Typography variant="caption">
                       {totalMissing} ({pct(totalMissing)}%)
@@ -924,7 +924,7 @@ const MapInfoBoard = ({
                       <LocalHospitalIcon
                         sx={{ fontSize: sizing.icon.xs, color: "warning.main" }}
                       />
-                      <Typography variant="caption">Injured</Typography>
+                      <Typography variant="caption">Yaralı</Typography>
                     </Box>
                     <Typography variant="caption">
                       {totalInjured} ({pct(totalInjured)}%)
@@ -945,7 +945,7 @@ const MapInfoBoard = ({
               color="text.secondary"
               sx={{ display: "block", mb: 0.5 }}
             >
-              Age Groups
+              Yaş Grupları
             </Typography>
             <Box
               sx={{
@@ -962,7 +962,7 @@ const MapInfoBoard = ({
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <ChildCareIcon fontSize="small" sx={{ color: "pink.main" }} />
                   <Typography variant="caption" sx={{ flex: 1 }}>
-                    Babies
+                    Bebek
                   </Typography>
                   <Chip
                     label={ageGroups.baby}
@@ -975,7 +975,7 @@ const MapInfoBoard = ({
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <SchoolIcon fontSize="small" sx={{ color: "info.main" }} />
                   <Typography variant="caption" sx={{ flex: 1 }}>
-                    Children
+                    Çocuk
                   </Typography>
                   <Chip
                     label={ageGroups.child}
@@ -988,7 +988,7 @@ const MapInfoBoard = ({
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <PersonIcon fontSize="small" sx={{ color: "success.main" }} />
                   <Typography variant="caption" sx={{ flex: 1 }}>
-                    Adults
+                    Yetişkin
                   </Typography>
                   <Chip
                     label={ageGroups.adult}
@@ -1004,7 +1004,7 @@ const MapInfoBoard = ({
                     sx={{ color: "warning.main" }}
                   />
                   <Typography variant="caption" sx={{ flex: 1 }}>
-                    Elderly
+                    Yaşlı
                   </Typography>
                   <Chip
                     label={ageGroups.elderly}
@@ -1023,7 +1023,7 @@ const MapInfoBoard = ({
                   color="text.secondary"
                   sx={{ display: "block", mb: 1 }}
                 >
-                  Reports ({reports.length})
+                  Raporlar ({reports.length})
                 </Typography>
                 <Box
                   sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}
@@ -1061,7 +1061,7 @@ const MapInfoBoard = ({
                             {r.reporter.name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {reportTotal} people
+                            {reportTotal} kişi
                           </Typography>
                         </Box>
                         <Typography
