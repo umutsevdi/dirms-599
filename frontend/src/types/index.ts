@@ -89,7 +89,12 @@ export interface PeopleReport {
 }
 
 // Account Management Types
-export type EntityType = "NGO" | "University" | "Company" | "Government" | "Media";
+export type EntityType =
+  | "NGO"
+  | "University"
+  | "Company"
+  | "Government"
+  | "Media";
 
 export type EmployeeRole = "ADMIN" | "USER";
 

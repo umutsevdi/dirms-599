@@ -150,7 +150,8 @@ export const typography = {
     semibold: 600,
     bold: 700,
   },
-  fontFamilyMono: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+  fontFamilyMono:
+    "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
 } as const;
 
 // SHAPES - Flat corners for serious, professional appearance

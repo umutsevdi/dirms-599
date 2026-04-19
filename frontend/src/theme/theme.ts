@@ -183,7 +183,8 @@ const components: ThemeOptions["components"] = {
     styleOverrides: {
       root: {
         borderRadius: 0,
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+        boxShadow:
+          "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
       },
     },
   },
@@ -191,7 +192,8 @@ const components: ThemeOptions["components"] = {
     styleOverrides: {
       root: {
         borderRadius: 0,
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+        boxShadow:
+          "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
       },
     },
   },

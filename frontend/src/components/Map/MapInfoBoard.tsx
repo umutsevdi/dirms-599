@@ -57,14 +57,14 @@ const getAggregateServiceStatus = (
   const normalized = statuses.map((s) => s ?? true);
   const allAvailable = normalized.every((s) => s === true);
   const allNotAvailable = normalized.every((s) => s === false);
-  
+
   if (allAvailable) return "available";
   if (allNotAvailable) return "not-available";
   return "partially";
 };
 
 // Extended type for aggregated reports with string service status
-type AggregatedPeopleReport = Omit<PeopleReport, 'servicesAccess'> & {
+type AggregatedPeopleReport = Omit<PeopleReport, "servicesAccess"> & {
   servicesAccess: {
     water: "available" | "partially" | "not-available";
     electricity: "available" | "partially" | "not-available";
@@ -80,7 +80,9 @@ const aggregateReports = (reports: PeopleReport[]): AggregatedPeopleReport => {
       ...report,
       servicesAccess: {
         water: report.servicesAccess?.water ? "available" : "not-available",
-        electricity: report.servicesAccess?.electricity ? "available" : "not-available",
+        electricity: report.servicesAccess?.electricity
+          ? "available"
+          : "not-available",
       },
     } as AggregatedPeopleReport;
   }
@@ -152,8 +154,12 @@ const aggregateReports = (reports: PeopleReport[]): AggregatedPeopleReport => {
     disasterId: reports[0]?.disasterId || "",
     // For services access in clusters, determine aggregate status
     servicesAccess: {
-      water: getAggregateServiceStatus(reports.map((r) => r.servicesAccess?.water ?? true)),
-      electricity: getAggregateServiceStatus(reports.map((r) => r.servicesAccess?.electricity ?? true)),
+      water: getAggregateServiceStatus(
+        reports.map((r) => r.servicesAccess?.water ?? true)
+      ),
+      electricity: getAggregateServiceStatus(
+        reports.map((r) => r.servicesAccess?.electricity ?? true)
+      ),
     },
   };
 };
@@ -194,7 +200,9 @@ const MapInfoBoard = ({
           top: layout.spacing.md,
           right: layout.spacing.md,
           zIndex: layout.zIndex.mapOverlay,
-          width: isCluster ? layout.panel.infoBoardWidthCluster : layout.panel.infoBoardWidth,
+          width: isCluster
+            ? layout.panel.infoBoardWidthCluster
+            : layout.panel.infoBoardWidth,
           maxHeight: `calc(100% - ${layout.spacing.xl}px)`,
           overflow: "auto",
           boxShadow: 3,
@@ -301,14 +309,20 @@ const MapInfoBoard = ({
                 label={`Water: ${firstReport.servicesAccess.water ? "Available" : "Not Available"}`}
                 size="small"
                 color={firstReport.servicesAccess.water ? "success" : "info"}
-                variant={firstReport.servicesAccess.water ? "filled" : "outlined"}
+                variant={
+                  firstReport.servicesAccess.water ? "filled" : "outlined"
+                }
               />
               <Chip
                 icon={<BoltIcon fontSize="small" />}
                 label={`Electric: ${firstReport.servicesAccess.electricity ? "Available" : "Not Available"}`}
                 size="small"
-                color={firstReport.servicesAccess.electricity ? "success" : "warning"}
-                variant={firstReport.servicesAccess.electricity ? "filled" : "outlined"}
+                color={
+                  firstReport.servicesAccess.electricity ? "success" : "warning"
+                }
+                variant={
+                  firstReport.servicesAccess.electricity ? "filled" : "outlined"
+                }
               />
             </Box>
           )}
@@ -320,19 +334,21 @@ const MapInfoBoard = ({
                   report.servicesAccess.water === "available"
                     ? "Available"
                     : report.servicesAccess.water === "partially"
-                    ? "Partially"
-                    : "Not Available"
+                      ? "Partially"
+                      : "Not Available"
                 }`}
                 size="small"
                 color={
                   report.servicesAccess.water === "available"
                     ? "success"
                     : report.servicesAccess.water === "partially"
-                    ? "info"
-                    : "default"
+                      ? "info"
+                      : "default"
                 }
                 variant={
-                  report.servicesAccess.water === "available" ? "filled" : "outlined"
+                  report.servicesAccess.water === "available"
+                    ? "filled"
+                    : "outlined"
                 }
               />
               <Chip
@@ -341,19 +357,21 @@ const MapInfoBoard = ({
                   report.servicesAccess.electricity === "available"
                     ? "Available"
                     : report.servicesAccess.electricity === "partially"
-                    ? "Partially"
-                    : "Not Available"
+                      ? "Partially"
+                      : "Not Available"
                 }`}
                 size="small"
                 color={
                   report.servicesAccess.electricity === "available"
                     ? "success"
                     : report.servicesAccess.electricity === "partially"
-                    ? "warning"
-                    : "default"
+                      ? "warning"
+                      : "default"
                 }
                 variant={
-                  report.servicesAccess.electricity === "available" ? "filled" : "outlined"
+                  report.servicesAccess.electricity === "available"
+                    ? "filled"
+                    : "outlined"
                 }
               />
             </Box>
@@ -554,7 +572,10 @@ const MapInfoBoard = ({
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
                       <LocalHospitalIcon
-                        sx={{ fontSize: sizing.icon.xs, color: "secondary.main" }}
+                        sx={{
+                          fontSize: sizing.icon.xs,
+                          color: "secondary.main",
+                        }}
                       />
                       <Typography variant="caption">Bedridden</Typography>
                     </Box>
@@ -616,7 +637,9 @@ const MapInfoBoard = ({
                     <Box
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
-                      <WomanIcon sx={{ fontSize: sizing.icon.xs, color: "pink.main" }} />
+                      <WomanIcon
+                        sx={{ fontSize: sizing.icon.xs, color: "pink.main" }}
+                      />
                       <Typography variant="caption">Gender</Typography>
                     </Box>
                     <Typography

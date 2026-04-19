@@ -36,7 +36,9 @@ export default function Header({
 }: HeaderProps) {
   const { user, entity, logout } = useAuth();
   const { disasters } = useData();
-  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
+  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setUserMenuAnchor(event.currentTarget);
@@ -74,9 +76,7 @@ export default function Header({
           )}
 
           {/* Page Title */}
-          <Typography variant="h6">
-            {title}
-          </Typography>
+          <Typography variant="h6">{title}</Typography>
 
           {/* Disaster Timer - right of title */}
           <DisasterTimer
@@ -99,7 +99,7 @@ export default function Header({
               size="small"
               color="primary"
               variant="outlined"
-              onClick={() => window.location.href = "/organization"}
+              onClick={() => (window.location.href = "/organization")}
               sx={{
                 display: { xs: "none", sm: "flex" },
                 cursor: "pointer",
@@ -173,7 +173,9 @@ export default function Header({
 
                 <Divider />
 
-                <MenuItem onClick={() => window.location.href = "/organization"}>
+                <MenuItem
+                  onClick={() => (window.location.href = "/organization")}
+                >
                   <ListItemIcon>
                     <BusinessIcon fontSize="small" />
                   </ListItemIcon>

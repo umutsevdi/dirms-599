@@ -343,12 +343,19 @@ const PeopleReportDialog = ({
 
           {/* Services Access Section */}
           <Box>
-            <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: "block" }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mb: 0.5, display: "block" }}
+            >
               Services Access
             </Typography>
             <Box sx={{ display: "flex", gap: 3 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <WaterDropIcon fontSize="small" sx={{ color: "text.secondary" }} />
+                <WaterDropIcon
+                  fontSize="small"
+                  sx={{ color: "text.secondary" }}
+                />
                 <Typography variant="body2">Water:</Typography>
                 <Switch
                   checked={servicesAccess.water}

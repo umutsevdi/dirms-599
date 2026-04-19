@@ -98,7 +98,12 @@ export default function Login() {
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Disaster Management System
         </Typography>
-        <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 4 }}>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          align="center"
+          sx={{ mb: 4 }}
+        >
           Sign in with your email to access your organization account
         </Typography>
 
@@ -149,8 +154,8 @@ export default function Login() {
             </Button>
 
             <Typography variant="body2" color="text.secondary" align="center">
-              We'll send a secure login link to your email.
-              The link expires in 6 hours.
+              We'll send a secure login link to your email. The link expires in
+              6 hours.
             </Typography>
           </form>
         )}
@@ -174,7 +179,11 @@ export default function Login() {
 
             {sentToken ? (
               <>
-                <Typography variant="caption" color="success.dark" sx={{ display: "block", mb: 1, fontWeight: 500 }}>
+                <Typography
+                  variant="caption"
+                  color="success.dark"
+                  sx={{ display: "block", mb: 1, fontWeight: 500 }}
+                >
                   ✉️ Email sent! Now simulate clicking the link:
                 </Typography>
                 <Button
@@ -214,10 +223,17 @@ export default function Login() {
               </>
             ) : (
               <>
-                <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", mb: 1 }}
+                >
                   Auto-fill Email & Submit:
                 </Typography>
-                <List dense sx={{ bgcolor: "background.paper", borderRadius: 1, mb: 2 }}>
+                <List
+                  dense
+                  sx={{ bgcolor: "background.paper", borderRadius: 1, mb: 2 }}
+                >
                   {testCredentials.slice(0, 4).map((cred, index) => (
                     <ListItem
                       key={index}
@@ -239,15 +255,30 @@ export default function Login() {
                         }}
                         primary={cred.email}
                         secondary={
-                          <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              gap: 0.5,
+                              alignItems: "center",
+                            }}
+                          >
                             <Chip
                               label={cred.role}
                               size="small"
-                              color={cred.role === "ADMIN" ? "primary" : "default"}
-                              variant={cred.role === "ADMIN" ? "filled" : "outlined"}
+                              color={
+                                cred.role === "ADMIN" ? "primary" : "default"
+                              }
+                              variant={
+                                cred.role === "ADMIN" ? "filled" : "outlined"
+                              }
                               sx={{ height: 16, fontSize: "0.625rem" }}
                             />
-                            <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: "0.625rem" }}>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              noWrap
+                              sx={{ fontSize: "0.625rem" }}
+                            >
                               {cred.entity}
                             </Typography>
                           </Box>
@@ -258,7 +289,6 @@ export default function Login() {
                 </List>
               </>
             )}
-
           </CardContent>
         </Card>
       </Box>

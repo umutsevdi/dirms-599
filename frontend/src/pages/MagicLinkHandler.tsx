@@ -1,6 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Box, Paper, Typography, CircularProgress, Alert, Button } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Typography,
+  CircularProgress,
+  Alert,
+  Button,
+} from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function MagicLinkHandler() {
@@ -14,7 +21,7 @@ export default function MagicLinkHandler() {
   useEffect(() => {
     // Prevent double-processing due to React StrictMode or re-renders
     if (hasProcessed.current) return;
-    
+
     const token = searchParams.get("token");
 
     if (!token) {
@@ -79,8 +86,8 @@ export default function MagicLinkHandler() {
               Login Failed
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              The login link may have expired or already been used.
-              Please request a new link.
+              The login link may have expired or already been used. Please
+              request a new link.
             </Typography>
             <Button variant="contained" onClick={() => navigate("/login")}>
               Go to Login

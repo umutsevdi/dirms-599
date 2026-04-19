@@ -182,7 +182,9 @@ export default function OrganizationSettings() {
     const result = await mockAuthService.addEmployee(newMember);
 
     if (result.success && result.employee) {
-      const linkResult = await mockAuthService.requestMagicLink(newMember.email);
+      const linkResult = await mockAuthService.requestMagicLink(
+        newMember.email
+      );
       if (linkResult.success && linkResult.token) {
         setInvitationToken(linkResult.token);
         setIsAddDialogOpen(false);
@@ -203,7 +205,10 @@ export default function OrganizationSettings() {
     setIsSubmitting(true);
     setFormError(null);
 
-    const result = await mockAuthService.editEmployee(editingMember.id, editForm);
+    const result = await mockAuthService.editEmployee(
+      editingMember.id,
+      editForm
+    );
 
     if (result.success) {
       loadMembers();
@@ -274,7 +279,11 @@ export default function OrganizationSettings() {
       }}
     >
       {/* Header */}
-      <Header title="Organization Settings" showBackButton onBack={() => window.location.href = "/"} />
+      <Header
+        title="Organization Settings"
+        showBackButton
+        onBack={() => (window.location.href = "/")}
+      />
 
       {/* Alerts */}
       <Box sx={{ px: 3, pt: 2 }}>
@@ -321,11 +330,17 @@ export default function OrganizationSettings() {
               height: "fit-content",
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2, mb: 3 }}>
+            <Box
+              sx={{ display: "flex", alignItems: "flex-start", gap: 2, mb: 3 }}
+            >
               <Avatar
                 src={entity.logoUrl}
                 alt={entity.name}
-                sx={{ width: sizing.avatar.lg, height: sizing.avatar.lg, fontSize: 32 }}
+                sx={{
+                  width: sizing.avatar.lg,
+                  height: sizing.avatar.lg,
+                  fontSize: 32,
+                }}
               >
                 {entity.name.charAt(0)}
               </Avatar>
@@ -352,7 +367,11 @@ export default function OrganizationSettings() {
               </Box>
               {isAdmin && (
                 <Tooltip title="Edit Organization">
-                  <IconButton onClick={handleOpenEditOrg} size="small" color="primary">
+                  <IconButton
+                    onClick={handleOpenEditOrg}
+                    size="small"
+                    color="primary"
+                  >
                     <EditIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -369,17 +388,28 @@ export default function OrganizationSettings() {
 
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Box>
-                <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block" }}
+                >
                   Organization ID
                 </Typography>
-                <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: "0.875rem" }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontFamily: "monospace", fontSize: "0.875rem" }}
+                >
                   {entity.id}
                 </Typography>
               </Box>
 
               <Box sx={{ display: "flex", gap: 4 }}>
                 <Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block" }}
+                  >
                     Created
                   </Typography>
                   <Typography variant="body2">
@@ -387,7 +417,11 @@ export default function OrganizationSettings() {
                   </Typography>
                 </Box>
                 <Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block" }}
+                  >
                     Updated
                   </Typography>
                   <Typography variant="body2">
@@ -421,7 +455,11 @@ export default function OrganizationSettings() {
                 <Typography variant="body1" sx={{ fontWeight: 500 }}>
                   {user.fullName}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.875rem" }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ fontSize: "0.875rem" }}
+                >
                   {user.email}
                 </Typography>
               </Box>
@@ -489,7 +527,9 @@ export default function OrganizationSettings() {
                       <TableCell sx={{ fontWeight: 600 }}>Role</TableCell>
                       <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
                       <TableCell sx={{ fontWeight: 600 }}>Last Login</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 600 }}>
+                        Actions
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -498,26 +538,46 @@ export default function OrganizationSettings() {
                         key={member.id}
                         sx={{
                           opacity: member.enabled ? 1 : 0.6,
-                          bgcolor: member.id === user?.id ? "action.selected" : "inherit",
+                          bgcolor:
+                            member.id === user?.id
+                              ? "action.selected"
+                              : "inherit",
                           "&:hover": { bgcolor: "action.hover" },
                         }}
                       >
                         <TableCell>
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
                             {member.fullName}
                             {member.id === user?.id && (
-                              <Chip label="You" size="small" variant="outlined" sx={{ height: 20 }} />
+                              <Chip
+                                label="You"
+                                size="small"
+                                variant="outlined"
+                                sx={{ height: 20 }}
+                              />
                             )}
                           </Box>
                         </TableCell>
-                        <TableCell sx={{ fontSize: "0.875rem" }}>{member.email}</TableCell>
+                        <TableCell sx={{ fontSize: "0.875rem" }}>
+                          {member.email}
+                        </TableCell>
                         <TableCell>
                           <Chip
                             icon={getRoleIcon(member.role)}
                             label={member.role}
                             size="small"
-                            color={member.role === "ADMIN" ? "primary" : "default"}
-                            variant={member.role === "ADMIN" ? "filled" : "outlined"}
+                            color={
+                              member.role === "ADMIN" ? "primary" : "default"
+                            }
+                            variant={
+                              member.role === "ADMIN" ? "filled" : "outlined"
+                            }
                             sx={{ height: 24 }}
                           />
                         </TableCell>
@@ -541,19 +601,28 @@ export default function OrganizationSettings() {
                             <IconButton
                               size="small"
                               onClick={() => handleOpenEdit(member)}
-                              disabled={member.id === user?.id && member.role === "ADMIN"}
+                              disabled={
+                                member.id === user?.id &&
+                                member.role === "ADMIN"
+                              }
                             >
                               <EditIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title={member.enabled ? "Disable" : "Enable"}>
+                          <Tooltip
+                            title={member.enabled ? "Disable" : "Enable"}
+                          >
                             <IconButton
                               size="small"
                               onClick={() => handleToggleEnabled(member)}
                               color={member.enabled ? "error" : "success"}
                               disabled={member.id === user?.id}
                             >
-                              {member.enabled ? <BlockIcon fontSize="small" /> : <CheckCircleIcon fontSize="small" />}
+                              {member.enabled ? (
+                                <BlockIcon fontSize="small" />
+                              ) : (
+                                <CheckCircleIcon fontSize="small" />
+                              )}
                             </IconButton>
                           </Tooltip>
                         </TableCell>
@@ -577,7 +646,12 @@ export default function OrganizationSettings() {
       </Box>
 
       {/* Organization Edit Dialog */}
-      <Dialog open={isEditingOrg} onClose={handleCloseEditOrg} maxWidth="sm" fullWidth>
+      <Dialog
+        open={isEditingOrg}
+        onClose={handleCloseEditOrg}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Edit Organization</DialogTitle>
         <DialogContent>
           {orgError && (
@@ -590,7 +664,9 @@ export default function OrganizationSettings() {
             fullWidth
             label="Organization Name"
             value={editOrgForm.name}
-            onChange={(e) => setEditOrgForm({ ...editOrgForm, name: e.target.value })}
+            onChange={(e) =>
+              setEditOrgForm({ ...editOrgForm, name: e.target.value })
+            }
             margin="normal"
             required
           />
@@ -599,7 +675,9 @@ export default function OrganizationSettings() {
             fullWidth
             label="Logo URL"
             value={editOrgForm.logoUrl}
-            onChange={(e) => setEditOrgForm({ ...editOrgForm, logoUrl: e.target.value })}
+            onChange={(e) =>
+              setEditOrgForm({ ...editOrgForm, logoUrl: e.target.value })
+            }
             margin="normal"
             placeholder="https://example.com/logo.png"
             helperText="Enter a URL for your organization logo"
@@ -609,7 +687,9 @@ export default function OrganizationSettings() {
             fullWidth
             label="Website"
             value={editOrgForm.website}
-            onChange={(e) => setEditOrgForm({ ...editOrgForm, website: e.target.value })}
+            onChange={(e) =>
+              setEditOrgForm({ ...editOrgForm, website: e.target.value })
+            }
             margin="normal"
             placeholder="https://www.example.com"
           />
@@ -618,7 +698,9 @@ export default function OrganizationSettings() {
             fullWidth
             label="Description"
             value={editOrgForm.description}
-            onChange={(e) => setEditOrgForm({ ...editOrgForm, description: e.target.value })}
+            onChange={(e) =>
+              setEditOrgForm({ ...editOrgForm, description: e.target.value })
+            }
             margin="normal"
             multiline
             rows={4}
@@ -640,7 +722,12 @@ export default function OrganizationSettings() {
       </Dialog>
 
       {/* Add Member Dialog */}
-      <Dialog open={isAddDialogOpen} onClose={handleCloseAdd} maxWidth="sm" fullWidth>
+      <Dialog
+        open={isAddDialogOpen}
+        onClose={handleCloseAdd}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Add New Member</DialogTitle>
         <DialogContent>
           {formError && (
@@ -653,7 +740,9 @@ export default function OrganizationSettings() {
             fullWidth
             label="Full Name"
             value={newMember.fullName}
-            onChange={(e) => setNewMember({ ...newMember, fullName: e.target.value })}
+            onChange={(e) =>
+              setNewMember({ ...newMember, fullName: e.target.value })
+            }
             margin="normal"
             required
           />
@@ -663,7 +752,9 @@ export default function OrganizationSettings() {
             label="Email Address"
             type="email"
             value={newMember.email}
-            onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
+            onChange={(e) =>
+              setNewMember({ ...newMember, email: e.target.value })
+            }
             margin="normal"
             required
           />
@@ -674,7 +765,10 @@ export default function OrganizationSettings() {
               value={newMember.role}
               label="Role"
               onChange={(e) =>
-                setNewMember({ ...newMember, role: e.target.value as EmployeeRole })
+                setNewMember({
+                  ...newMember,
+                  role: e.target.value as EmployeeRole,
+                })
               }
             >
               <MenuItem value="USER">User (Regular access)</MenuItem>
@@ -682,7 +776,11 @@ export default function OrganizationSettings() {
             </Select>
           </FormControl>
 
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: "block" }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mt: 2, display: "block" }}
+          >
             An invitation email with a login link will be sent to this address.
             The link will be valid for 6 hours.
           </Typography>
@@ -694,7 +792,11 @@ export default function OrganizationSettings() {
           <Button
             onClick={handleAddMember}
             variant="contained"
-            disabled={isSubmitting || !newMember.fullName.trim() || !newMember.email.trim()}
+            disabled={
+              isSubmitting ||
+              !newMember.fullName.trim() ||
+              !newMember.email.trim()
+            }
           >
             {isSubmitting ? "Adding..." : "Add Member"}
           </Button>
@@ -702,7 +804,12 @@ export default function OrganizationSettings() {
       </Dialog>
 
       {/* Edit Member Dialog */}
-      <Dialog open={isEditDialogOpen} onClose={handleCloseEdit} maxWidth="sm" fullWidth>
+      <Dialog
+        open={isEditDialogOpen}
+        onClose={handleCloseEdit}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Edit Member</DialogTitle>
         <DialogContent>
           {formError && (
@@ -715,7 +822,9 @@ export default function OrganizationSettings() {
             fullWidth
             label="Full Name"
             value={editForm.fullName}
-            onChange={(e) => setEditForm({ ...editForm, fullName: e.target.value })}
+            onChange={(e) =>
+              setEditForm({ ...editForm, fullName: e.target.value })
+            }
             margin="normal"
             required
           />
@@ -726,7 +835,10 @@ export default function OrganizationSettings() {
               value={editForm.role}
               label="Role"
               onChange={(e) =>
-                setEditForm({ ...editForm, role: e.target.value as EmployeeRole })
+                setEditForm({
+                  ...editForm,
+                  role: e.target.value as EmployeeRole,
+                })
               }
             >
               <MenuItem value="USER">User (Regular access)</MenuItem>
@@ -738,7 +850,9 @@ export default function OrganizationSettings() {
             <Typography>Account Status:</Typography>
             <Switch
               checked={editForm.enabled}
-              onChange={(e) => setEditForm({ ...editForm, enabled: e.target.checked })}
+              onChange={(e) =>
+                setEditForm({ ...editForm, enabled: e.target.checked })
+              }
             />
             <Chip
               label={editForm.enabled ? "Enabled" : "Disabled"}
@@ -791,7 +905,8 @@ export default function OrganizationSettings() {
           </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            In production, this link would be sent via email. For testing, you can copy or click the link below:
+            In production, this link would be sent via email. For testing, you
+            can copy or click the link below:
           </Typography>
 
           <Box
@@ -805,7 +920,8 @@ export default function OrganizationSettings() {
               mb: 2,
             }}
           >
-            {invitationToken && `${window.location.origin}/auth/verify?token=${invitationToken}`}
+            {invitationToken &&
+              `${window.location.origin}/auth/verify?token=${invitationToken}`}
           </Box>
         </DialogContent>
         <DialogActions>

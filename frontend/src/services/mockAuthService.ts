@@ -13,8 +13,10 @@ const entities: Entity[] = [
     id: "ent-1",
     name: "Red Cross Disaster Relief",
     type: "NGO" as EntityType,
-    logoUrl: "https://api.dicebear.com/7.x/initials/svg?seed=RC&backgroundColor=e53935",
-    description: "International humanitarian NGO providing disaster relief and emergency assistance worldwide.",
+    logoUrl:
+      "https://api.dicebear.com/7.x/initials/svg?seed=RC&backgroundColor=e53935",
+    description:
+      "International humanitarian NGO providing disaster relief and emergency assistance worldwide.",
     website: "https://www.redcross.org",
     createdAt: "2024-01-15T00:00:00Z",
     updatedAt: "2024-01-15T00:00:00Z",
@@ -23,8 +25,10 @@ const entities: Entity[] = [
     id: "ent-2",
     name: "Istanbul Technical University",
     type: "University" as EntityType,
-    logoUrl: "https://api.dicebear.com/7.x/initials/svg?seed=ITU&backgroundColor=1565c0",
-    description: "Leading technical university conducting disaster research and coordination.",
+    logoUrl:
+      "https://api.dicebear.com/7.x/initials/svg?seed=ITU&backgroundColor=1565c0",
+    description:
+      "Leading technical university conducting disaster research and coordination.",
     website: "https://www.itu.edu.tr",
     createdAt: "2024-02-20T00:00:00Z",
     updatedAt: "2024-02-20T00:00:00Z",
@@ -33,8 +37,10 @@ const entities: Entity[] = [
     id: "ent-3",
     name: "Emergency Response Corp",
     type: "Company" as EntityType,
-    logoUrl: "https://api.dicebear.com/7.x/initials/svg?seed=ERC&backgroundColor=2e7d32",
-    description: "Private emergency response company providing rapid disaster relief services.",
+    logoUrl:
+      "https://api.dicebear.com/7.x/initials/svg?seed=ERC&backgroundColor=2e7d32",
+    description:
+      "Private emergency response company providing rapid disaster relief services.",
     website: "https://www.emergencyresponse.com",
     createdAt: "2024-03-10T00:00:00Z",
     updatedAt: "2024-03-10T00:00:00Z",
@@ -121,7 +127,8 @@ const employees: Employee[] = [
 let currentSession: AuthSession | null = null;
 
 // Helper functions
-const generateId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateId = (prefix: string) =>
+  `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 const addHours = (date: Date, hours: number) => {
   const result = new Date(date);
@@ -164,7 +171,10 @@ const findMagicLinkToken = (token: string): MagicLinkToken | undefined => {
   return tokens.find((t) => t.token === token);
 };
 
-const updateMagicLinkToken = (token: string, updates: Partial<MagicLinkToken>) => {
+const updateMagicLinkToken = (
+  token: string,
+  updates: Partial<MagicLinkToken>
+) => {
   const tokens = getMagicLinkTokens();
   const index = tokens.findIndex((t) => t.token === token);
   if (index !== -1) {
@@ -235,17 +245,24 @@ export const mockAuthService = {
   },
 
   // Request magic link (simulates sending email)
-  requestMagicLink: async (email: string): Promise<{ success: boolean; token?: string; error?: string }> => {
+  requestMagicLink: async (
+    email: string
+  ): Promise<{ success: boolean; token?: string; error?: string }> => {
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const employee = employees.find((e) => e.email.toLowerCase() === email.toLowerCase());
+    const employee = employees.find(
+      (e) => e.email.toLowerCase() === email.toLowerCase()
+    );
     if (!employee) {
       return { success: false, error: "No account found with this email" };
     }
 
     if (!employee.enabled) {
-      return { success: false, error: "Account has been disabled. Contact your administrator." };
+      return {
+        success: false,
+        error: "Account has been disabled. Contact your administrator.",
+      };
     }
 
     // Generate magic link token (valid for 6 hours)
@@ -265,7 +282,9 @@ export const mockAuthService = {
   },
 
   // Verify magic link and create session
-  verifyMagicLink: async (token: string): Promise<{ success: boolean; session?: AuthSession; error?: string }> => {
+  verifyMagicLink: async (
+    token: string
+  ): Promise<{ success: boolean; session?: AuthSession; error?: string }> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     const magicToken = findMagicLinkToken(token);
@@ -278,7 +297,10 @@ export const mockAuthService = {
     }
 
     if (new Date(magicToken.expiresAt) < new Date()) {
-      return { success: false, error: "Link has expired. Please request a new one." };
+      return {
+        success: false,
+        error: "Link has expired. Please request a new one.",
+      };
     }
 
     const employee = employees.find((e) => e.id === magicToken.employeeId);
@@ -354,8 +376,13 @@ export const mockAuthService = {
     }
 
     // Check if email already exists
-    if (employees.some((e) => e.email.toLowerCase() === data.email.toLowerCase())) {
-      return { success: false, error: "An employee with this email already exists" };
+    if (
+      employees.some((e) => e.email.toLowerCase() === data.email.toLowerCase())
+    ) {
+      return {
+        success: false,
+        error: "An employee with this email already exists",
+      };
     }
 
     const newEmployee: Employee = {
@@ -397,10 +424,17 @@ export const mockAuthService = {
     // Can't edit yourself's role if you're the only admin
     if (employeeId === session.userId && data.role && data.role !== "ADMIN") {
       const entityAdmins = employees.filter(
-        (e) => e.entityId === session.entityId && e.role === "ADMIN" && e.enabled && e.id !== employeeId
+        (e) =>
+          e.entityId === session.entityId &&
+          e.role === "ADMIN" &&
+          e.enabled &&
+          e.id !== employeeId
       );
       if (entityAdmins.length === 0) {
-        return { success: false, error: "Cannot demote yourself - you are the only admin" };
+        return {
+          success: false,
+          error: "Cannot demote yourself - you are the only admin",
+        };
       }
     }
 
@@ -441,7 +475,12 @@ export const mockAuthService = {
   },
 
   // For development: get all test credentials
-  getTestCredentials: (): { email: string; password: null; role: EmployeeRole; entity: string }[] => {
+  getTestCredentials: (): {
+    email: string;
+    password: null;
+    role: EmployeeRole;
+    entity: string;
+  }[] => {
     return employees.map((e) => ({
       email: e.email,
       password: null,

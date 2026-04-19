@@ -30,10 +30,7 @@ const defaultIcon = new Icon({
 /**
  * Create marker icon HTML with consistent styling
  */
-const createMarkerHtml = (
-  backgroundColor: string,
-  content: string
-): string => {
+const createMarkerHtml = (backgroundColor: string, content: string): string => {
   return `<div style="background-color:${backgroundColor};color:white;border-radius:50%;width:${sizing.marker.width}px;height:${sizing.marker.height}px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:${sizing.marker.fontSize}px">${content}</div>`;
 };
 

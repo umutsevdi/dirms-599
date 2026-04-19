@@ -94,12 +94,22 @@ export const FloatingInfoCard = styled(Box, {
 /**
  * Get chip styles for age groups
  */
-export const getAgeGroupChipStyles = (type: "baby" | "child" | "adult" | "elderly") => {
+export const getAgeGroupChipStyles = (
+  type: "baby" | "child" | "adult" | "elderly"
+) => {
   const colorMap = {
     baby: { bg: "pink.50", color: "pink.700", icon: colors.ageGroups.baby },
     child: { bg: "info.50", color: "info.700", icon: colors.ageGroups.child },
-    adult: { bg: "success.50", color: "success.700", icon: colors.ageGroups.adult },
-    elderly: { bg: "warning.50", color: "warning.700", icon: colors.ageGroups.elderly },
+    adult: {
+      bg: "success.50",
+      color: "success.700",
+      icon: colors.ageGroups.adult,
+    },
+    elderly: {
+      bg: "warning.50",
+      color: "warning.700",
+      icon: colors.ageGroups.elderly,
+    },
   };
   return {
     height: sizing.chip.sm,

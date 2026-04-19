@@ -18,8 +18,12 @@ interface AuthContextType {
   isAdmin: boolean;
 
   // Actions
-  login: (email: string) => Promise<{ success: boolean; token?: string; error?: string }>;
-  verifyMagicLink: (token: string) => Promise<{ success: boolean; error?: string }>;
+  login: (
+    email: string
+  ) => Promise<{ success: boolean; token?: string; error?: string }>;
+  verifyMagicLink: (
+    token: string
+  ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   refreshUser: () => void;
 }
@@ -64,7 +68,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [user]);
 
   const login = useCallback(
-    async (email: string): Promise<{ success: boolean; token?: string; error?: string }> => {
+    async (
+      email: string
+    ): Promise<{ success: boolean; token?: string; error?: string }> => {
       const result = await mockAuthService.requestMagicLink(email);
       return result;
     },
