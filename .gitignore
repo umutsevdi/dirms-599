@@ -1,5 +1,5 @@
 # Confidential data files
-frontend/src/mock/*
+frontend/src/mocks/*
 
 # Logs
 logs

@@ -478,21 +478,19 @@ const DashboardLayout = () => {
               }}
               onMouseDown={handleBottomPanelResizeStart}
             />
-            <Box sx={{ pt: 0.5, flex: 1, overflow: "hidden" }}>
-              <BottomPanel
-                disasters={disasters}
-                inventoryItems={inventoryItems}
-                peopleReports={peopleReports}
-                onAddInventory={handleAddInventory}
-                onEditInventory={handleEditInventory}
-                onAddPeople={handleAddPeople}
-                onEditPeople={handleEditPeople}
-                onSelectPeople={handleSelectPeople}
-                onSelectDisaster={handleSelectDisaster}
-                onAddDisaster={handleAddDisaster}
-                onEditDisaster={handleEditDisaster}
-              />
-            </Box>
+            <BottomPanel
+              disasters={disasters}
+              inventoryItems={inventoryItems}
+              peopleReports={peopleReports}
+              onAddInventory={handleAddInventory}
+              onEditInventory={handleEditInventory}
+              onAddPeople={handleAddPeople}
+              onEditPeople={handleEditPeople}
+              onSelectPeople={handleSelectPeople}
+              onSelectDisaster={handleSelectDisaster}
+              onAddDisaster={handleAddDisaster}
+              onEditDisaster={handleEditDisaster}
+            />
           </Box>
         </Box>
       </Box>

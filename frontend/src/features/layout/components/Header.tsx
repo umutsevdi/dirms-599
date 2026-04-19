@@ -192,7 +192,7 @@ export default function Header({
                   <ListItemIcon>
                     <BusinessIcon fontSize="small" />
                   </ListItemIcon>
-                  Organization Settings
+                  Kurum Ayarları
                 </MenuItem>
 
                 <Divider />
@@ -201,7 +201,7 @@ export default function Header({
                   <ListItemIcon>
                     <LogoutIcon fontSize="small" />
                   </ListItemIcon>
-                  Logout
+                  Çıkış Yap
                 </MenuItem>
               </Menu>
             </>
