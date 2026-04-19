@@ -1,3 +1,10 @@
+/**
+ * Inter Font - Professional typography for disaster management
+ * Weights: 300 (Light), 400 (Regular), 500 (Medium), 600 (Semibold), 700 (Bold)
+ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* CSS Reset */
 * {
   margin: 0;
   padding: 0;
@@ -9,4 +16,64 @@ body,
 #root {
   height: 100%;
   width: 100%;
+}
+
+/* Base font settings */
+body {
+  font-family: "Inter", "Roboto", "Helvetica", "Arial", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Flat corner preference for all elements */
+* {
+  /* Note: Most components use MUI theme with borderRadius: 0 */
+  /* This is a fallback for non-MUI elements */
+}
+
+/* ============================================
+   LEAFLET MAP MARKER Z-INDEX PRIORITIZATION
+   People reports must appear above incidents
+   ============================================ */
+
+/* People markers - highest priority (z-index: 1000) */
+.custom-people-icon,
+.custom-people-cluster-icon {
+  z-index: 1000 !important;
+}
+
+.custom-people-icon div,
+.custom-people-cluster-icon div {
+  z-index: 1000 !important;
+  position: relative;
+}
+
+/* Disaster markers - lower priority (z-index: 100) */
+.custom-disaster-icon {
+  z-index: 100 !important;
+}
+
+.custom-disaster-icon div {
+  z-index: 100 !important;
+  position: relative;
+}
+
+/* Resource markers - lower priority (z-index: 100) */
+.custom-resource-icon {
+  z-index: 100 !important;
+}
+
+.custom-resource-icon div {
+  z-index: 100 !important;
+  position: relative;
+}
+
+/* Ensure marker containers also respect z-index */
+.leaflet-marker-icon {
+  transition: none !important;
+}
+
+/* When hovering, bring marker to very front */
+.leaflet-marker-icon:hover {
+  z-index: 2000 !important;
 }

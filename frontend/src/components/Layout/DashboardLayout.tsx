@@ -3,9 +3,6 @@ import { useNominatim } from "../../hooks/useNominatim";
 import { useData } from "../../contexts/DataContext";
 import {
   Box,
-  CssBaseline,
-  ThemeProvider,
-  createTheme,
 } from "@mui/material";
 import { layout, colors } from "../../theme";
 import DisasterMap from "../Map/DisasterMap";
@@ -25,7 +22,7 @@ import type {
   PeopleReport,
 } from "../../types";
 
-const theme = createTheme();
+
 
 const sampleInventory: InventoryItem[] = [
   {
@@ -98,6 +95,7 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 2, child: 5, adult: 12, elderly: 3 },
     genderCounts: { women: 7 },
+    servicesAccess: { water: false, electricity: false },
     statusCounts: {
       missing: 3,
       injured: 2,
@@ -124,6 +122,7 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 1, child: 3, adult: 8, elderly: 4 },
     genderCounts: { women: 6 },
+    servicesAccess: { water: true, electricity: false },
     statusCounts: {
       missing: 1,
       injured: 0,
@@ -153,6 +152,7 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 0, child: 2, adult: 6, elderly: 1 },
     genderCounts: { women: 3 },
+    servicesAccess: { water: false, electricity: true },
     statusCounts: {
       missing: 0,
       injured: 1,
@@ -160,7 +160,7 @@ const samplePeopleReports: PeopleReport[] = [
       bedridden: 0,
       chronicDisease: {},
     },
-    details: "Flooded area, people evacuated to higher ground.",
+    details: "Flooded area, people evacuated to higher ground. Water pipes damaged but power lines intact.",
     timestamp: "2026-04-14T09:00:00Z",
     disasterId: "2",
   },
@@ -182,6 +182,7 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 0, child: 1, adult: 4, elderly: 2 },
     genderCounts: { women: 3 },
+    servicesAccess: { water: false, electricity: false },
     statusCounts: {
       missing: 0,
       injured: 3,
@@ -213,6 +214,7 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 1, child: 4, adult: 9, elderly: 2 },
     genderCounts: { women: 5 },
+    servicesAccess: { water: true, electricity: true },
     statusCounts: {
       missing: 0,
       injured: 1,
@@ -242,6 +244,7 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 2, child: 3, adult: 7, elderly: 3 },
     genderCounts: { women: 5 },
+    servicesAccess: { water: true, electricity: false },
     statusCounts: {
       missing: 1,
       injured: 2,
@@ -273,6 +276,7 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 0, child: 5, adult: 11, elderly: 1 },
     genderCounts: { women: 6 },
+    servicesAccess: { water: true, electricity: true },
     statusCounts: {
       missing: 0,
       injured: 0,
@@ -304,6 +308,7 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 1, child: 2, adult: 5, elderly: 4 },
     genderCounts: { women: 4 },
+    servicesAccess: { water: false, electricity: false },
     statusCounts: {
       missing: 2,
       injured: 1,
@@ -334,6 +339,7 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 3, child: 6, adult: 8, elderly: 2 },
     genderCounts: { women: 5 },
+    servicesAccess: { water: true, electricity: true },
     statusCounts: {
       missing: 0,
       injured: 3,
@@ -364,6 +370,7 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 1, child: 3, adult: 6, elderly: 2 },
     genderCounts: { women: 4 },
+    servicesAccess: { water: true, electricity: true },
     statusCounts: {
       missing: 1,
       injured: 4,
@@ -395,16 +402,17 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 0, child: 4, adult: 10, elderly: 3 },
     genderCounts: { women: 6 },
+    servicesAccess: { water: true, electricity: false },
     statusCounts: {
       missing: 0,
       injured: 0,
       disabled: 0,
-      bedridden: 0,
+      bedridden: 1,
       chronicDisease: {},
     },
-    details: "Beach promenade area. Families displaced from nearby residences.",
-    timestamp: "2026-04-14T14:00:00Z",
-    disasterId: "2",
+    details: "People gathered in open area. Need blankets and food supplies. Electricity intermittent.",
+    timestamp: "2026-04-15T11:30:00Z",
+    disasterId: "1",
   },
   {
     id: "r-12",
@@ -425,6 +433,7 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 2, child: 7, adult: 12, elderly: 4 },
     genderCounts: { women: 8 },
+    servicesAccess: { water: false, electricity: false },
     statusCounts: {
       missing: 3,
       injured: 5,
@@ -496,14 +505,12 @@ const DashboardLayout = () => {
     id: d.id,
     position: d.location,
     type: "disaster",
-    popupContent: `<strong>${d.type}</strong><br/>${d.address}`,
   }));
 
   const peopleMarkers: MapMarker[] = peopleReports.map((r) => ({
     id: r.id,
     position: r.location,
     type: "people",
-    popupContent: `<strong>${r.reporter.name}</strong><br/>${r.location.address}`,
   }));
 
   const circles = disasters
@@ -658,7 +665,6 @@ const DashboardLayout = () => {
         id: disaster.id,
         position: disaster.location,
         type: "disaster",
-        popupContent: `<strong>${disaster.type}</strong><br/>${disaster.address}`,
       });
       setDisplayedPeopleReports([]);
       setMapCenter(disaster.location);
@@ -749,9 +755,7 @@ const DashboardLayout = () => {
     : [];
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box
+    <Box
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -908,8 +912,7 @@ const DashboardLayout = () => {
           initialLocation={pendingCoords}
           initialAddress={pendingAddress}
         />
-      </Box>
-    </ThemeProvider>
+    </Box>
   );
 };
 

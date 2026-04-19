@@ -185,7 +185,21 @@ const DisasterMap = ({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {/* People reports - clustered */}
+      {/* Disaster and Resource markers - not clustered (render FIRST so they appear BEHIND people reports) */}
+      {markers
+        .filter((marker) => marker.type !== "people")
+        .map((marker) => (
+          <Marker
+            key={marker.id}
+            position={[marker.position.lat, marker.position.lng]}
+            icon={getMarkerIcon(marker.type)}
+            eventHandlers={{ click: () => onMarkerClick?.(marker) }}
+          >
+            {marker.popupContent && <Popup>{marker.popupContent}</Popup>}
+          </Marker>
+        ))}
+
+      {/* People reports - clustered (render LAST so they appear ON TOP of incidents) */}
       <MarkerClusterGroup
         iconCreateFunction={createPeopleClusterIcon}
         spiderfyOnMaxZoom={true}
@@ -232,20 +246,6 @@ const DisasterMap = ({
             );
           })}
       </MarkerClusterGroup>
-
-      {/* Disaster and Resource markers - not clustered */}
-      {markers
-        .filter((marker) => marker.type !== "people")
-        .map((marker) => (
-          <Marker
-            key={marker.id}
-            position={[marker.position.lat, marker.position.lng]}
-            icon={getMarkerIcon(marker.type)}
-            eventHandlers={{ click: () => onMarkerClick?.(marker) }}
-          >
-            {marker.popupContent && <Popup>{marker.popupContent}</Popup>}
-          </Marker>
-        ))}
       {circles.map((circle, index) => (
         <Circle
           key={index}

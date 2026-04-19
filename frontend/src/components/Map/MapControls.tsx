@@ -199,8 +199,8 @@ const MapControls = ({
           <Tooltip
             title={
               isAddPeopleMode
-                ? "Click on map to place people report"
-                : "Add people report on map"
+                ? "Click on map to place report"
+                : "Add report on map"
             }
             placement="right"
           >

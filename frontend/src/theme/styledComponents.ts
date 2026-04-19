@@ -125,7 +125,7 @@ export const captionStyles = {
  * Monospace text styles
  */
 export const monospaceStyles = {
-  fontFamily: typography.fontFamily.mono,
+  fontFamily: typography.fontFamilyMono,
 };
 
 // SX PROP HELPERS

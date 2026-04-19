@@ -17,8 +17,11 @@ import {
   Paper,
   MenuItem,
   Select,
+  Switch,
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import WaterDropIcon from "@mui/icons-material/WaterDrop";
+import BoltIcon from "@mui/icons-material/Bolt";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -77,6 +80,10 @@ const PeopleReportDialog = ({
     elderly: 0,
   });
   const [genderCounts, setGenderCounts] = useState({ women: 0 });
+  const [servicesAccess, setServicesAccess] = useState({
+    water: true,
+    electricity: true,
+  });
   const [statusCounts, setStatusCounts] = useState({
     missing: 0,
     injured: 0,
@@ -103,6 +110,10 @@ const PeopleReportDialog = ({
       setNeeds([...report.needs].sort((a, b) => a.priority - b.priority));
       setCounts({ ...report.counts });
       setGenderCounts({ women: report.genderCounts?.women || 0 });
+      setServicesAccess({
+        water: report.servicesAccess?.water ?? true,
+        electricity: report.servicesAccess?.electricity ?? true,
+      });
       setStatusCounts({
         missing: report.statusCounts?.missing || 0,
         injured: report.statusCounts?.injured || 0,
@@ -123,6 +134,7 @@ const PeopleReportDialog = ({
       setNeeds([]);
       setCounts({ baby: 0, child: 0, adult: 0, elderly: 0 });
       setGenderCounts({ women: 0 });
+      setServicesAccess({ water: true, electricity: true });
       setStatusCounts({ missing: 0, injured: 0, disabled: 0, bedridden: 0 });
       setChronicDiseases({});
       setDetails("");
@@ -232,6 +244,7 @@ const PeopleReportDialog = ({
       needs,
       counts,
       genderCounts,
+      servicesAccess,
       statusCounts: {
         ...statusCounts,
         chronicDisease: chronicDiseases,
@@ -252,7 +265,7 @@ const PeopleReportDialog = ({
 
   return (
     <Dialog open={isOpen} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{report ? "Edit" : "New"} People Report</DialogTitle>
+      <DialogTitle>{report ? "Edit" : "New"} Report</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 2 }}
@@ -326,6 +339,43 @@ const PeopleReportDialog = ({
                 ))}
               </List>
             )}
+          </Box>
+
+          {/* Services Access Section */}
+          <Box>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: "block" }}>
+              Services Access
+            </Typography>
+            <Box sx={{ display: "flex", gap: 3 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <WaterDropIcon fontSize="small" sx={{ color: "text.secondary" }} />
+                <Typography variant="body2">Water:</Typography>
+                <Switch
+                  checked={servicesAccess.water}
+                  onChange={(e) =>
+                    setServicesAccess((prev) => ({
+                      ...prev,
+                      water: e.target.checked,
+                    }))
+                  }
+                  size="small"
+                />
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <BoltIcon fontSize="small" sx={{ color: "text.secondary" }} />
+                <Typography variant="body2">Electric:</Typography>
+                <Switch
+                  checked={servicesAccess.electricity}
+                  onChange={(e) =>
+                    setServicesAccess((prev) => ({
+                      ...prev,
+                      electricity: e.target.checked,
+                    }))
+                  }
+                  size="small"
+                />
+              </Box>
+            </Box>
           </Box>
 
           <Box>

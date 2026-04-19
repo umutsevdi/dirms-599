@@ -24,6 +24,8 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import CallIcon from "@mui/icons-material/Call";
 import ChatIcon from "@mui/icons-material/Chat";
 import WomanIcon from "@mui/icons-material/Female";
+import WaterDropIcon from "@mui/icons-material/WaterDrop";
+import BoltIcon from "@mui/icons-material/Bolt";
 import type { Disaster, PeopleReport } from "../../types";
 import { layout, sizing, getAgeGroupChipStyles } from "../../theme";
 
@@ -47,9 +49,41 @@ const getContactIcon = (method: string) => {
   return <PhoneIcon fontSize="small" sx={{ color: "text.secondary" }} />;
 };
 
+// Helper to determine aggregate service status from boolean reports
+// Logic: If ANY unavailable → Partially, If ALL unavailable → Not Available, If ALL available → Available
+const getAggregateServiceStatus = (
+  statuses: (boolean | undefined)[]
+): "available" | "partially" | "not-available" => {
+  const normalized = statuses.map((s) => s ?? true);
+  const allAvailable = normalized.every((s) => s === true);
+  const allNotAvailable = normalized.every((s) => s === false);
+  
+  if (allAvailable) return "available";
+  if (allNotAvailable) return "not-available";
+  return "partially";
+};
+
+// Extended type for aggregated reports with string service status
+type AggregatedPeopleReport = Omit<PeopleReport, 'servicesAccess'> & {
+  servicesAccess: {
+    water: "available" | "partially" | "not-available";
+    electricity: "available" | "partially" | "not-available";
+  };
+};
+
 // Aggregate multiple reports into a single view
-const aggregateReports = (reports: PeopleReport[]): PeopleReport => {
-  if (reports.length === 1) return reports[0];
+const aggregateReports = (reports: PeopleReport[]): AggregatedPeopleReport => {
+  // For single report, convert boolean to aggregate string format
+  if (reports.length === 1) {
+    const report = reports[0];
+    return {
+      ...report,
+      servicesAccess: {
+        water: report.servicesAccess?.water ? "available" : "not-available",
+        electricity: report.servicesAccess?.electricity ? "available" : "not-available",
+      },
+    } as AggregatedPeopleReport;
+  }
 
   // Calculate average location
   const avgLat =
@@ -116,6 +150,11 @@ const aggregateReports = (reports: PeopleReport[]): PeopleReport => {
     details: "", // Not used in aggregated view
     timestamp: new Date().toISOString(),
     disasterId: reports[0]?.disasterId || "",
+    // For services access in clusters, determine aggregate status
+    servicesAccess: {
+      water: getAggregateServiceStatus(reports.map((r) => r.servicesAccess?.water ?? true)),
+      electricity: getAggregateServiceStatus(reports.map((r) => r.servicesAccess?.electricity ?? true)),
+    },
   };
 };
 
@@ -171,7 +210,7 @@ const MapInfoBoard = ({
           >
             <Box>
               <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                People Report
+                Report
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {`Reported by ${report.reporter.name}`}
@@ -253,6 +292,72 @@ const MapInfoBoard = ({
                 )}
               </Box>
             )}
+
+          {/* Services Access */}
+          {!isCluster && firstReport.servicesAccess && (
+            <Box sx={{ mb: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
+              <Chip
+                icon={<WaterDropIcon fontSize="small" />}
+                label={`Water: ${firstReport.servicesAccess.water ? "Available" : "Not Available"}`}
+                size="small"
+                color={firstReport.servicesAccess.water ? "success" : "info"}
+                variant={firstReport.servicesAccess.water ? "filled" : "outlined"}
+              />
+              <Chip
+                icon={<BoltIcon fontSize="small" />}
+                label={`Electric: ${firstReport.servicesAccess.electricity ? "Available" : "Not Available"}`}
+                size="small"
+                color={firstReport.servicesAccess.electricity ? "success" : "warning"}
+                variant={firstReport.servicesAccess.electricity ? "filled" : "outlined"}
+              />
+            </Box>
+          )}
+          {isCluster && report.servicesAccess && (
+            <Box sx={{ mb: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
+              <Chip
+                icon={<WaterDropIcon fontSize="small" />}
+                label={`Water: ${
+                  report.servicesAccess.water === "available"
+                    ? "Available"
+                    : report.servicesAccess.water === "partially"
+                    ? "Partially"
+                    : "Not Available"
+                }`}
+                size="small"
+                color={
+                  report.servicesAccess.water === "available"
+                    ? "success"
+                    : report.servicesAccess.water === "partially"
+                    ? "info"
+                    : "default"
+                }
+                variant={
+                  report.servicesAccess.water === "available" ? "filled" : "outlined"
+                }
+              />
+              <Chip
+                icon={<BoltIcon fontSize="small" />}
+                label={`Electric: ${
+                  report.servicesAccess.electricity === "available"
+                    ? "Available"
+                    : report.servicesAccess.electricity === "partially"
+                    ? "Partially"
+                    : "Not Available"
+                }`}
+                size="small"
+                color={
+                  report.servicesAccess.electricity === "available"
+                    ? "success"
+                    : report.servicesAccess.electricity === "partially"
+                    ? "warning"
+                    : "default"
+                }
+                variant={
+                  report.servicesAccess.electricity === "available" ? "filled" : "outlined"
+                }
+              />
+            </Box>
+          )}
 
           <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
             People ({totalPeople})

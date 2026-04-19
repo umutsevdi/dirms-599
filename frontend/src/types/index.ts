@@ -72,6 +72,10 @@ export interface PeopleReport {
   genderCounts: {
     women: number;
   };
+  servicesAccess: {
+    water: boolean;
+    electricity: boolean;
+  };
   statusCounts: {
     missing: number;
     injured: number;

@@ -1,45 +1,77 @@
 /**
  * Centralized Design Tokens
- * All hardcoded values should reference these tokens
+ * Aligned with the professional disaster management theme
+ * - Professional gray palette with strategic color usage
+ * - Flat corners (0px) for serious, clean appearance
+ * - Muted colors appropriate for emergency operations
  */
 
-// COLORS
+// PROFESSIONAL COLOR PALETTE
+// Based on the custom MUI theme for disaster management
 export const colors = {
-  // Semantic colors
+  // Primary neutrals - professional UI chrome
+  primary: {
+    main: "#475569", // slate-600
+    light: "#64748b", // slate-500
+    dark: "#334155", // slate-700
+    contrast: "#ffffff",
+  },
+  // Secondary - deep charcoal
+  secondary: {
+    main: "#334155", // slate-700
+    light: "#475569", // slate-600
+    dark: "#1e293b", // slate-800
+    contrast: "#ffffff",
+  },
+  // Background grays
+  background: {
+    default: "#f8fafc", // slate-50
+    paper: "#ffffff",
+    elevated: "#f1f5f9", // slate-100
+  },
+  // Text colors
+  text: {
+    primary: "#1e293b", // slate-800
+    secondary: "#64748b", // slate-500
+    disabled: "#94a3b8", // slate-400
+  },
+  // Semantic colors - strategic use for status indicators
   disaster: {
-    main: "#ef4444", // Red for disasters
-    light: "#fca5a5",
-    dark: "#dc2626",
+    main: "#e11d48", // rose-600 - fires, earthquakes, critical
+    light: "#fda4af", // rose-300
+    dark: "#be123c", // rose-700
   },
   resource: {
-    main: "#22c55e", // Green for resources/people
-    light: "#86efac",
-    dark: "#16a34a",
+    main: "#0d9488", // teal-600 - resolved, resources, safe
+    light: "#5eead4", // teal-300
+    dark: "#0f766e", // teal-700
   },
   warning: {
-    main: "#f97316", // Orange for moderate severity
-    light: "#fdba74",
-    dark: "#ea580c",
+    main: "#d97706", // amber-600 - caution, warning
+    light: "#fcd34d", // amber-300
+    dark: "#b45309", // amber-700
   },
   info: {
-    main: "#3b82f6", // Blue for info
-    light: "#93c5fd",
-    dark: "#2563eb",
+    main: "#64748b", // slate-500 - neutral information
+    light: "#94a3b8", // slate-400
+    dark: "#475569", // slate-600
   },
-  // Age group colors
+  // Age group colors - muted but distinguishable
   ageGroups: {
-    baby: "#ec4899", // Pink
-    child: "#3b82f6", // Blue
-    adult: "#22c55e", // Green
-    elderly: "#f59e0b", // Amber/Orange
+    baby: "#db2777", // pink-600
+    child: "#4f46e5", // indigo-600
+    adult: "#0d9488", // teal-600
+    elderly: "#d97706", // amber-600
   },
   // Status colors
   status: {
-    missing: "#ef4444",
-    injured: "#f97316",
-    disabled: "#3b82f6",
-    bedridden: "#8b5cf6",
+    missing: "#e11d48", // rose-600
+    injured: "#d97706", // amber-600
+    disabled: "#4f46e5", // indigo-600
+    bedridden: "#7c3aed", // violet-600
   },
+  // Divider and borders
+  divider: "#e2e8f0", // slate-200
 } as const;
 
 // LAYOUT
@@ -102,33 +134,50 @@ export const sizing = {
 
 // TYPOGRAPHY
 export const typography = {
+  fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
   fontSize: {
     xs: "0.625rem", // 10px
     sm: "0.75rem", // 12px
     md: "0.875rem", // 14px
     base: "1rem", // 16px
+    lg: "1.125rem", // 18px
+    xl: "1.25rem", // 20px
   },
-  fontFamily: {
-    mono: "monospace",
+  fontWeight: {
+    light: 300,
+    regular: 400,
+    medium: 500,
+    semibold: 600,
+    bold: 700,
   },
+  fontFamilyMono: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
 } as const;
 
-// SHAPES
+// SHAPES - Flat corners for serious, professional appearance
 export const shapes = {
   borderRadius: {
     none: 0,
-    sm: 4,
-    md: 8,
-    lg: 16,
-    full: 9999,
+    xs: 0,
+    sm: 0,
+    md: 0,
+    lg: 0,
+    full: 0, // Even "full" is 0 for consistency
   },
+} as const;
+
+// SHADOWS
+export const shadows = {
+  sm: "0 1px 2px rgba(0, 0, 0, 0.05)",
+  md: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+  lg: "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
+  xl: "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.06)",
 } as const;
 
 // LEAFLET MAP STYLES
 export const leafletStyles = {
-  // Marker icon base styles
+  // Marker icon base styles - flat squares for consistency
   markerBase: `
-    border-radius: 50%;
+    border-radius: 0;
     width: 32px;
     height: 32px;
     display: flex;
@@ -139,30 +188,30 @@ export const leafletStyles = {
   `,
   // Pre-built marker HTML strings
   markers: {
-    disaster: `<div style="background-color:${colors.disaster.main};color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">!</div>`,
-    resource: `<div style="background-color:${colors.resource.main};color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">R</div>`,
+    disaster: `<div style="background-color:${colors.disaster.main};color:white;border-radius:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">!</div>`,
+    resource: `<div style="background-color:${colors.resource.main};color:white;border-radius:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">R</div>`,
     people: (count: number) =>
-      `<div style="background-color:${colors.resource.main};color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">${count}</div>`,
+      `<div style="background-color:${colors.resource.main};color:white;border-radius:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">${count}</div>`,
     peopleCluster: (totalCount: number) =>
-      `<div style="background-color:${colors.resource.main};color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">${totalCount}</div>`,
+      `<div style="background-color:${colors.resource.main};color:white;border-radius:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">${totalCount}</div>`,
   },
 } as const;
 
 // MUI THEME EXTENSIONS
-// These should be merged with the MUI theme
+// These are merged with the MUI theme in theme.ts
 export const themeExtensions = {
   palette: {
     disaster: {
       main: colors.disaster.main,
       light: colors.disaster.light,
       dark: colors.disaster.dark,
-      contrastText: "#fff",
+      contrastText: "#ffffff",
     },
     resource: {
       main: colors.resource.main,
       light: colors.resource.light,
       dark: colors.resource.dark,
-      contrastText: "#fff",
+      contrastText: "#ffffff",
     },
     ageGroups: {
       baby: colors.ageGroups.baby,
@@ -170,5 +219,21 @@ export const themeExtensions = {
       adult: colors.ageGroups.adult,
       elderly: colors.ageGroups.elderly,
     },
+    status: {
+      missing: colors.status.missing,
+      injured: colors.status.injured,
+      disabled: colors.status.disabled,
+      bedridden: colors.status.bedridden,
+    },
   },
+} as const;
+
+// ACTION OPACITIES (for hover, selected, disabled states)
+export const actionOpacities = {
+  hover: 0.04,
+  selected: 0.08,
+  disabled: 0.26,
+  disabledBackground: 0.12,
+  focus: 0.12,
+  activated: 0.12,
 } as const;
