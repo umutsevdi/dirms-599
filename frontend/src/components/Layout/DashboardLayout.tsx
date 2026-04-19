@@ -1,26 +1,21 @@
 import { useState, useRef, useCallback } from "react";
 import { useNominatim } from "../../hooks/useNominatim";
+import { useData } from "../../contexts/DataContext";
 import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
   Box,
-  Badge,
-  Avatar,
   CssBaseline,
   ThemeProvider,
   createTheme,
 } from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import { layout, colors } from "../../theme";
 import DisasterMap from "../Map/DisasterMap";
+import Header from "./Header";
 import InventoryDialog from "../Dialogs/InventoryDialog";
 import IncidentDialog from "../Dialogs/IncidentDialog";
 import PeopleReportDialog from "../Dialogs/PeopleReportDialog";
 import MapControls from "../Map/MapControls";
 import MapInfoBoard from "../Map/MapInfoBoard";
 import SidePanel from "../Map/SidePanel";
-import DisasterTimer from "../Map/DisasterTimer";
 import BottomPanel from "./BottomPanel";
 import type {
   Coordinates,
@@ -31,52 +26,6 @@ import type {
 } from "../../types";
 
 const theme = createTheme();
-
-const sampleDisasters: Disaster[] = [
-  {
-    id: "1",
-    type: "Earthquake",
-    location: { lat: 38.4192, lng: 27.1287, address: "Izmir, Turkey" },
-    address: "Izmir, Turkey",
-    severity: "critical",
-    status: "active",
-    timestamp: "2026-04-15T10:30:00Z",
-    description: "Magnitude 5.8 earthquake reported in Izmir region.",
-    affectedRadius: 5000,
-  },
-  {
-    id: "2",
-    type: "Flood",
-    location: { lat: 41.0082, lng: 28.9784, address: "Istanbul, Turkey" },
-    address: "Istanbul, Turkey",
-    severity: "critical",
-    status: "contained",
-    timestamp: "2026-04-14T08:15:00Z",
-    description: "Flash flooding in low-lying areas due to heavy rainfall.",
-    affectedRadius: 2000,
-  },
-  {
-    id: "3",
-    type: "Wildfire",
-    location: { lat: 36.8969, lng: 30.7133, address: "Antalya, Turkey" },
-    address: "Antalya, Turkey",
-    severity: "moderate",
-    status: "active",
-    timestamp: "2026-04-13T14:45:00Z",
-    description: "Forest fire spreading in mountainous region.",
-    affectedRadius: 3000,
-  },
-  {
-    id: "4",
-    type: "Landslide",
-    location: { lat: 40.7486, lng: 29.9243, address: "Sakarya, Turkey" },
-    address: "Sakarya, Turkey",
-    severity: "low",
-    status: "resolved",
-    timestamp: "2026-04-12T06:00:00Z",
-    description: "Minor landslide on highway, road cleared.",
-  },
-];
 
 const sampleInventory: InventoryItem[] = [
   {
@@ -490,11 +439,13 @@ const samplePeopleReports: PeopleReport[] = [
   },
 ];
 
-const MIN_PANEL = 200;
-const MAX_PANEL = 600;
-const DEFAULT_PANEL = 320;
+// Use theme layout constants for panel sizing
+const MIN_PANEL = layout.panel.minWidth;
+const MAX_PANEL = layout.panel.maxWidth;
+const DEFAULT_PANEL = layout.panel.defaultWidth;
 
 const DashboardLayout = () => {
+  const { disasters, setDisasters } = useData();
   const [mapCenter, setMapCenter] = useState<Coordinates>({
     lat: 39.9334,
     lng: 32.8597,
@@ -505,8 +456,7 @@ const DashboardLayout = () => {
     useState<InventoryItem[]>(sampleInventory);
   const [peopleReports, setPeopleReports] =
     useState<PeopleReport[]>(samplePeopleReports);
-  const [disasters, setDisasters] = useState<Disaster[]>(sampleDisasters);
-  const [sidePanelWidth, setSidePanelWidth] = useState(DEFAULT_PANEL);
+  const [sidePanelWidth, setSidePanelWidth] = useState<number>(DEFAULT_PANEL);
   const [addIncidentMode, setAddIncidentMode] = useState(false);
   const [addPeopleMode, setAddPeopleMode] = useState(false);
   const [selectedDisasterMarker, setSelectedDisasterMarker] =
@@ -563,10 +513,10 @@ const DashboardLayout = () => {
       radius: d.affectedRadius!,
       color:
         d.severity === "critical"
-          ? "#ef4444"
+          ? colors.disaster.main
           : d.severity === "moderate"
-            ? "#f97316"
-            : "#eab308",
+            ? colors.warning.main
+            : "#eab308", // Keeping yellow as it's not in our semantic palette
     }));
 
   const handleLocationSelect = (coords: Coordinates, zoom: number) => {
@@ -810,35 +760,7 @@ const DashboardLayout = () => {
           overflow: "hidden",
         }}
       >
-        <AppBar position="static" color="default" elevation={1}>
-          <Toolbar sx={{ gap: 2 }}>
-            <Typography
-              variant="h6"
-              component="a"
-              sx={{ flexGrow: 1, textDecoration: "none", color: "inherit" }}
-            >
-              Disaster Management System
-            </Typography>
-            <DisasterTimer
-              disasters={disasters.map((d) => ({
-                timestamp: d.timestamp,
-                type: d.type,
-              }))}
-            />
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <IconButton color="inherit">
-                <Badge badgeContent={1} color="primary">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-              <Avatar
-                src="https://api.dicebear.com/7.x/initials/svg?seed=DM"
-                alt="User"
-                sx={{ width: 32, height: 32 }}
-              />
-            </Box>
-          </Toolbar>
-        </AppBar>
+        <Header title="Disaster Management System" />
 
         <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
           {/* Left Side Panel */}

@@ -25,6 +25,7 @@ import CallIcon from "@mui/icons-material/Call";
 import ChatIcon from "@mui/icons-material/Chat";
 import WomanIcon from "@mui/icons-material/Female";
 import type { Disaster, PeopleReport } from "../../types";
+import { layout, sizing, getAgeGroupChipStyles } from "../../theme";
 
 interface MapInfoBoardProps {
   disaster: Disaster | null;
@@ -151,11 +152,11 @@ const MapInfoBoard = ({
       <Card
         sx={{
           position: "absolute",
-          top: 16,
-          right: 16,
-          zIndex: 1000,
-          width: isCluster ? 380 : 340,
-          maxHeight: "calc(100% - 32px)",
+          top: layout.spacing.md,
+          right: layout.spacing.md,
+          zIndex: layout.zIndex.mapOverlay,
+          width: isCluster ? layout.panel.infoBoardWidthCluster : layout.panel.infoBoardWidth,
+          maxHeight: `calc(100% - ${layout.spacing.xl}px)`,
           overflow: "auto",
           boxShadow: 3,
         }}
@@ -275,12 +276,7 @@ const MapInfoBoard = ({
               <Chip
                 label={report.counts.baby}
                 size="small"
-                sx={{
-                  height: 20,
-                  minWidth: 28,
-                  bgcolor: "pink.50",
-                  color: "pink.700",
-                }}
+                sx={getAgeGroupChipStyles("baby")}
               />
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -291,12 +287,7 @@ const MapInfoBoard = ({
               <Chip
                 label={report.counts.child}
                 size="small"
-                sx={{
-                  height: 20,
-                  minWidth: 28,
-                  bgcolor: "info.50",
-                  color: "info.700",
-                }}
+                sx={getAgeGroupChipStyles("child")}
               />
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -307,12 +298,7 @@ const MapInfoBoard = ({
               <Chip
                 label={report.counts.adult}
                 size="small"
-                sx={{
-                  height: 20,
-                  minWidth: 28,
-                  bgcolor: "success.50",
-                  color: "success.700",
-                }}
+                sx={getAgeGroupChipStyles("adult")}
               />
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -323,12 +309,7 @@ const MapInfoBoard = ({
               <Chip
                 label={report.counts.elderly}
                 size="small"
-                sx={{
-                  height: 20,
-                  minWidth: 28,
-                  bgcolor: "warning.50",
-                  color: "warning.700",
-                }}
+                sx={getAgeGroupChipStyles("elderly")}
               />
             </Box>
           </Box>
@@ -360,7 +341,7 @@ const MapInfoBoard = ({
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
                       <PersonSearchIcon
-                        sx={{ fontSize: 14, color: "error.main" }}
+                        sx={{ fontSize: sizing.icon.xs, color: "error.main" }}
                       />
                       <Typography variant="caption">Missing</Typography>
                     </Box>
@@ -396,7 +377,7 @@ const MapInfoBoard = ({
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
                       <LocalHospitalIcon
-                        sx={{ fontSize: 14, color: "warning.main" }}
+                        sx={{ fontSize: sizing.icon.xs, color: "warning.main" }}
                       />
                       <Typography variant="caption">Injured</Typography>
                     </Box>
@@ -432,7 +413,7 @@ const MapInfoBoard = ({
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
                       <LocalHospitalIcon
-                        sx={{ fontSize: 14, color: "info.main" }}
+                        sx={{ fontSize: sizing.icon.xs, color: "info.main" }}
                       />
                       <Typography variant="caption">Disabled</Typography>
                     </Box>
@@ -468,7 +449,7 @@ const MapInfoBoard = ({
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
                       <LocalHospitalIcon
-                        sx={{ fontSize: 14, color: "secondary.main" }}
+                        sx={{ fontSize: sizing.icon.xs, color: "secondary.main" }}
                       />
                       <Typography variant="caption">Bedridden</Typography>
                     </Box>
@@ -530,7 +511,7 @@ const MapInfoBoard = ({
                     <Box
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
-                      <WomanIcon sx={{ fontSize: 14, color: "pink.main" }} />
+                      <WomanIcon sx={{ fontSize: sizing.icon.xs, color: "pink.main" }} />
                       <Typography variant="caption">Gender</Typography>
                     </Box>
                     <Typography
@@ -660,11 +641,11 @@ const MapInfoBoard = ({
     <Card
       sx={{
         position: "absolute",
-        top: 16,
-        right: 16,
-        zIndex: 1000,
-        width: 320,
-        maxHeight: "calc(100% - 32px)",
+        top: layout.spacing.md,
+        right: layout.spacing.md,
+        zIndex: layout.zIndex.mapOverlay,
+        width: layout.panel.infoBoardWidth,
+        maxHeight: `calc(100% - ${layout.spacing.xl}px)`,
         overflow: "auto",
         boxShadow: 3,
       }}
@@ -784,7 +765,7 @@ const MapInfoBoard = ({
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
                       <PersonSearchIcon
-                        sx={{ fontSize: 14, color: "error.main" }}
+                        sx={{ fontSize: sizing.icon.xs, color: "error.main" }}
                       />
                       <Typography variant="caption">Missing</Typography>
                     </Box>
@@ -813,7 +794,7 @@ const MapInfoBoard = ({
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
                       <LocalHospitalIcon
-                        sx={{ fontSize: 14, color: "warning.main" }}
+                        sx={{ fontSize: sizing.icon.xs, color: "warning.main" }}
                       />
                       <Typography variant="caption">Injured</Typography>
                     </Box>
@@ -858,12 +839,7 @@ const MapInfoBoard = ({
                   <Chip
                     label={ageGroups.baby}
                     size="small"
-                    sx={{
-                      height: 20,
-                      minWidth: 28,
-                      bgcolor: "pink.50",
-                      color: "pink.700",
-                    }}
+                    sx={getAgeGroupChipStyles("baby")}
                   />
                 </Box>
               )}
@@ -876,12 +852,7 @@ const MapInfoBoard = ({
                   <Chip
                     label={ageGroups.child}
                     size="small"
-                    sx={{
-                      height: 20,
-                      minWidth: 28,
-                      bgcolor: "info.50",
-                      color: "info.700",
-                    }}
+                    sx={getAgeGroupChipStyles("child")}
                   />
                 </Box>
               )}
@@ -894,12 +865,7 @@ const MapInfoBoard = ({
                   <Chip
                     label={ageGroups.adult}
                     size="small"
-                    sx={{
-                      height: 20,
-                      minWidth: 28,
-                      bgcolor: "success.50",
-                      color: "success.700",
-                    }}
+                    sx={getAgeGroupChipStyles("adult")}
                   />
                 </Box>
               )}
@@ -915,12 +881,7 @@ const MapInfoBoard = ({
                   <Chip
                     label={ageGroups.elderly}
                     size="small"
-                    sx={{
-                      height: 20,
-                      minWidth: 28,
-                      bgcolor: "warning.50",
-                      color: "warning.700",
-                    }}
+                    sx={getAgeGroupChipStyles("elderly")}
                   />
                 </Box>
               )}

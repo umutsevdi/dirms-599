@@ -10,6 +10,7 @@ import {
 import { Icon, DivIcon } from "leaflet";
 import { useEffect } from "react";
 import type { Coordinates, MapMarker, PeopleReport } from "../../types";
+import { colors, sizing, shapes } from "../../theme";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
@@ -26,26 +27,36 @@ const defaultIcon = new Icon({
   shadowSize: [41, 41],
 });
 
+/**
+ * Create marker icon HTML with consistent styling
+ */
+const createMarkerHtml = (
+  backgroundColor: string,
+  content: string
+): string => {
+  return `<div style="background-color:${backgroundColor};color:white;border-radius:50%;width:${sizing.marker.width}px;height:${sizing.marker.height}px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:${sizing.marker.fontSize}px">${content}</div>`;
+};
+
 const disasterIcon = new DivIcon({
-  html: `<div style="background-color:#ef4444;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">!</div>`,
+  html: createMarkerHtml(colors.disaster.main, "!"),
   className: "custom-disaster-icon",
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
+  iconSize: [sizing.marker.width, sizing.marker.height],
+  iconAnchor: [sizing.marker.width / 2, sizing.marker.height / 2],
 });
 
 const resourceIcon = new DivIcon({
-  html: `<div style="background-color:#22c55e;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">R</div>`,
+  html: createMarkerHtml(colors.resource.main, "R"),
   className: "custom-resource-icon",
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
+  iconSize: [sizing.marker.width, sizing.marker.height],
+  iconAnchor: [sizing.marker.width / 2, sizing.marker.height / 2],
 });
 
 const createPeopleIcon = (count: number) =>
   new DivIcon({
-    html: `<div style="background-color:#22c55e;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">${count}</div>`,
+    html: createMarkerHtml(colors.resource.main, count.toString()),
     className: "custom-people-icon",
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
+    iconSize: [sizing.marker.width, sizing.marker.height],
+    iconAnchor: [sizing.marker.width / 2, sizing.marker.height / 2],
   });
 
 // Create cluster icon that sums all people counts in the cluster
@@ -65,12 +76,19 @@ const createPeopleClusterIcon = (cluster: any) => {
   });
 
   return new DivIcon({
-    html: `<div style="background-color:#22c55e;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px">${totalCount}</div>`,
+    html: createMarkerHtml(colors.resource.main, totalCount.toString()),
     className: "custom-people-cluster-icon",
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
+    iconSize: [sizing.marker.width, sizing.marker.height],
+    iconAnchor: [sizing.marker.width / 2, sizing.marker.height / 2],
   });
 };
+
+// Map container styles using theme tokens
+const mapContainerStyles = {
+  height: "100%",
+  width: "100%",
+  borderRadius: shapes.borderRadius.md,
+} as const;
 
 interface DisasterMapProps {
   center?: Coordinates;
@@ -159,7 +177,7 @@ const DisasterMap = ({
     <MapContainer
       center={[center.lat, center.lng]}
       zoom={zoom}
-      style={{ height: "100%", width: "100%", borderRadius: 8 }}
+      style={mapContainerStyles}
     >
       <MapClickHandler onMapClick={onMapClick} />
       <MapController mapRef={mapRef} />
@@ -234,8 +252,8 @@ const DisasterMap = ({
           center={[circle.center.lat, circle.center.lng]}
           radius={circle.radius}
           pathOptions={{
-            color: circle.color || "#ef4444",
-            fillColor: circle.color || "#ef4444",
+            color: circle.color || colors.disaster.main,
+            fillColor: circle.color || colors.disaster.main,
             fillOpacity: 0.15,
           }}
         />

@@ -43,21 +43,37 @@ const DisasterTimer = ({ disasters }: DisasterTimerProps) => {
   if (!elapsed) return null;
 
   return (
-    <Box sx={{ textAlign: "center" }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 1,
+        bgcolor: "background.paper",
+        px: 1.5,
+        py: 0.5,
+        borderRadius: 1,
+        border: 1,
+        borderColor: "divider",
+      }}
+    >
       <Typography
         variant="body2"
-        sx={{ fontWeight: 900, color: "error.main", letterSpacing: 2 }}
+        sx={{
+          fontWeight: 700,
+          color: "error.main",
+          letterSpacing: 1,
+          fontSize: "0.875rem",
+        }}
       >
         DISASTER
       </Typography>
       <Typography
-        variant="caption"
+        variant="body2"
         sx={{
           fontFamily: "monospace",
-          color: "error.main",
-          opacity: 0.8,
-          display: "block",
-          mt: 0.5,
+          fontWeight: 600,
+          color: "text.primary",
+          fontSize: "0.875rem",
         }}
       >
         {elapsed}
@@ -65,13 +81,11 @@ const DisasterTimer = ({ disasters }: DisasterTimerProps) => {
       <Typography
         variant="caption"
         sx={{
-          color: "text.disabled",
-          display: "block",
-          fontSize: "0.65rem",
-          mt: 0.25,
+          color: "text.secondary",
+          fontSize: "0.75rem",
         }}
       >
-        since earliest event
+        since earliest report
       </Typography>
     </Box>
   );
