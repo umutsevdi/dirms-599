@@ -15,6 +15,7 @@ import {
   Chip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 import type { InventoryItem, PeopleReport, Disaster } from "../../types";
 
 interface BottomPanelProps {
@@ -27,6 +28,8 @@ interface BottomPanelProps {
   onEditPeople: (report: PeopleReport) => void;
   onSelectPeople: (report: PeopleReport | null) => void;
   onSelectDisaster: (disaster: Disaster | null) => void;
+  onAddDisaster?: () => void;
+  onEditDisaster?: (disaster: Disaster) => void;
 }
 
 const BottomPanel = ({
@@ -39,12 +42,17 @@ const BottomPanel = ({
   onEditPeople,
   onSelectPeople,
   onSelectDisaster,
+  onAddDisaster,
+  onEditDisaster,
 }: BottomPanelProps) => {
   const [activeTab, setActiveTab] = useState(0);
   const [inventorySearch, setInventorySearch] = useState("");
   const [peopleSearch, setPeopleSearch] = useState("");
   const [disasterSearch, setDisasterSearch] = useState("");
   const [selectedPeopleId, setSelectedPeopleId] = useState<string | null>(null);
+  const [selectedInventoryId, setSelectedInventoryId] = useState<string | null>(
+    null
+  );
   const [selectedDisasterId, setSelectedDisasterId] = useState<string | null>(
     null
   );
@@ -86,16 +94,25 @@ const BottomPanel = ({
   const handleSelectPeopleRow = (report: PeopleReport) => {
     const newId = report.id === selectedPeopleId ? null : report.id;
     setSelectedPeopleId(newId);
+    setSelectedInventoryId(null);
     setSelectedDisasterId(null);
     const selected = newId === report.id ? report : null;
     onSelectPeople(selected);
     onSelectDisaster(null);
   };
 
+  const handleSelectInventoryRow = (item: InventoryItem) => {
+    const newId = item.id === selectedInventoryId ? null : item.id;
+    setSelectedInventoryId(newId);
+    setSelectedPeopleId(null);
+    setSelectedDisasterId(null);
+  };
+
   const handleSelectDisasterRow = (disaster: Disaster) => {
     const newId = disaster.id === selectedDisasterId ? null : disaster.id;
     setSelectedDisasterId(newId);
     setSelectedPeopleId(null);
+    setSelectedInventoryId(null);
     const selected = newId === disaster.id ? disaster : null;
     onSelectDisaster(selected);
     onSelectPeople(null);
@@ -191,6 +208,7 @@ const BottomPanel = ({
                     variant="contained"
                     size="small"
                     onClick={onAddPeople}
+                    startIcon={<AddIcon />}
                   >
                     Add
                   </Button>
@@ -223,6 +241,7 @@ const BottomPanel = ({
                       <TableCell>Location</TableCell>
                       <TableCell>Total</TableCell>
                       <TableCell>Injured</TableCell>
+                      <TableCell>Chronic</TableCell>
                       <TableCell>Baby</TableCell>
                       <TableCell>Child</TableCell>
                       <TableCell>Elderly</TableCell>
@@ -233,7 +252,7 @@ const BottomPanel = ({
                     {filteredPeople.length === 0 ? (
                       <TableRow>
                         <TableCell
-                          colSpan={8}
+                          colSpan={9}
                           sx={{ textAlign: "center", color: "text.secondary" }}
                         >
                           No reports
@@ -250,6 +269,9 @@ const BottomPanel = ({
                         const sortedNeeds = [...report.needs].sort(
                           (a, b) => a.priority - b.priority
                         );
+                        const chronicTotal = Object.values(
+                          report.statusCounts?.chronicDisease || {}
+                        ).reduce((sum, count) => sum + count, 0);
                         return (
                           <TableRow
                             key={report.id}
@@ -273,6 +295,7 @@ const BottomPanel = ({
                             </TableCell>
                             <TableCell>{total}</TableCell>
                             <TableCell>{report.statusCounts.injured}</TableCell>
+                            <TableCell>{chronicTotal}</TableCell>
                             <TableCell>{report.counts.baby}</TableCell>
                             <TableCell>{report.counts.child}</TableCell>
                             <TableCell>{report.counts.elderly}</TableCell>
@@ -329,20 +352,25 @@ const BottomPanel = ({
                     variant="contained"
                     size="small"
                     onClick={onAddInventory}
+                    startIcon={<AddIcon />}
                   >
                     Add
                   </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    disabled={filteredInventory.length !== 1}
-                    onClick={() =>
-                      filteredInventory.length === 1 &&
-                      onEditInventory(filteredInventory[0])
-                    }
-                  >
-                    Edit
-                  </Button>
+                  {selectedInventoryId && (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<EditIcon />}
+                      onClick={() => {
+                        const item = inventoryItems.find(
+                          (i) => i.id === selectedInventoryId
+                        );
+                        if (item) onEditInventory(item);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  )}
                 </Box>
               </Box>
 
@@ -370,45 +398,54 @@ const BottomPanel = ({
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredInventory.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell sx={{ fontWeight: "medium" }}>
-                            {item.name}
-                          </TableCell>
-                          <TableCell>{item.quantity}</TableCell>
-                          <TableCell>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                flexWrap: "wrap",
-                                gap: 0.5,
-                              }}
-                            >
-                              {item.resolves.map((need) => (
+                      filteredInventory.map((item) => {
+                        const isSelected = selectedInventoryId === item.id;
+                        return (
+                          <TableRow
+                            key={item.id}
+                            hover
+                            selected={isSelected}
+                            onClick={() => handleSelectInventoryRow(item)}
+                            sx={{ cursor: "pointer" }}
+                          >
+                            <TableCell sx={{ fontWeight: "medium" }}>
+                              {item.name}
+                            </TableCell>
+                            <TableCell>{item.quantity}</TableCell>
+                            <TableCell>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  gap: 0.5,
+                                }}
+                              >
+                                {item.resolves.map((need) => (
+                                  <Chip
+                                    key={need}
+                                    label={need}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{ height: 24 }}
+                                  />
+                                ))}
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              {item.group ? (
                                 <Chip
-                                  key={need}
-                                  label={need}
+                                  label={item.group}
                                   size="small"
-                                  variant="outlined"
-                                  sx={{ height: 24 }}
+                                  color="info"
+                                  sx={{ textTransform: "capitalize" }}
                                 />
-                              ))}
-                            </Box>
-                          </TableCell>
-                          <TableCell>
-                            {item.group ? (
-                              <Chip
-                                label={item.group}
-                                size="small"
-                                color="info"
-                                sx={{ textTransform: "capitalize" }}
-                              />
-                            ) : (
-                              "—"
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))
+                              ) : (
+                                "—"
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
                     )}
                   </TableBody>
                 </Table>
@@ -436,13 +473,31 @@ const BottomPanel = ({
                   sx={{ width: 256 }}
                 />
                 <Box sx={{ display: "flex", gap: 1 }}>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={() => onSelectDisaster(null)}
-                  >
-                    Clear Selection
-                  </Button>
+                  {onAddDisaster && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={onAddDisaster}
+                      startIcon={<AddIcon />}
+                    >
+                      Add
+                    </Button>
+                  )}
+                  {selectedDisasterId && onEditDisaster && (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<EditIcon />}
+                      onClick={() => {
+                        const disaster = disasters.find(
+                          (d) => d.id === selectedDisasterId
+                        );
+                        if (disaster) onEditDisaster(disaster);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  )}
                 </Box>
               </Box>
 

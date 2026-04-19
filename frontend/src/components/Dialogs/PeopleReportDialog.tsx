@@ -22,6 +22,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import { useNominatim } from "../../hooks/useNominatim";
 import type { Coordinates, PeopleReport, Need } from "../../types";
 
@@ -83,6 +84,8 @@ const PeopleReportDialog = ({
     bedridden: 0,
   });
   const [chronicDiseases, setChronicDiseases] = useState<Record<string, number>>({});
+  const [newDiseaseName, setNewDiseaseName] = useState("");
+  const [newDiseaseCount, setNewDiseaseCount] = useState(1);
   const [details, setDetails] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -174,6 +177,37 @@ const PeopleReportDialog = ({
       newNeeds[index].priority = newNeeds[swapIdx].priority;
       newNeeds[swapIdx].priority = tempPriority;
       return newNeeds.sort((a, b) => a.priority - b.priority);
+    });
+  };
+
+  // Chronic disease management functions
+  const addChronicDisease = () => {
+    const trimmedName = newDiseaseName.trim();
+    if (!trimmedName || newDiseaseCount <= 0) return;
+    setChronicDiseases((prev) => ({
+      ...prev,
+      [trimmedName]: newDiseaseCount,
+    }));
+    setNewDiseaseName("");
+    setNewDiseaseCount(1);
+  };
+
+  const updateChronicDiseaseCount = (disease: string, count: number) => {
+    if (count <= 0) {
+      removeChronicDisease(disease);
+      return;
+    }
+    setChronicDiseases((prev) => ({
+      ...prev,
+      [disease]: count,
+    }));
+  };
+
+  const removeChronicDisease = (disease: string) => {
+    setChronicDiseases((prev) => {
+      const updated = { ...prev };
+      delete updated[disease];
+      return updated;
     });
   };
 
@@ -552,6 +586,100 @@ const PeopleReportDialog = ({
                 size="small"
                 fullWidth
               />
+            </Box>
+          </Box>
+
+          {/* Chronic Diseases Section */}
+          <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              Chronic Diseases (optional)
+            </Typography>
+
+            {/* Existing diseases list */}
+            {Object.keys(chronicDiseases).length > 0 && (
+              <Box sx={{ mb: 2 }}>
+                {Object.entries(chronicDiseases).map(([disease, count]) => (
+                  <Box
+                    key={disease}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mb: 1,
+                      p: 1,
+                      bgcolor: "action.hover",
+                      borderRadius: 1,
+                    }}
+                  >
+                    <TextField
+                      value={disease}
+                      size="small"
+                      disabled
+                      sx={{ flex: 1 }}
+                    />
+                    <TextField
+                      type="number"
+                      value={count}
+                      onChange={(e) =>
+                        updateChronicDiseaseCount(disease, Number(e.target.value))
+                      }
+                      slotProps={{ htmlInput: { min: 0 } }}
+                      size="small"
+                      sx={{ width: 80 }}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => removeChronicDisease(disease)}
+                      color="error"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                ))}
+              </Box>
+            )}
+
+            {/* Add new disease */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                p: 1,
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 1,
+                borderStyle: "dashed",
+              }}
+            >
+              <TextField
+                label="Disease name"
+                value={newDiseaseName}
+                onChange={(e) => setNewDiseaseName(e.target.value)}
+                placeholder="e.g., Diabetes, Asthma..."
+                size="small"
+                sx={{ flex: 1 }}
+              />
+              <TextField
+                label="Count"
+                type="number"
+                value={newDiseaseCount}
+                onChange={(e) =>
+                  setNewDiseaseCount(Math.max(1, Number(e.target.value)))
+                }
+                slotProps={{ htmlInput: { min: 1 } }}
+                size="small"
+                sx={{ width: 80 }}
+              />
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={addChronicDisease}
+                disabled={!newDiseaseName.trim()}
+                startIcon={<AddIcon />}
+              >
+                Add
+              </Button>
             </Box>
           </Box>
 

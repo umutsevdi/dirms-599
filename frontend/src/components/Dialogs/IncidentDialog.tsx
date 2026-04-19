@@ -16,6 +16,8 @@ import {
 import type { Disaster, Coordinates } from "../../types";
 
 interface IncidentDialogProps {
+  action: "add" | "edit";
+  disaster?: Disaster | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: (incident: Disaster) => void;
@@ -35,6 +37,8 @@ const INCIDENT_TYPES = [
 ];
 
 const IncidentDialog = ({
+  action,
+  disaster,
   isOpen,
   onClose,
   onSave,
@@ -50,49 +54,77 @@ const IncidentDialog = ({
 
   useEffect(() => {
     if (isOpen) {
-      setType("");
-      setSeverity("low");
-      setStatus("active");
-      setDescription("");
-      setAffectedRadius("");
-      setAddress(initialAddress || "");
+      if (action === "edit" && disaster) {
+        // Populate fields from existing disaster
+        setType(disaster.type);
+        setSeverity(disaster.severity);
+        setStatus(disaster.status);
+        setDescription(disaster.description);
+        setAffectedRadius(
+          disaster.affectedRadius ? disaster.affectedRadius.toString() : ""
+        );
+        setAddress(disaster.address);
+      } else {
+        // Reset for new incident
+        setType("");
+        setSeverity("low");
+        setStatus("active");
+        setDescription("");
+        setAffectedRadius("");
+        setAddress(initialAddress || "");
+      }
     }
-  }, [isOpen, initialAddress]);
+  }, [isOpen, action, disaster, initialAddress]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!type || !initialLocation) return;
+    if (!type) return;
 
-    const newIncident: Disaster = {
-      id: `d-${Date.now()}`,
+    const location =
+      action === "edit" && disaster
+        ? disaster.location
+        : initialLocation;
+
+    if (!location) return;
+
+    const incident: Disaster = {
+      id:
+        action === "edit" && disaster
+          ? disaster.id
+          : `d-${Date.now()}`,
       type,
-      location: initialLocation,
+      location,
       address: address || "Unknown location",
       severity,
       status,
-      timestamp: new Date().toISOString(),
+      timestamp:
+        action === "edit" && disaster
+          ? disaster.timestamp
+          : new Date().toISOString(),
       description,
       affectedRadius: affectedRadius ? parseInt(affectedRadius) : undefined,
     };
-    onSave(newIncident);
+    onSave(incident);
     onClose();
   };
 
+  const isEdit = action === "edit";
+  const location = isEdit && disaster ? disaster.location : initialLocation;
+
   return (
     <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Report Incident</DialogTitle>
+      <DialogTitle>{isEdit ? "Edit" : "Report"} Incident</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}
         >
-          {initialLocation && (
+          {location && (
             <Box sx={{ mb: 1 }}>
               <Typography variant="body2" color="text.secondary">
                 Location
               </Typography>
               <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
-                {initialLocation.lat.toFixed(4)},{" "}
-                {initialLocation.lng.toFixed(4)}
+                {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
               </Typography>
             </Box>
           )}
@@ -143,7 +175,9 @@ const IncidentDialog = ({
               labelId="status-label"
               label="Status"
               value={status}
-              onChange={(e) => setStatus(e.target.value as Disaster["status"])}
+              onChange={(e) =>
+                setStatus(e.target.value as Disaster["status"])
+              }
             >
               <MenuItem value="active">Active</MenuItem>
               <MenuItem value="contained">Contained</MenuItem>
@@ -177,9 +211,9 @@ const IncidentDialog = ({
             type="submit"
             variant="contained"
             color="primary"
-            disabled={!type || !initialLocation}
+            disabled={!type || !location}
           >
-            Report Incident
+            {isEdit ? "Update" : "Report"} Incident
           </Button>
         </DialogActions>
       </form>

@@ -416,7 +416,11 @@ const DashboardLayout = () => {
   }>({ open: false, action: "add" });
   const [editingPeopleReport, setEditingPeopleReport] =
     useState<PeopleReport | null>(null);
-  const [incidentDialogOpen, setIncidentDialogOpen] = useState(false);
+  const [incidentDialog, setIncidentDialog] = useState<{
+    open: boolean;
+    action: "add" | "edit";
+  }>({ open: false, action: "add" });
+  const [editingDisaster, setEditingDisaster] = useState<Disaster | null>(null);
   const [pendingCoords, setPendingCoords] = useState<Coordinates | null>(null);
   const [pendingAddress, setPendingAddress] = useState("");
 
@@ -504,7 +508,7 @@ const DashboardLayout = () => {
       const address = await reverseGeocode(coords);
       setPendingAddress(address);
 
-      setIncidentDialogOpen(true);
+      setIncidentDialog({ open: true, action: "add" });
       setAddIncidentMode(false);
     } else if (addPeopleMode) {
       setPendingCoords(coords);
@@ -556,6 +560,20 @@ const DashboardLayout = () => {
     setPendingCoords(null);
     setPendingAddress("");
     setPeopleDialog({ open: true, action: "edit" });
+  };
+
+  const handleAddDisaster = () => {
+    setEditingDisaster(null);
+    setPendingCoords(null);
+    setPendingAddress("");
+    setIncidentDialog({ open: true, action: "add" });
+  };
+
+  const handleEditDisaster = (disaster: Disaster) => {
+    setEditingDisaster(disaster);
+    setPendingCoords(null);
+    setPendingAddress("");
+    setIncidentDialog({ open: true, action: "edit" });
   };
 
   const handleSelectPeople = (report: PeopleReport | null) => {
@@ -623,9 +641,14 @@ const DashboardLayout = () => {
   };
 
   const handleSaveIncident = (incident: Disaster) => {
-    setDisasters((prev) => [...prev, incident]);
+    setDisasters((prev) => {
+      const existing = prev.find((d) => d.id === incident.id);
+      if (existing) return prev.map((d) => (d.id === incident.id ? incident : d));
+      return [...prev, incident];
+    });
     setPendingCoords(null);
     setPendingAddress("");
+    setEditingDisaster(null);
   };
 
   const handleSidePanelResizeStart = useCallback(
@@ -803,6 +826,8 @@ const DashboardLayout = () => {
                 onEditPeople={handleEditPeople}
                 onSelectPeople={handleSelectPeople}
                 onSelectDisaster={handleSelectDisaster}
+                onAddDisaster={handleAddDisaster}
+                onEditDisaster={handleEditDisaster}
               />
             </Box>
           </Box>
@@ -835,11 +860,14 @@ const DashboardLayout = () => {
         />
 
         <IncidentDialog
-          isOpen={incidentDialogOpen}
+          action={incidentDialog.action}
+          disaster={editingDisaster}
+          isOpen={incidentDialog.open}
           onClose={() => {
-            setIncidentDialogOpen(false);
+            setIncidentDialog({ open: false, action: "add" });
             setPendingCoords(null);
             setPendingAddress("");
+            setEditingDisaster(null);
           }}
           onSave={handleSaveIncident}
           initialLocation={pendingCoords}
