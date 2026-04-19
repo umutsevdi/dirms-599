@@ -93,7 +93,7 @@ const MapClickHandler = ({
 }) => {
   useMapEvents({
     click: (e) => {
-      onMapClick?.({ lat: e.latlng.lat, lng: e.latlng.lng });
+      onMapClick?.({ lat: e.latlng.lat, lng: e.latlng.lng, address: "" });
     },
   });
   return null;
@@ -126,7 +126,7 @@ const MapController = ({
 };
 
 const DisasterMap = ({
-  center = { lat: 39.9334, lng: 32.8597 },
+  center = { lat: 39.9334, lng: 32.8597, address: "" },
   zoom = 6,
   markers = [],
   circles = [],

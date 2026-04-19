@@ -49,7 +49,7 @@ const AddressSearch = ({ onSearch, onLocationSelect }: AddressSearchProps) => {
         <Button
           variant="outlined"
           size="small"
-          onClick={() => onLocationSelect({ lat: 39.9334, lng: 32.8597 })}
+          onClick={() => onLocationSelect({ lat: 39.9334, lng: 32.8597, address: "" })}
         >
           Use my location
         </Button>

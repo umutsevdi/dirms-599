@@ -1,8 +1,8 @@
 import { useState } from "react";
-import type { Coordinates, GeocodeResult } from "../types";
+import type { Coordinates } from "../types";
 
 export function useNominatim() {
-  const [results, setResults] = useState<GeocodeResult[]>([]);
+  const [results, setResults] = useState<Coordinates[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,8 +38,9 @@ export function useNominatim() {
       const data = await response.json();
       setResults(
         data.map((item: any) => ({
+          lat: parseFloat(item.lat),
+          lng: parseFloat(item.lon),
           address: item.display_name,
-          location: { lat: parseFloat(item.lat), lng: parseFloat(item.lon) },
         }))
       );
     } catch (err) {

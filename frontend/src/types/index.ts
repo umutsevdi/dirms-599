@@ -1,6 +1,7 @@
 export interface Coordinates {
   lat: number;
   lng: number;
+  address: string; // Human readable address
 }
 
 export interface Disaster {
@@ -54,9 +55,13 @@ export interface Need {
 
 export interface PeopleReport {
   id: string;
-  reporter: string;
+  reporter: {
+      name: string;
+      phoneNumber?: string;
+      contactMethod?: string;
+      contactDetails?: string;
+  };
   location: Coordinates;
-  address: string;
   needs: Need[];
   counts: {
     baby: number;
@@ -70,16 +75,11 @@ export interface PeopleReport {
   statusCounts: {
     missing: number;
     injured: number;
+    disabled: number;
+    bedridden: number;
+    chronicDisease: Record<string, number>; // Chronic Disease type - count map
   };
   details: string;
   timestamp: string;
   disasterId?: string;
-  phoneNumber?: string;
-  contactMethod?: string;
-  contactDetails?: string;
-}
-
-export interface GeocodeResult {
-  address: string;
-  location: Coordinates;
 }

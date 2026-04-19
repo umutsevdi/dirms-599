@@ -67,11 +67,20 @@ const aggregateReports = (reports: PeopleReport[]): PeopleReport => {
     })
   );
 
+  // Aggregate chronic diseases
+  const chronicDiseaseAgg: Record<string, number> = {};
+  reports.forEach((r) => {
+    Object.entries(r.statusCounts?.chronicDisease || {}).forEach(([disease, count]) => {
+      chronicDiseaseAgg[disease] = (chronicDiseaseAgg[disease] || 0) + count;
+    });
+  });
+
   return {
     id: `cluster-${Date.now()}`,
-    reporter: reports.map((r) => r.reporter).join(", "),
-    location: { lat: avgLat, lng: avgLng },
-    address: "Multiple locations",
+    reporter: {
+      name: reports.map((r) => r.reporter.name).join(", "),
+    },
+    location: { lat: avgLat, lng: avgLng, address: "Multiple locations" },
     needs: uniqueNeeds,
     counts: {
       baby: reports.reduce((sum, r) => sum + r.counts.baby, 0),
@@ -91,6 +100,15 @@ const aggregateReports = (reports: PeopleReport[]): PeopleReport => {
         (sum, r) => sum + (r.statusCounts?.injured || 0),
         0
       ),
+      disabled: reports.reduce(
+        (sum, r) => sum + (r.statusCounts?.disabled || 0),
+        0
+      ),
+      bedridden: reports.reduce(
+        (sum, r) => sum + (r.statusCounts?.bedridden || 0),
+        0
+      ),
+      chronicDisease: chronicDiseaseAgg,
     },
     details: "", // Not used in aggregated view
     timestamp: new Date().toISOString(),
@@ -153,7 +171,7 @@ const MapInfoBoard = ({
                 People Report
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {`Reported by ${report.reporter}`}
+                {`Reported by ${report.reporter.name}`}
               </Typography>
             </Box>
             <IconButton
@@ -170,10 +188,10 @@ const MapInfoBoard = ({
           <Box
             sx={{ display: "flex", flexDirection: "column", gap: 0.75, mb: 2 }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <LocationOnIcon fontSize="small" color="action" />
               <Typography variant="body2">
-                {report.address} ({report.location.lat.toFixed(4)},{" "}
+                {report.location.address} ({report.location.lat.toFixed(4)},{" "}
                 {report.location.lng.toFixed(4)})
               </Typography>
             </Box>
@@ -186,7 +204,7 @@ const MapInfoBoard = ({
           </Box>
 
           {!isCluster &&
-            (firstReport.phoneNumber || firstReport.contactMethod) && (
+            (firstReport.reporter.phoneNumber || firstReport.reporter.contactMethod) && (
               <Box
                 sx={{
                   display: "flex",
@@ -196,7 +214,7 @@ const MapInfoBoard = ({
                   flexWrap: "wrap",
                 }}
               >
-                {firstReport.phoneNumber && (
+                {firstReport.reporter.phoneNumber && (
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     <PhoneIcon
                       fontSize="small"
@@ -206,22 +224,27 @@ const MapInfoBoard = ({
                       variant="body2"
                       sx={{ fontFamily: "monospace" }}
                     >
-                      {firstReport.phoneNumber}
+                      {firstReport.reporter.phoneNumber}
                     </Typography>
                   </Box>
                 )}
-                {firstReport.phoneNumber && firstReport.contactMethod && (
+                {firstReport.reporter.phoneNumber && firstReport.reporter.contactMethod && (
                   <Typography variant="body2" color="text.secondary">
                     ·
                   </Typography>
                 )}
-                {firstReport.contactMethod && (
+                {firstReport.reporter.contactMethod && (
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    {getContactIcon(firstReport.contactMethod)}
+                    {getContactIcon(firstReport.reporter.contactMethod)}
                     <Typography variant="body2">
-                      {firstReport.contactMethod}
+                      {firstReport.reporter.contactMethod}
                     </Typography>
                   </Box>
+                )}
+                {firstReport.reporter.contactDetails && (
+                  <Typography variant="body2" color="text.secondary">
+                    ({firstReport.reporter.contactDetails})
+                  </Typography>
                 )}
               </Box>
             )}
@@ -392,6 +415,97 @@ const MapInfoBoard = ({
                   />
                 </Box>
               )}
+              {report.statusCounts.disabled > 0 && (
+                <Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                    >
+                      <LocalHospitalIcon
+                        sx={{ fontSize: 14, color: "info.main" }}
+                      />
+                      <Typography variant="caption">Disabled</Typography>
+                    </Box>
+                    <Typography
+                      variant="caption"
+                      sx={{ fontWeight: "bold", color: "info.main" }}
+                    >
+                      {report.statusCounts.disabled}
+                    </Typography>
+                  </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={
+                      totalPeople > 0
+                        ? (report.statusCounts.disabled / totalPeople) * 100
+                        : 0
+                    }
+                    color="info"
+                    sx={{ height: 6, borderRadius: 1, mt: 0.5 }}
+                  />
+                </Box>
+              )}
+              {report.statusCounts.bedridden > 0 && (
+                <Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                    >
+                      <LocalHospitalIcon
+                        sx={{ fontSize: 14, color: "secondary.main" }}
+                      />
+                      <Typography variant="caption">Bedridden</Typography>
+                    </Box>
+                    <Typography
+                      variant="caption"
+                      sx={{ fontWeight: "bold", color: "secondary.main" }}
+                    >
+                      {report.statusCounts.bedridden}
+                    </Typography>
+                  </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={
+                      totalPeople > 0
+                        ? (report.statusCounts.bedridden / totalPeople) * 100
+                        : 0
+                    }
+                    sx={{ height: 6, borderRadius: 1, mt: 0.5 }}
+                  />
+                </Box>
+              )}
+              {Object.keys(report.statusCounts.chronicDisease || {}).length > 0 && (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+                    Chronic Diseases
+                  </Typography>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.5 }}>
+                    {Object.entries(report.statusCounts.chronicDisease || {}).map(
+                      ([disease, count]) => (
+                        <Chip
+                          key={disease}
+                          label={`${disease}: ${count}`}
+                          size="small"
+                          color="default"
+                          sx={{ height: 20, fontSize: "0.75rem" }}
+                        />
+                      )
+                    )}
+                  </Box>
+                </Box>
+              )}
               {genderBase > 0 && (
                 <Box>
                   <Box
@@ -470,7 +584,7 @@ const MapInfoBoard = ({
                           display: "block",
                         }}
                       >
-                        {isCluster ? `${r.reporter}: ${r.details}` : r.details}
+                        {isCluster ? `${r.reporter.name}: ${r.details}` : r.details}
                       </Typography>
                     )
                 )}
@@ -841,7 +955,7 @@ const MapInfoBoard = ({
                             variant="caption"
                             sx={{ fontWeight: "bold" }}
                           >
-                            {r.reporter}
+                            {r.reporter.name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
                             {reportTotal} people
@@ -852,7 +966,7 @@ const MapInfoBoard = ({
                           color="text.secondary"
                           sx={{ display: "block", mb: 0.5 }}
                         >
-                          {r.address}
+                          {r.location.address}
                         </Typography>
                         {sortedNeeds.length > 0 && (
                           <Box

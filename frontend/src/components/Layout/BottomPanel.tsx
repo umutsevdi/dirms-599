@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo } from "react";
 import {
   Box,
   Tabs,
@@ -27,7 +27,6 @@ interface BottomPanelProps {
   onEditPeople: (report: PeopleReport) => void;
   onSelectPeople: (report: PeopleReport | null) => void;
   onSelectDisaster: (disaster: Disaster | null) => void;
-  initialHeight?: number;
 }
 
 const BottomPanel = ({
@@ -40,7 +39,6 @@ const BottomPanel = ({
   onEditPeople,
   onSelectPeople,
   onSelectDisaster,
-  initialHeight = 180,
 }: BottomPanelProps) => {
   const [activeTab, setActiveTab] = useState(0);
   const [inventorySearch, setInventorySearch] = useState("");
@@ -49,34 +47,6 @@ const BottomPanel = ({
   const [selectedPeopleId, setSelectedPeopleId] = useState<string | null>(null);
   const [selectedDisasterId, setSelectedDisasterId] = useState<string | null>(
     null
-  );
-  const [height, setHeight] = useState(initialHeight);
-  const isDragging = useRef(false);
-
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      isDragging.current = true;
-      const startY = e.clientY;
-      const startHeight = height;
-
-      const handleMouseMove = (moveEvent: MouseEvent) => {
-        if (!isDragging.current) return;
-        const delta = startY - moveEvent.clientY;
-        const newHeight = Math.max(120, Math.min(500, startHeight + delta));
-        setHeight(newHeight);
-      };
-
-      const handleMouseUp = () => {
-        isDragging.current = false;
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-      };
-
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    },
-    [height]
   );
 
   const filteredInventory = useMemo(() => {
@@ -95,8 +65,8 @@ const BottomPanel = ({
     const q = peopleSearch.toLowerCase();
     return peopleReports.filter(
       (r) =>
-        r.reporter.toLowerCase().includes(q) ||
-        r.address.toLowerCase().includes(q) ||
+        r.reporter.name.toLowerCase().includes(q) ||
+        r.location.address.toLowerCase().includes(q) ||
         r.needs.some((n) => n.label.toLowerCase().includes(q))
     );
   }, [peopleReports, peopleSearch]);
@@ -165,20 +135,10 @@ const BottomPanel = ({
         bgcolor: "background.paper",
         borderTop: 1,
         borderColor: "divider",
-        height,
+        flex: 1,
+        overflow: "hidden",
       }}
     >
-      <Box
-        sx={{
-          height: 4,
-          cursor: "row-resize",
-          bgcolor: "divider",
-          "&:hover": { bgcolor: "primary.main" },
-          transition: "background-color 0.2s",
-        }}
-        onMouseDown={handleMouseDown}
-      />
-
       <Box
         sx={{
           flex: 1,
@@ -299,7 +259,7 @@ const BottomPanel = ({
                             sx={{ cursor: "pointer" }}
                           >
                             <TableCell sx={{ fontWeight: "medium" }}>
-                              {report.reporter}
+                              {report.reporter.name}
                             </TableCell>
                             <TableCell
                               sx={{
@@ -309,7 +269,7 @@ const BottomPanel = ({
                                 whiteSpace: "nowrap",
                               }}
                             >
-                              {report.address}
+                              {report.location.address}
                             </TableCell>
                             <TableCell>{total}</TableCell>
                             <TableCell>{report.statusCounts.injured}</TableCell>

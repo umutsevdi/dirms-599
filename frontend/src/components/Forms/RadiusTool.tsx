@@ -66,7 +66,7 @@ const RadiusTool = ({ onRadiusDraw }: RadiusToolProps) => {
           size="small"
           fullWidth
           sx={{ mt: 2 }}
-          onClick={() => onRadiusDraw({ lat: 39.9334, lng: 32.8597 }, radius)}
+          onClick={() => onRadiusDraw({ lat: 39.9334, lng: 32.8597, address: "" }, radius)}
         >
           Draw Radius
         </Button>

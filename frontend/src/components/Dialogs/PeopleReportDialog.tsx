@@ -53,7 +53,17 @@ const PeopleReportDialog = ({
   initialLocation,
   initialAddress,
 }: PeopleReportDialogProps) => {
-  const [reporter, setReporter] = useState("");
+  const [reporter, setReporter] = useState<{
+    name: string;
+    phoneNumber?: string;
+    contactMethod?: string;
+    contactDetails?: string;
+  }>({
+    name: "",
+    phoneNumber: "",
+    contactMethod: "Phone Call",
+    contactDetails: "",
+  });
   const [locationQuery, setLocationQuery] = useState("");
   const [locationCoords, setLocationCoords] = useState<Coordinates | null>(
     null
@@ -66,11 +76,14 @@ const PeopleReportDialog = ({
     elderly: 0,
   });
   const [genderCounts, setGenderCounts] = useState({ women: 0 });
-  const [statusCounts, setStatusCounts] = useState({ missing: 0, injured: 0 });
+  const [statusCounts, setStatusCounts] = useState({
+    missing: 0,
+    injured: 0,
+    disabled: 0,
+    bedridden: 0,
+  });
+  const [chronicDiseases, setChronicDiseases] = useState<Record<string, number>>({});
   const [details, setDetails] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [contactMethod, setContactMethod] = useState("");
-  const [contactMethodCustom, setContactMethodCustom] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const { results, loading, search } = useNominatim();
@@ -80,39 +93,34 @@ const PeopleReportDialog = ({
   useEffect(() => {
     if (report) {
       setReporter(report.reporter);
-      setLocationQuery(report.address);
+      setLocationQuery(report.location.address);
       setLocationCoords(report.location);
       setNeeds([...report.needs].sort((a, b) => a.priority - b.priority));
       setCounts({ ...report.counts });
       setGenderCounts({ women: report.genderCounts?.women || 0 });
-      setStatusCounts({ ...report.statusCounts });
+      setStatusCounts({
+        missing: report.statusCounts?.missing || 0,
+        injured: report.statusCounts?.injured || 0,
+        disabled: report.statusCounts?.disabled || 0,
+        bedridden: report.statusCounts?.bedridden || 0,
+      });
+      setChronicDiseases(report.statusCounts?.chronicDisease || {});
       setDetails(report.details);
-      setPhoneNumber(report.phoneNumber || "");
-      if (
-        report.contactMethod &&
-        CONTACT_METHOD_OPTIONS.includes(report.contactMethod)
-      ) {
-        setContactMethod(report.contactMethod);
-        setContactMethodCustom("");
-      } else if (report.contactMethod) {
-        setContactMethod("Other");
-        setContactMethodCustom(report.contactMethod);
-      } else {
-        setContactMethod("");
-        setContactMethodCustom("");
-      }
     } else {
-      setReporter("");
+      setReporter({
+        name: "",
+        phoneNumber: "",
+        contactMethod: "Phone Call",
+        contactDetails: "",
+      });
       setLocationQuery(initialAddress || "");
       setLocationCoords(initialLocation || null);
       setNeeds([]);
       setCounts({ baby: 0, child: 0, adult: 0, elderly: 0 });
       setGenderCounts({ women: 0 });
-      setStatusCounts({ missing: 0, injured: 0 });
+      setStatusCounts({ missing: 0, injured: 0, disabled: 0, bedridden: 0 });
+      setChronicDiseases({});
       setDetails("");
-      setPhoneNumber("");
-      setContactMethod("Phone Call");
-      setContactMethodCustom("");
     }
     setShowSuggestions(false);
   }, [report, initialLocation, initialAddress, isOpen]);
@@ -139,8 +147,8 @@ const PeopleReportDialog = ({
     }, 400);
   };
 
-  const handleSelectLocation = (address: string, location: Coordinates) => {
-    setLocationQuery(address);
+  const handleSelectLocation = (location: Coordinates) => {
+    setLocationQuery(location.address);
     setLocationCoords(location);
     setShowSuggestions(false);
   };
@@ -171,24 +179,30 @@ const PeopleReportDialog = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reporter || !locationCoords) return;
+    if (!reporter.name || !locationCoords) return;
 
     const newReport: PeopleReport = {
       id: report?.id || `report-${Date.now()}`,
-      reporter,
-      location: locationCoords,
-      address: locationQuery,
+      reporter: {
+        name: reporter.name,
+        phoneNumber: reporter.phoneNumber || undefined,
+        contactMethod: reporter.contactMethod || undefined,
+        contactDetails: reporter.contactDetails || undefined,
+      },
+      location: {
+        ...locationCoords,
+        address: locationQuery,
+      },
       needs,
       counts,
       genderCounts,
-      statusCounts,
+      statusCounts: {
+        ...statusCounts,
+        chronicDisease: chronicDiseases,
+      },
       details,
       timestamp: new Date().toISOString(),
       disasterId: report?.disasterId,
-      phoneNumber: phoneNumber || undefined,
-      contactMethod:
-        (contactMethod === "Other" ? contactMethodCustom : contactMethod) ||
-        undefined,
     };
     onSave(newReport);
     onClose();
@@ -209,8 +223,8 @@ const PeopleReportDialog = ({
         >
           <TextField
             label="Reporter Name"
-            value={reporter}
-            onChange={(e) => setReporter(e.target.value)}
+            value={reporter.name}
+            onChange={(e) => setReporter((prev) => ({ ...prev, name: e.target.value }))}
             placeholder="Who is reporting?"
             required
             fullWidth
@@ -255,9 +269,7 @@ const PeopleReportDialog = ({
                 {results.map((result, index) => (
                   <ListItem
                     key={index}
-                    onClick={() =>
-                      handleSelectLocation(result.address, result.location)
-                    }
+                    onClick={() => handleSelectLocation(result)}
                     sx={{
                       cursor: "pointer",
                       px: 2,
@@ -287,16 +299,16 @@ const PeopleReportDialog = ({
             >
               <TextField
                 label="Phone Number"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                value={reporter.phoneNumber}
+                onChange={(e) => setReporter((prev) => ({ ...prev, phoneNumber: e.target.value }))}
                 placeholder="+90 555 123 4567"
                 size="small"
                 fullWidth
               />
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 <Select
-                  value={contactMethod}
-                  onChange={(e) => setContactMethod(e.target.value)}
+                  value={reporter.contactMethod}
+                  onChange={(e) => setReporter((prev) => ({ ...prev, contactMethod: e.target.value }))}
                   displayEmpty
                   size="small"
                   fullWidth
@@ -310,10 +322,10 @@ const PeopleReportDialog = ({
                     </MenuItem>
                   ))}
                 </Select>
-                {contactMethod === "Other" && (
+                {reporter.contactMethod === "Other" && (
                   <TextField
-                    value={contactMethodCustom}
-                    onChange={(e) => setContactMethodCustom(e.target.value)}
+                    value={reporter.contactDetails}
+                    onChange={(e) => setReporter((prev) => ({ ...prev, contactDetails: e.target.value }))}
                     placeholder="Specify contact method..."
                     size="small"
                     fullWidth
@@ -482,7 +494,7 @@ const PeopleReportDialog = ({
               Status
             </Typography>
             <Box
-              sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}
+              sx={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 2 }}
             >
               <TextField
                 label="Missing"
@@ -512,6 +524,34 @@ const PeopleReportDialog = ({
                 size="small"
                 fullWidth
               />
+              <TextField
+                label="Disabled"
+                type="number"
+                value={statusCounts.disabled}
+                onChange={(e) =>
+                  setStatusCounts((prev) => ({
+                    ...prev,
+                    disabled: Math.max(0, Number(e.target.value)),
+                  }))
+                }
+                slotProps={{ htmlInput: { min: 0 } }}
+                size="small"
+                fullWidth
+              />
+              <TextField
+                label="Bedridden"
+                type="number"
+                value={statusCounts.bedridden}
+                onChange={(e) =>
+                  setStatusCounts((prev) => ({
+                    ...prev,
+                    bedridden: Math.max(0, Number(e.target.value)),
+                  }))
+                }
+                slotProps={{ htmlInput: { min: 0 } }}
+                size="small"
+                fullWidth
+              />
             </Box>
           </Box>
 
@@ -531,7 +571,7 @@ const PeopleReportDialog = ({
             type="submit"
             variant="contained"
             color="primary"
-            disabled={!reporter || !locationCoords}
+            disabled={!reporter.name || !locationCoords}
           >
             {report ? "Update" : "Submit"} Report
           </Button>

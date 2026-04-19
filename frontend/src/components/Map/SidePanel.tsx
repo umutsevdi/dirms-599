@@ -10,11 +10,11 @@ import {
 } from "@mui/material";
 import type { Disaster } from "../../types";
 
-interface RightPanelProps {
+interface SidePanelProps {
   disasters: Disaster[];
 }
 
-const RightPanel = ({ disasters }: RightPanelProps) => {
+const SidePanel = ({ disasters }: SidePanelProps) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const getSeverityColor = (
@@ -133,4 +133,4 @@ const RightPanel = ({ disasters }: RightPanelProps) => {
   );
 };
 
-export default RightPanel;
+export default SidePanel;

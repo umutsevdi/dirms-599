@@ -21,6 +21,7 @@ export function useGeolocation() {
         setLocation({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
+          address: "",
         });
         setLoading(false);
       },

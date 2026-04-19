@@ -127,7 +127,7 @@ const MapControls = ({
                   <ListItem
                     key={index}
                     onClick={() =>
-                      handleSelect(result.address, result.location)
+                      handleSelect(result.address, result)
                     }
                     sx={{
                       cursor: "pointer",
