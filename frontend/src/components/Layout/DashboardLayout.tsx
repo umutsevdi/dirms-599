@@ -26,6 +26,11 @@ const MIN_PANEL = layout.panel.minWidth;
 const MAX_PANEL = layout.panel.maxWidth;
 const DEFAULT_PANEL = layout.panel.defaultWidth;
 
+// Bottom panel height constants (as percentages)
+const MIN_PANEL_HEIGHT_PERCENT = layout.panel.minHeightPercent;
+const MAX_PANEL_HEIGHT_PERCENT = layout.panel.maxHeightPercent;
+const DEFAULT_PANEL_HEIGHT_PERCENT = layout.panel.defaultHeightPercent;
+
 const DashboardLayout = () => {
   const { disasters, setDisasters } = useData();
   const [mapCenter, setMapCenter] = useState<Coordinates>({
@@ -39,6 +44,7 @@ const DashboardLayout = () => {
   const [peopleReports, setPeopleReports] =
     useState<PeopleReport[]>(actualPeopleReports);
   const [sidePanelWidth, setSidePanelWidth] = useState<number>(DEFAULT_PANEL);
+  const [bottomPanelHeightPercent, setBottomPanelHeightPercent] = useState<number>(DEFAULT_PANEL_HEIGHT_PERCENT);
   const [addIncidentMode, setAddIncidentMode] = useState(false);
   const [addPeopleMode, setAddPeopleMode] = useState(false);
   const [selectedDisasterMarker, setSelectedDisasterMarker] =
@@ -317,6 +323,35 @@ const DashboardLayout = () => {
     [sidePanelWidth]
   );
 
+  const handleBottomPanelResizeStart = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      const startY = e.clientY;
+      const container = e.currentTarget.parentElement?.parentElement;
+      const containerHeight = container?.clientHeight || window.innerHeight;
+      const startHeightPercent = bottomPanelHeightPercent;
+
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const deltaPixels = moveEvent.clientY - startY;
+        const deltaPercent = (deltaPixels / containerHeight) * 100;
+        // Dragging up decreases height (delta is negative), dragging down increases height
+        const newHeightPercent = startHeightPercent - deltaPercent;
+        setBottomPanelHeightPercent(
+          Math.max(MIN_PANEL_HEIGHT_PERCENT, Math.min(MAX_PANEL_HEIGHT_PERCENT, newHeightPercent))
+        );
+      };
+
+      const handleMouseUp = () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
+
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    },
+    [bottomPanelHeightPercent]
+  );
+
   const selectedDisasterFromMarker = selectedDisasterMarker
     ? (disasters.find((d) => d.id === selectedDisasterMarker.id) ?? null)
     : null;
@@ -378,12 +413,12 @@ const DashboardLayout = () => {
             gap: 2,
           }}
         >
-          {/* Map - 50% height */}
+          {/* Map - fills remaining space */}
           <Box
             sx={{
               flex: 1,
               position: "relative",
-              minHeight: 0,
+              minHeight: 200,
               borderRadius: 1,
               overflow: "hidden",
             }}
@@ -418,29 +453,49 @@ const DashboardLayout = () => {
             />
           </Box>
 
-          {/* Bottom Panel - 50% height */}
+          {/* Bottom Panel - resizable */}
           <Box
             sx={{
-              flex: 1,
+              position: "relative",
+              flexShrink: 0,
+              height: `${bottomPanelHeightPercent}%`,
+              minHeight: `${MIN_PANEL_HEIGHT_PERCENT}%`,
+              maxHeight: `${MAX_PANEL_HEIGHT_PERCENT}%`,
               display: "flex",
               flexDirection: "column",
-              minHeight: 0,
               overflow: "hidden",
             }}
           >
-            <BottomPanel
-              disasters={disasters}
-              inventoryItems={inventoryItems}
-              peopleReports={peopleReports}
-              onAddInventory={handleAddInventory}
-              onEditInventory={handleEditInventory}
-              onAddPeople={handleAddPeople}
-              onEditPeople={handleEditPeople}
-              onSelectPeople={handleSelectPeople}
-              onSelectDisaster={handleSelectDisaster}
-              onAddDisaster={handleAddDisaster}
-              onEditDisaster={handleEditDisaster}
+            {/* Resize Handle */}
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 4,
+                cursor: "row-resize",
+                bgcolor: "action.hover",
+                "&:hover": { bgcolor: "primary.main" },
+                zIndex: 10,
+              }}
+              onMouseDown={handleBottomPanelResizeStart}
             />
+            <Box sx={{ pt: 0.5, flex: 1, overflow: "hidden" }}>
+              <BottomPanel
+                disasters={disasters}
+                inventoryItems={inventoryItems}
+                peopleReports={peopleReports}
+                onAddInventory={handleAddInventory}
+                onEditInventory={handleEditInventory}
+                onAddPeople={handleAddPeople}
+                onEditPeople={handleEditPeople}
+                onSelectPeople={handleSelectPeople}
+                onSelectDisaster={handleSelectDisaster}
+                onAddDisaster={handleAddDisaster}
+                onEditDisaster={handleEditDisaster}
+              />
+            </Box>
           </Box>
         </Box>
       </Box>

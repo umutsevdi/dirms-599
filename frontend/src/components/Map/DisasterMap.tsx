@@ -140,6 +140,37 @@ const MapController = ({
   return null;
 };
 
+// Resize handler to ensure map renders correctly when container size changes
+const MapResizeHandler = () => {
+  const map = useMap();
+
+  useEffect(() => {
+    const container = map.getContainer();
+
+    const resizeObserver = new ResizeObserver(() => {
+      // Use requestAnimationFrame to batch resize calls
+      requestAnimationFrame(() => {
+        map.invalidateSize();
+      });
+    });
+
+    resizeObserver.observe(container);
+
+    // Also handle window resize
+    const handleWindowResize = () => {
+      map.invalidateSize();
+    };
+    window.addEventListener("resize", handleWindowResize);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  }, [map]);
+
+  return null;
+};
+
 const DisasterMap = ({
   center = { lat: 39.9334, lng: 32.8597, address: "" },
   zoom = 6,
@@ -178,6 +209,7 @@ const DisasterMap = ({
     >
       <MapClickHandler onMapClick={onMapClick} />
       <MapController mapRef={mapRef} />
+      <MapResizeHandler />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

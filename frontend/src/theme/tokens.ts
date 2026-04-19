@@ -83,6 +83,9 @@ export const layout = {
     defaultWidth: 320,
     infoBoardWidth: 320,
     infoBoardWidthCluster: 380,
+    minHeightPercent: 20,
+    maxHeightPercent: 70,
+    defaultHeightPercent: 50,
   },
   // Spacing scale (in px, matching MUI spacing)
   spacing: {
