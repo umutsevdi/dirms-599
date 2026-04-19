@@ -83,7 +83,9 @@ const PeopleReportDialog = ({
     disabled: 0,
     bedridden: 0,
   });
-  const [chronicDiseases, setChronicDiseases] = useState<Record<string, number>>({});
+  const [chronicDiseases, setChronicDiseases] = useState<
+    Record<string, number>
+  >({});
   const [newDiseaseName, setNewDiseaseName] = useState("");
   const [newDiseaseCount, setNewDiseaseCount] = useState(1);
   const [details, setDetails] = useState("");
@@ -258,7 +260,9 @@ const PeopleReportDialog = ({
           <TextField
             label="Reporter Name"
             value={reporter.name}
-            onChange={(e) => setReporter((prev) => ({ ...prev, name: e.target.value }))}
+            onChange={(e) =>
+              setReporter((prev) => ({ ...prev, name: e.target.value }))
+            }
             placeholder="Who is reporting?"
             required
             fullWidth
@@ -334,7 +338,12 @@ const PeopleReportDialog = ({
               <TextField
                 label="Phone Number"
                 value={reporter.phoneNumber}
-                onChange={(e) => setReporter((prev) => ({ ...prev, phoneNumber: e.target.value }))}
+                onChange={(e) =>
+                  setReporter((prev) => ({
+                    ...prev,
+                    phoneNumber: e.target.value,
+                  }))
+                }
                 placeholder="+90 555 123 4567"
                 size="small"
                 fullWidth
@@ -342,7 +351,12 @@ const PeopleReportDialog = ({
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 <Select
                   value={reporter.contactMethod}
-                  onChange={(e) => setReporter((prev) => ({ ...prev, contactMethod: e.target.value }))}
+                  onChange={(e) =>
+                    setReporter((prev) => ({
+                      ...prev,
+                      contactMethod: e.target.value,
+                    }))
+                  }
                   displayEmpty
                   size="small"
                   fullWidth
@@ -359,7 +373,12 @@ const PeopleReportDialog = ({
                 {reporter.contactMethod === "Other" && (
                   <TextField
                     value={reporter.contactDetails}
-                    onChange={(e) => setReporter((prev) => ({ ...prev, contactDetails: e.target.value }))}
+                    onChange={(e) =>
+                      setReporter((prev) => ({
+                        ...prev,
+                        contactDetails: e.target.value,
+                      }))
+                    }
                     placeholder="Specify contact method..."
                     size="small"
                     fullWidth
@@ -528,7 +547,11 @@ const PeopleReportDialog = ({
               Status
             </Typography>
             <Box
-              sx={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 2 }}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(4, 1fr)",
+                gap: 2,
+              }}
             >
               <TextField
                 label="Missing"
@@ -621,7 +644,10 @@ const PeopleReportDialog = ({
                       type="number"
                       value={count}
                       onChange={(e) =>
-                        updateChronicDiseaseCount(disease, Number(e.target.value))
+                        updateChronicDiseaseCount(
+                          disease,
+                          Number(e.target.value)
+                        )
                       }
                       slotProps={{ htmlInput: { min: 0 } }}
                       size="small"

@@ -81,17 +81,12 @@ const IncidentDialog = ({
     if (!type) return;
 
     const location =
-      action === "edit" && disaster
-        ? disaster.location
-        : initialLocation;
+      action === "edit" && disaster ? disaster.location : initialLocation;
 
     if (!location) return;
 
     const incident: Disaster = {
-      id:
-        action === "edit" && disaster
-          ? disaster.id
-          : `d-${Date.now()}`,
+      id: action === "edit" && disaster ? disaster.id : `d-${Date.now()}`,
       type,
       location,
       address: address || "Unknown location",
@@ -175,9 +170,7 @@ const IncidentDialog = ({
               labelId="status-label"
               label="Status"
               value={status}
-              onChange={(e) =>
-                setStatus(e.target.value as Disaster["status"])
-              }
+              onChange={(e) => setStatus(e.target.value as Disaster["status"])}
             >
               <MenuItem value="active">Active</MenuItem>
               <MenuItem value="contained">Contained</MenuItem>

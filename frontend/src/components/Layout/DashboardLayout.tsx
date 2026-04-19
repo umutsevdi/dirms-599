@@ -149,7 +149,13 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 2, child: 5, adult: 12, elderly: 3 },
     genderCounts: { women: 7 },
-    statusCounts: { missing: 3, injured: 2, disabled: 1, bedridden: 0, chronicDisease: { Diabetes: 2, Hypertension: 1 } },
+    statusCounts: {
+      missing: 3,
+      injured: 2,
+      disabled: 1,
+      bedridden: 0,
+      chronicDisease: { Diabetes: 2, Hypertension: 1 },
+    },
     details:
       "Multiple families trapped in collapsed buildings. Urgent medical assistance needed.",
     timestamp: "2026-04-15T11:00:00Z",
@@ -169,7 +175,13 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 1, child: 3, adult: 8, elderly: 4 },
     genderCounts: { women: 6 },
-    statusCounts: { missing: 1, injured: 0, disabled: 0, bedridden: 1, chronicDisease: {} },
+    statusCounts: {
+      missing: 1,
+      injured: 0,
+      disabled: 0,
+      bedridden: 1,
+      chronicDisease: {},
+    },
     details: "People gathered in open area. Need blankets and food supplies.",
     timestamp: "2026-04-15T11:30:00Z",
     disasterId: "1",
@@ -181,14 +193,24 @@ const samplePeopleReports: PeopleReport[] = [
       phoneNumber: "+90 555 222 3344",
       contactMethod: "Phone Call",
     },
-    location: { lat: 41.0082, lng: 28.9784, address: "Kadikoy, Istanbul, Turkey" },
+    location: {
+      lat: 41.0082,
+      lng: 28.9784,
+      address: "Kadikoy, Istanbul, Turkey",
+    },
     needs: [
       { label: "Water", priority: 1 },
       { label: "Clothing", priority: 2 },
     ],
     counts: { baby: 0, child: 2, adult: 6, elderly: 1 },
     genderCounts: { women: 3 },
-    statusCounts: { missing: 0, injured: 1, disabled: 0, bedridden: 0, chronicDisease: {} },
+    statusCounts: {
+      missing: 0,
+      injured: 1,
+      disabled: 0,
+      bedridden: 0,
+      chronicDisease: {},
+    },
     details: "Flooded area, people evacuated to higher ground.",
     timestamp: "2026-04-14T09:00:00Z",
     disasterId: "2",
@@ -200,14 +222,24 @@ const samplePeopleReports: PeopleReport[] = [
       contactMethod: "Other",
       contactDetails: "Telegram: @zeynep_a",
     },
-    location: { lat: 36.8969, lng: 30.7133, address: "Konyaalti, Antalya, Turkey" },
+    location: {
+      lat: 36.8969,
+      lng: 30.7133,
+      address: "Konyaalti, Antalya, Turkey",
+    },
     needs: [
       { label: "Medical", priority: 1 },
       { label: "Water", priority: 2 },
     ],
     counts: { baby: 0, child: 1, adult: 4, elderly: 2 },
     genderCounts: { women: 3 },
-    statusCounts: { missing: 0, injured: 3, disabled: 1, bedridden: 0, chronicDisease: { Asthma: 1 } },
+    statusCounts: {
+      missing: 0,
+      injured: 3,
+      disabled: 1,
+      bedridden: 0,
+      chronicDisease: { Asthma: 1 },
+    },
     details: "Smoke inhalation cases reported. Need medical supplies urgently.",
     timestamp: "2026-04-13T15:00:00Z",
     disasterId: "3",
@@ -220,7 +252,11 @@ const samplePeopleReports: PeopleReport[] = [
       phoneNumber: "+90 555 333 4455",
       contactMethod: "WhatsApp",
     },
-    location: { lat: 41.015, lng: 28.985, address: "Moda, Kadikoy, Istanbul, Turkey" },
+    location: {
+      lat: 41.015,
+      lng: 28.985,
+      address: "Moda, Kadikoy, Istanbul, Turkey",
+    },
     needs: [
       { label: "Food", priority: 1 },
       { label: "Water", priority: 1 },
@@ -228,7 +264,13 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 1, child: 4, adult: 9, elderly: 2 },
     genderCounts: { women: 5 },
-    statusCounts: { missing: 0, injured: 1, disabled: 0, bedridden: 0, chronicDisease: {} },
+    statusCounts: {
+      missing: 0,
+      injured: 1,
+      disabled: 0,
+      bedridden: 0,
+      chronicDisease: {},
+    },
     details: "Neighborhood park gathering point. 3 families need assistance.",
     timestamp: "2026-04-14T10:30:00Z",
     disasterId: "2",
@@ -240,14 +282,24 @@ const samplePeopleReports: PeopleReport[] = [
       phoneNumber: "+90 555 444 5566",
       contactMethod: "SMS",
     },
-    location: { lat: 41.012, lng: 28.982, address: "Osmanağa, Kadikoy, Istanbul, Turkey" },
+    location: {
+      lat: 41.012,
+      lng: 28.982,
+      address: "Osmanağa, Kadikoy, Istanbul, Turkey",
+    },
     needs: [
       { label: "Medical", priority: 1 },
       { label: "Blankets", priority: 2 },
     ],
     counts: { baby: 2, child: 3, adult: 7, elderly: 3 },
     genderCounts: { women: 5 },
-    statusCounts: { missing: 1, injured: 2, disabled: 1, bedridden: 2, chronicDisease: { Diabetes: 1, HeartDisease: 1 } },
+    statusCounts: {
+      missing: 1,
+      injured: 2,
+      disabled: 1,
+      bedridden: 2,
+      chronicDisease: { Diabetes: 1, HeartDisease: 1 },
+    },
     details:
       "School gymnasium shelter. Elderly residents need medical checkups.",
     timestamp: "2026-04-14T11:00:00Z",
@@ -260,7 +312,11 @@ const samplePeopleReports: PeopleReport[] = [
       phoneNumber: "+90 555 555 6677",
       contactMethod: "Phone Call",
     },
-    location: { lat: 41.005, lng: 28.975, address: "Fenerbahce, Kadikoy, Istanbul, Turkey" },
+    location: {
+      lat: 41.005,
+      lng: 28.975,
+      address: "Fenerbahce, Kadikoy, Istanbul, Turkey",
+    },
     needs: [
       { label: "Water", priority: 1 },
       { label: "Food", priority: 2 },
@@ -268,7 +324,13 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 0, child: 5, adult: 11, elderly: 1 },
     genderCounts: { women: 6 },
-    statusCounts: { missing: 0, injured: 0, disabled: 0, bedridden: 0, chronicDisease: {} },
+    statusCounts: {
+      missing: 0,
+      injured: 0,
+      disabled: 0,
+      bedridden: 0,
+      chronicDisease: {},
+    },
     details:
       "Sports stadium evacuation center. All ages present, stable condition.",
     timestamp: "2026-04-14T12:00:00Z",
@@ -281,7 +343,11 @@ const samplePeopleReports: PeopleReport[] = [
       phoneNumber: "+90 555 666 7788",
       contactMethod: "WhatsApp",
     },
-    location: { lat: 41.018, lng: 28.99, address: "Goztepe, Kadikoy, Istanbul, Turkey" },
+    location: {
+      lat: 41.018,
+      lng: 28.99,
+      address: "Goztepe, Kadikoy, Istanbul, Turkey",
+    },
     needs: [
       { label: "Shelter", priority: 1 },
       { label: "Medical", priority: 2 },
@@ -289,7 +355,13 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 1, child: 2, adult: 5, elderly: 4 },
     genderCounts: { women: 4 },
-    statusCounts: { missing: 2, injured: 1, disabled: 1, bedridden: 1, chronicDisease: { Hypertension: 2 } },
+    statusCounts: {
+      missing: 2,
+      injured: 1,
+      disabled: 1,
+      bedridden: 1,
+      chronicDisease: { Hypertension: 2 },
+    },
     details:
       "Community center damaged. Families with elderly need urgent relocation.",
     timestamp: "2026-04-14T12:30:00Z",
@@ -302,14 +374,24 @@ const samplePeopleReports: PeopleReport[] = [
       phoneNumber: "+90 555 777 8899",
       contactMethod: "SMS",
     },
-    location: { lat: 41.022, lng: 28.995, address: "Erenkoy, Kadikoy, Istanbul, Turkey" },
+    location: {
+      lat: 41.022,
+      lng: 28.995,
+      address: "Erenkoy, Kadikoy, Istanbul, Turkey",
+    },
     needs: [
       { label: "Food", priority: 1 },
       { label: "Water", priority: 1 },
     ],
     counts: { baby: 3, child: 6, adult: 8, elderly: 2 },
     genderCounts: { women: 5 },
-    statusCounts: { missing: 0, injured: 3, disabled: 0, bedridden: 0, chronicDisease: {} },
+    statusCounts: {
+      missing: 0,
+      injured: 3,
+      disabled: 0,
+      bedridden: 0,
+      chronicDisease: {},
+    },
     details: "Local mosque courtyard. Many children and infants need supplies.",
     timestamp: "2026-04-14T13:00:00Z",
     disasterId: "2",
@@ -321,7 +403,11 @@ const samplePeopleReports: PeopleReport[] = [
       phoneNumber: "+90 555 888 9900",
       contactMethod: "Phone Call",
     },
-    location: { lat: 41.01, lng: 28.98, address: "Kosuyolu, Kadikoy, Istanbul, Turkey" },
+    location: {
+      lat: 41.01,
+      lng: 28.98,
+      address: "Kosuyolu, Kadikoy, Istanbul, Turkey",
+    },
     needs: [
       { label: "Medical", priority: 1 },
       { label: "Shelter", priority: 2 },
@@ -329,7 +415,13 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 1, child: 3, adult: 6, elderly: 2 },
     genderCounts: { women: 4 },
-    statusCounts: { missing: 1, injured: 4, disabled: 0, bedridden: 1, chronicDisease: { Diabetes: 1 } },
+    statusCounts: {
+      missing: 1,
+      injured: 4,
+      disabled: 0,
+      bedridden: 1,
+      chronicDisease: { Diabetes: 1 },
+    },
     details:
       "Hospital parking lot. Several injured patients discharged to make room.",
     timestamp: "2026-04-14T13:30:00Z",
@@ -342,7 +434,11 @@ const samplePeopleReports: PeopleReport[] = [
       phoneNumber: "+90 555 999 0011",
       contactMethod: "WhatsApp",
     },
-    location: { lat: 41.02, lng: 28.985, address: "Suadiye, Kadikoy, Istanbul, Turkey" },
+    location: {
+      lat: 41.02,
+      lng: 28.985,
+      address: "Suadiye, Kadikoy, Istanbul, Turkey",
+    },
     needs: [
       { label: "Water", priority: 1 },
       { label: "Food", priority: 2 },
@@ -350,7 +446,13 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 0, child: 4, adult: 10, elderly: 3 },
     genderCounts: { women: 6 },
-    statusCounts: { missing: 0, injured: 0, disabled: 0, bedridden: 0, chronicDisease: {} },
+    statusCounts: {
+      missing: 0,
+      injured: 0,
+      disabled: 0,
+      bedridden: 0,
+      chronicDisease: {},
+    },
     details: "Beach promenade area. Families displaced from nearby residences.",
     timestamp: "2026-04-14T14:00:00Z",
     disasterId: "2",
@@ -362,7 +464,11 @@ const samplePeopleReports: PeopleReport[] = [
       phoneNumber: "+90 555 000 1122",
       contactMethod: "SMS",
     },
-    location: { lat: 41.007, lng: 28.978, address: "Caddebostan, Kadikoy, Istanbul, Turkey" },
+    location: {
+      lat: 41.007,
+      lng: 28.978,
+      address: "Caddebostan, Kadikoy, Istanbul, Turkey",
+    },
     needs: [
       { label: "Shelter", priority: 1 },
       { label: "Medical", priority: 1 },
@@ -370,7 +476,13 @@ const samplePeopleReports: PeopleReport[] = [
     ],
     counts: { baby: 2, child: 7, adult: 12, elderly: 4 },
     genderCounts: { women: 8 },
-    statusCounts: { missing: 3, injured: 5, disabled: 2, bedridden: 1, chronicDisease: { HeartDisease: 2, Diabetes: 1 } },
+    statusCounts: {
+      missing: 3,
+      injured: 5,
+      disabled: 2,
+      bedridden: 1,
+      chronicDisease: { HeartDisease: 2, Diabetes: 1 },
+    },
     details:
       "Shopping mall parking structure. Multiple injuries from building collapse nearby.",
     timestamp: "2026-04-14T14:30:00Z",
@@ -643,7 +755,8 @@ const DashboardLayout = () => {
   const handleSaveIncident = (incident: Disaster) => {
     setDisasters((prev) => {
       const existing = prev.find((d) => d.id === incident.id);
-      if (existing) return prev.map((d) => (d.id === incident.id ? incident : d));
+      if (existing)
+        return prev.map((d) => (d.id === incident.id ? incident : d));
       return [...prev, incident];
     });
     setPendingCoords(null);

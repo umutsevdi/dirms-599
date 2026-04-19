@@ -126,9 +126,7 @@ const MapControls = ({
                 {results.map((result, index) => (
                   <ListItem
                     key={index}
-                    onClick={() =>
-                      handleSelect(result.address, result)
-                    }
+                    onClick={() => handleSelect(result.address, result)}
                     sx={{
                       cursor: "pointer",
                       px: 2,

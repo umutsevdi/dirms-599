@@ -70,9 +70,11 @@ const aggregateReports = (reports: PeopleReport[]): PeopleReport => {
   // Aggregate chronic diseases
   const chronicDiseaseAgg: Record<string, number> = {};
   reports.forEach((r) => {
-    Object.entries(r.statusCounts?.chronicDisease || {}).forEach(([disease, count]) => {
-      chronicDiseaseAgg[disease] = (chronicDiseaseAgg[disease] || 0) + count;
-    });
+    Object.entries(r.statusCounts?.chronicDisease || {}).forEach(
+      ([disease, count]) => {
+        chronicDiseaseAgg[disease] = (chronicDiseaseAgg[disease] || 0) + count;
+      }
+    );
   });
 
   return {
@@ -188,7 +190,7 @@ const MapInfoBoard = ({
           <Box
             sx={{ display: "flex", flexDirection: "column", gap: 0.75, mb: 2 }}
           >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <LocationOnIcon fontSize="small" color="action" />
               <Typography variant="body2">
                 {report.location.address} ({report.location.lat.toFixed(4)},{" "}
@@ -204,7 +206,8 @@ const MapInfoBoard = ({
           </Box>
 
           {!isCluster &&
-            (firstReport.reporter.phoneNumber || firstReport.reporter.contactMethod) && (
+            (firstReport.reporter.phoneNumber ||
+              firstReport.reporter.contactMethod) && (
               <Box
                 sx={{
                   display: "flex",
@@ -228,11 +231,12 @@ const MapInfoBoard = ({
                     </Typography>
                   </Box>
                 )}
-                {firstReport.reporter.phoneNumber && firstReport.reporter.contactMethod && (
-                  <Typography variant="body2" color="text.secondary">
-                    ·
-                  </Typography>
-                )}
+                {firstReport.reporter.phoneNumber &&
+                  firstReport.reporter.contactMethod && (
+                    <Typography variant="body2" color="text.secondary">
+                      ·
+                    </Typography>
+                  )}
                 {firstReport.reporter.contactMethod && (
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     {getContactIcon(firstReport.reporter.contactMethod)}
@@ -486,23 +490,31 @@ const MapInfoBoard = ({
                   />
                 </Box>
               )}
-              {Object.keys(report.statusCounts.chronicDisease || {}).length > 0 && (
+              {Object.keys(report.statusCounts.chronicDisease || {}).length >
+                0 && (
                 <Box sx={{ mt: 1 }}>
                   <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                     Chronic Diseases
                   </Typography>
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.5 }}>
-                    {Object.entries(report.statusCounts.chronicDisease || {}).map(
-                      ([disease, count]) => (
-                        <Chip
-                          key={disease}
-                          label={`${disease}: ${count}`}
-                          size="small"
-                          color="default"
-                          sx={{ height: 20, fontSize: "0.75rem" }}
-                        />
-                      )
-                    )}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 0.5,
+                      mt: 0.5,
+                    }}
+                  >
+                    {Object.entries(
+                      report.statusCounts.chronicDisease || {}
+                    ).map(([disease, count]) => (
+                      <Chip
+                        key={disease}
+                        label={`${disease}: ${count}`}
+                        size="small"
+                        color="default"
+                        sx={{ height: 20, fontSize: "0.75rem" }}
+                      />
+                    ))}
                   </Box>
                 </Box>
               )}
@@ -584,7 +596,9 @@ const MapInfoBoard = ({
                           display: "block",
                         }}
                       >
-                        {isCluster ? `${r.reporter.name}: ${r.details}` : r.details}
+                        {isCluster
+                          ? `${r.reporter.name}: ${r.details}`
+                          : r.details}
                       </Typography>
                     )
                 )}

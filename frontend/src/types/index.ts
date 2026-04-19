@@ -56,10 +56,10 @@ export interface Need {
 export interface PeopleReport {
   id: string;
   reporter: {
-      name: string;
-      phoneNumber?: string;
-      contactMethod?: string;
-      contactDetails?: string;
+    name: string;
+    phoneNumber?: string;
+    contactMethod?: string;
+    contactDetails?: string;
   };
   location: Coordinates;
   needs: Need[];
