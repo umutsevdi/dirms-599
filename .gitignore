@@ -1,6 +1,27 @@
 # Confidential data files
 frontend/src/mocks/*
 
+# Python backend
+backend/venv/
+backend/__pycache__/
+backend/**/*.py[cod]
+backend/**/*$py.class
+backend/**/*.so
+backend/.Python
+backend/env/
+backend/ENV/
+backend/.env
+backend/.venv
+backend/*.egg-info/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.coverage
+backend/htmlcov/
+backend/.tox/
+backend/*.log
+backend/alembic/versions/*.py
+!backend/alembic/versions/.gitkeep
+
 # Logs
 logs
 *.log
