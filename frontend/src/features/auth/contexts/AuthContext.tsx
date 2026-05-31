@@ -4,28 +4,27 @@ import {
   useState,
   useEffect,
   useCallback,
+  useRef,
   type ReactNode,
 } from "react";
 import type { Employee, Entity } from "../types/auth.types";
-import { mockAuthService } from "../services/mockAuthService";
+import { apiAuthService } from "../services/apiAuthService";
 
 interface AuthContextType {
-  // State
   user: Employee | null;
   entity: Entity | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   isAdmin: boolean;
 
-  // Actions
   login: (
     email: string
   ) => Promise<{ success: boolean; token?: string; error?: string }>;
   verifyMagicLink: (
     token: string
   ) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
-  refreshUser: () => void;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -38,14 +37,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<Employee | null>(null);
   const [entity, setEntity] = useState<Entity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const userRef = useRef(user);
 
-  // Load initial session
   useEffect(() => {
-    const initAuth = () => {
-      const session = mockAuthService.getSession();
+    userRef.current = user;
+  }, [user]);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const session = apiAuthService.getSession();
       if (session) {
-        const currentUser = mockAuthService.getCurrentUser();
-        const currentEntity = mockAuthService.getCurrentEntity();
+        const [currentUser, currentEntity] = await Promise.all([
+          apiAuthService.getCurrentUser(),
+          apiAuthService.getCurrentEntity(),
+        ]);
         setUser(currentUser);
         setEntity(currentEntity);
       }
@@ -54,24 +59,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     initAuth();
 
-    // Check session validity periodically (every minute)
     const interval = setInterval(() => {
-      const session = mockAuthService.getSession();
-      if (!session && user) {
-        // Session expired
+      const session = apiAuthService.getSession();
+      if (!session && userRef.current) {
         setUser(null);
         setEntity(null);
       }
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, []);
 
   const login = useCallback(
     async (
       email: string
     ): Promise<{ success: boolean; token?: string; error?: string }> => {
-      const result = await mockAuthService.requestMagicLink(email);
+      const result = await apiAuthService.requestMagicLink(email);
       return result;
     },
     []
@@ -79,10 +82,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const verifyMagicLink = useCallback(
     async (token: string): Promise<{ success: boolean; error?: string }> => {
-      const result = await mockAuthService.verifyMagicLink(token);
+      const result = await apiAuthService.verifyMagicLink(token);
       if (result.success && result.session) {
-        const currentUser = mockAuthService.getCurrentUser();
-        const currentEntity = mockAuthService.getCurrentEntity();
+        const [currentUser, currentEntity] = await Promise.all([
+          apiAuthService.getCurrentUser(),
+          apiAuthService.getCurrentEntity(),
+        ]);
         setUser(currentUser);
         setEntity(currentEntity);
       }
@@ -91,15 +96,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     []
   );
 
-  const logout = useCallback(() => {
-    mockAuthService.logout();
+  const logout = useCallback(async () => {
+    await apiAuthService.logout();
     setUser(null);
     setEntity(null);
   }, []);
 
-  const refreshUser = useCallback(() => {
-    const currentUser = mockAuthService.getCurrentUser();
-    const currentEntity = mockAuthService.getCurrentEntity();
+  const refreshUser = useCallback(async () => {
+    const [currentUser, currentEntity] = await Promise.all([
+      apiAuthService.getCurrentUser(),
+      apiAuthService.getCurrentEntity(),
+    ]);
     setUser(currentUser);
     setEntity(currentEntity);
   }, []);
@@ -109,7 +116,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     entity,
     isAuthenticated: !!user,
     isLoading,
-    isAdmin: mockAuthService.isAdmin(),
+    isAdmin: apiAuthService.isAdmin(),
     login,
     verifyMagicLink,
     logout,

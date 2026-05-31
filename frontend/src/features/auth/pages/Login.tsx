@@ -54,12 +54,21 @@ export default function Login() {
   };
 
   // Dev tools functions - remove in production
-  const handleDevAutoFill = (emailAddress: string) => {
+  const handleDevAutoFill = async (emailAddress: string) => {
     setEmail(emailAddress);
-    setTimeout(() => {
-      const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
-      handleSubmit(fakeEvent);
-    }, 100);
+    setIsLoading(true);
+    setError(null);
+    setSentToken(null);
+
+    const result = await login(emailAddress);
+
+    if (result.success && result.token) {
+      setSentToken(result.token);
+    } else {
+      setError(result.error || "Failed to send login link");
+    }
+
+    setIsLoading(false);
   };
 
   const handleDevSimulateMagicLink = () => {
@@ -254,6 +263,7 @@ export default function Login() {
                           },
                         }}
                         primary={cred.email}
+                        secondaryTypographyProps={{ component: "div" }}
                         secondary={
                           <Box
                             sx={{

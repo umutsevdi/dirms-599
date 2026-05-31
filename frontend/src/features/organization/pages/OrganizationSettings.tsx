@@ -30,8 +30,8 @@ import {
   Snackbar,
 } from "@mui/material";
 import { useAuth } from "../../auth/contexts/AuthContext";
+import { apiAuthService } from "../../auth/services/apiAuthService";
 import { sizing } from "../../../theme";
-import { mockAuthService } from "../../auth/services/mockAuthService";
 import type { Entity, Employee, EmployeeRole } from "../../auth/types/auth.types";
 import Header from "../../layout/components/Header";
 import EditIcon from "@mui/icons-material/Edit";
@@ -122,7 +122,7 @@ export default function OrganizationSettings() {
     setIsSavingOrg(true);
     setOrgError(null);
 
-    const result = await mockAuthService.updateEntity(editOrgForm);
+    const result = await apiAuthService.updateEntity(editOrgForm);
 
     if (result.success) {
       setOrgSuccess("Organization information updated successfully");
@@ -137,8 +137,8 @@ export default function OrganizationSettings() {
   };
 
   // Member functions
-  const loadMembers = () => {
-    const entityMembers = mockAuthService.getEntityEmployees();
+  const loadMembers = async () => {
+    const entityMembers = await apiAuthService.getEntityEmployees();
     setMembers(entityMembers);
   };
 
@@ -179,10 +179,10 @@ export default function OrganizationSettings() {
     setIsSubmitting(true);
     setFormError(null);
 
-    const result = await mockAuthService.addEmployee(newMember);
+    const result = await apiAuthService.addEmployee(newMember);
 
     if (result.success && result.employee) {
-      const linkResult = await mockAuthService.requestMagicLink(
+      const linkResult = await apiAuthService.requestMagicLink(
         newMember.email
       );
       if (linkResult.success && linkResult.token) {
@@ -205,7 +205,7 @@ export default function OrganizationSettings() {
     setIsSubmitting(true);
     setFormError(null);
 
-    const result = await mockAuthService.editEmployee(
+    const result = await apiAuthService.editEmployee(
       editingMember.id,
       editForm
     );
@@ -223,7 +223,7 @@ export default function OrganizationSettings() {
   };
 
   const handleToggleEnabled = async (member: Employee) => {
-    const result = await mockAuthService.editEmployee(member.id, {
+    const result = await apiAuthService.editEmployee(member.id, {
       enabled: !member.enabled,
     });
 

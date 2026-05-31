@@ -1,0 +1,22 @@
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  db:
+    image: 'postgres:18-alpine'
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/test:/var/lib/postgresql/18/docker:Z
+    env_file:
+      - test.env
+    networks:
+      - app-tier
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+    networks:
+      - app-tier

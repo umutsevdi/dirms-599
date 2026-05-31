@@ -11,6 +11,7 @@ import DashboardLayout from "./features/layout/components/DashboardLayout";
 import Login from "./features/auth/pages/Login";
 import MagicLinkHandler from "./features/auth/pages/MagicLinkHandler";
 import OrganizationSettings from "./features/organization/pages/OrganizationSettings";
+import ArchetypesPage from "./features/archetypes/pages/ArchetypesPage";
 
 function App() {
   return (
@@ -38,6 +39,16 @@ function App() {
               element={
                 <ProtectedRoute>
                   <OrganizationSettings />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Archetype Management */}
+            <Route
+              path="/archetypes"
+              element={
+                <ProtectedRoute>
+                  <ArchetypesPage />
                 </ProtectedRoute>
               }
             />

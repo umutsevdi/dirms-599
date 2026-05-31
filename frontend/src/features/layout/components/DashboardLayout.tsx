@@ -1,9 +1,10 @@
 import { useState, useRef, useCallback } from "react";
 import { useNominatim } from "../../../shared/hooks/useNominatim";
 import { useData } from "../../disasters/contexts/DataContext";
+import { useInventory } from "../../inventory/hooks/useInventory";
 import { Box } from "@mui/material";
 import { layout, colors } from "../../../theme";
-import { peopleReports as actualPeopleReports, sampleInventory } from "../../../mocks";
+import { peopleReports as actualPeopleReports } from "../../../mocks";
 import DisasterMap from "../../disasters/components/DisasterMap";
 import Header from "./Header";
 import InventoryDialog from "../../inventory/components/dialogs/InventoryDialog";
@@ -30,14 +31,13 @@ const DEFAULT_PANEL_HEIGHT_PERCENT = layout.panel.defaultHeightPercent;
 
 const DashboardLayout = () => {
   const { disasters, setDisasters } = useData();
+  const { items: inventoryItems, saveItem: saveInventoryItem } = useInventory();
   const [mapCenter, setMapCenter] = useState<Coordinates>({
     lat: 39.9334,
     lng: 32.8597,
     address: "",
   });
   const [mapZoom, setMapZoom] = useState(6);
-  const [inventoryItems, setInventoryItems] =
-    useState<InventoryItem[]>(sampleInventory);
   const [peopleReports, setPeopleReports] =
     useState<PeopleReport[]>(actualPeopleReports);
   const [sidePanelWidth, setSidePanelWidth] = useState<number>(DEFAULT_PANEL);
@@ -260,12 +260,8 @@ const DashboardLayout = () => {
     setSelectedDisasterMarker(null);
   };
 
-  const handleSaveInventory = (item: InventoryItem) => {
-    setInventoryItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
-      if (existing) return prev.map((i) => (i.id === item.id ? item : i));
-      return [...prev, item];
-    });
+  const handleSaveInventory = async (item: InventoryItem) => {
+    await saveInventoryItem(item);
   };
 
   const handleSavePeople = (report: PeopleReport) => {
