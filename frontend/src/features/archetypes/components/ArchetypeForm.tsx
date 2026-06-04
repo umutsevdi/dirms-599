@@ -29,7 +29,7 @@ import type {
   UrgencyLevel,
 } from "../types/archetypes.types";
 
-type ArchetypeType = "incident" | "inventory";
+type ArchetypeType = "incident" | "inventory" | "need";
 type InventoryCategory = "food" | "medical" | "shelter" | "clothing" | "equipment" | "hygiene" | "other";
 
 const INVENTORY_CATEGORIES: { value: InventoryCategory; label: string }[] = [
@@ -65,6 +65,8 @@ export interface ArchetypeFormData {
   resolvesNeeds: string[];
   targetDemographics: string[];
   parentArchetypeId?: string | null;
+  icon?: string;
+  color?: string;
 }
 
 interface InheritedKeys {
@@ -135,6 +137,8 @@ export default function ArchetypeForm({
   const [demographicInput, setDemographicInput] = useState("");
   const [showJson, setShowJson] = useState(showJsonInitial);
   const [formTab, setFormTab] = useState(0);
+  const [icon, setIcon] = useState(initial?.icon ?? "");
+  const [color, setColor] = useState(initial?.color ?? "");
 
   const parentOptions = useMemo(() => {
     return allArchetypes
@@ -210,18 +214,26 @@ export default function ArchetypeForm({
         setUrgency: r.setUrgency,
         message: r.message,
       })),
-      default_report_urgency: defaultReportUrgency,
     };
 
     if (type === "incident") {
       return {
         ...base,
+        default_report_urgency: defaultReportUrgency,
         implications: {
           needs: [],
           demographics: [],
           chronic_diseases: [],
           status_counts: {},
         },
+      };
+    }
+
+    if (type === "need") {
+      return {
+        ...base,
+        icon: icon || undefined,
+        color: color || undefined,
       };
     }
 
@@ -245,6 +257,8 @@ export default function ArchetypeForm({
     quantityUnit,
     resolvesNeeds,
     targetDemographics,
+    icon,
+    color,
   ]);
 
   const isValid = id.trim() !== "" && name.trim() !== "";
@@ -263,6 +277,8 @@ export default function ArchetypeForm({
       resolvesNeeds,
       targetDemographics,
       parentArchetypeId: parentArchetypeId || null,
+      icon: icon || undefined,
+      color: color || undefined,
     });
   };
 
@@ -328,6 +344,7 @@ export default function ArchetypeForm({
   };
 
   const inventoryTabOffset = type === "inventory" ? 1 : 0;
+  const needsTabOffset = type === "need" ? 1 : 0;
 
   return (
     <Box sx={{ display: "flex", gap: 2, height: "100%", minHeight: 0 }}>
@@ -344,6 +361,7 @@ export default function ArchetypeForm({
             >
               <MenuItem value="incident">Olay</MenuItem>
               <MenuItem value="inventory">Envanter</MenuItem>
+              <MenuItem value="need">İhtiyaç</MenuItem>
             </Select>
           </FormControl>
 
@@ -425,6 +443,7 @@ export default function ArchetypeForm({
           <Tab label="Alanlar" />
           <Tab label="Aciliyet Kuralları" />
           {type === "inventory" && <Tab label="Envanter Özellikleri" />}
+          {type === "need" && <Tab label="Görünüm" />}
         </Tabs>
 
         {/* Scrollable content area */}
@@ -755,6 +774,28 @@ export default function ArchetypeForm({
                   />
                 )}
               </Box>
+            </Box>
+          )}
+
+          {/* Needs Appearance */}
+          {type === "need" && formTab === 2 - needsTabOffset && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, p: 0.5 }}>
+              <TextField
+                size="small"
+                label="İkon"
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+                helperText="MUI ikon adı (örn: WaterDrop, Restaurant)"
+                disabled={readOnly}
+              />
+              <TextField
+                size="small"
+                label="Renk"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                helperText="Hex renk kodu (örn: #2196F3)"
+                disabled={readOnly}
+              />
             </Box>
           )}
         </Box>

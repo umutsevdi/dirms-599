@@ -19,6 +19,7 @@ import AddIcon from "@mui/icons-material/Add";
 import type { Disaster } from "../../disasters/types/disasters.types";
 import type { InventoryItem } from "../../inventory/types/inventory.types";
 import type { PeopleReport } from "../../people-reports/types/people-reports.types";
+import { getNeedName } from "../../../shared/constants/needs";
 
 interface BottomPanelProps {
   disasters: Disaster[];
@@ -77,7 +78,7 @@ const BottomPanel = ({
       (r) =>
         r.reporter.name.toLowerCase().includes(q) ||
         r.location.address.toLowerCase().includes(q) ||
-        r.needs.some((n) => n.label.toLowerCase().includes(q))
+        r.needs.some((n) => getNeedName(n.archetypeId).toLowerCase().includes(q))
     );
   }, [peopleReports, peopleSearch]);
 
@@ -294,8 +295,8 @@ const BottomPanel = ({
                             >
                               {sortedNeeds.map((need) => (
                                 <Chip
-                                  key={need.label}
-                                  label={need.label}
+                                  key={need.archetypeId}
+                                  label={getNeedName(need.archetypeId)}
                                   size="small"
                                   variant="outlined"
                                   sx={{ height: 24 }}

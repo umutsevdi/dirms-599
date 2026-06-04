@@ -1,13 +1,16 @@
 import * as archetypesApi from "../../../shared/api/archetypes";
+import * as peopleReportsApi from "../../../shared/api/peopleReports";
 import type {
   IncidentArchetype,
   InventoryArchetype,
+  NeedsArchetype,
   ArchetypeListEntry,
   UrgencyLevel,
 } from "../types/archetypes.types";
 import type {
   ApiIncidentArchetypeResponse,
   ApiInventoryArchetypeResponse,
+  ApiNeedsArchetypeResponse,
   ApiArchetypeListEntry,
   ApiIncidentArchetypeCreate,
   ApiInventoryArchetypeCreate,
@@ -36,6 +39,31 @@ function mapUrgencyRules(api: ApiIncidentArchetypeResponse["urgency_rules"]): In
   }));
 }
 
+function mapNeedsArchetype(api: ApiNeedsArchetypeResponse): NeedsArchetype {
+  return {
+    id: api.id,
+    name: api.name,
+    description: api.description,
+    category: "need",
+    source: api.source,
+    urgencyRules: api.urgency_rules.map((r) => ({
+      field: r.field,
+      operator: r.operator,
+      value: r.value,
+      setUrgency: r.setUrgency,
+      message: r.message,
+    })),
+    icon: api.icon,
+    color: api.color,
+    wikidataId: api.wikidata_id,
+    parentArchetypeId: api.parent_archetype_id,
+    createdBy: api.created_by,
+    createdAt: api.created_at,
+    updatedAt: api.updated_at,
+    version: api.version,
+  };
+}
+
 function mapListEntry(api: ApiArchetypeListEntry): ArchetypeListEntry {
   return {
     type: api.type,
@@ -48,6 +76,7 @@ function mapListEntry(api: ApiArchetypeListEntry): ArchetypeListEntry {
     resolvesNeeds: api.resolves_needs,
     targetDemographics: api.target_demographics,
     fieldSchema: api.field_schema,
+    urgencyRules: api.urgency_rules,
   };
 }
 
@@ -118,13 +147,16 @@ export async function fetchInventoryArchetype(id: string): Promise<InventoryArch
 
 export async function fetchParentArchetype(
   entry: ArchetypeListEntry
-): Promise<IncidentArchetype | InventoryArchetype | null> {
+): Promise<IncidentArchetype | InventoryArchetype | NeedsArchetype | null> {
   if (!entry.parentArchetypeId) return null;
   try {
     if (entry.type === "incident") {
       return await fetchIncidentArchetype(entry.parentArchetypeId);
     }
-    return await fetchInventoryArchetype(entry.parentArchetypeId);
+    if (entry.type === "inventory") {
+      return await fetchInventoryArchetype(entry.parentArchetypeId);
+    }
+    return await fetchNeedsArchetype(entry.parentArchetypeId);
   } catch {
     return null;
   }
@@ -308,4 +340,72 @@ export async function calculateInventoryArchetypeUrgency(
   values: Record<string, unknown>
 ): Promise<{ urgency: string; reason: string }> {
   return archetypesApi.calculateInventoryArchetypeUrgency(id, values);
+}
+
+export async function fetchNeedsArchetype(id: string): Promise<NeedsArchetype> {
+  const api = await peopleReportsApi.getNeedsArchetype(id);
+  return mapNeedsArchetype(api);
+}
+
+export async function createNeedsArchetype(
+  data: Omit<NeedsArchetype, "source" | "createdBy" | "createdAt" | "updatedAt" | "version">
+): Promise<NeedsArchetype> {
+  const apiData = {
+    id: data.id,
+    name: data.name,
+    description: data.description,
+    urgency_rules: data.urgencyRules.map((r) => ({
+      field: r.field,
+      operator: r.operator,
+      value: r.value,
+      setUrgency: r.setUrgency,
+      message: r.message,
+    })),
+    icon: data.icon,
+    color: data.color,
+    parent_archetype_id: data.parentArchetypeId,
+  };
+  const api = await peopleReportsApi.createNeedsArchetype(apiData);
+  return mapNeedsArchetype(api);
+}
+
+export async function updateNeedsArchetype(
+  id: string,
+  data: Partial<NeedsArchetype>
+): Promise<NeedsArchetype> {
+  const apiData: Record<string, unknown> = {};
+  if (data.name !== undefined) apiData.name = data.name;
+  if (data.description !== undefined) apiData.description = data.description;
+  if (data.urgencyRules) apiData.urgency_rules = data.urgencyRules.map((r) => ({
+    field: r.field,
+    operator: r.operator,
+    value: r.value,
+    setUrgency: r.setUrgency,
+    message: r.message,
+  }));
+  if (data.icon !== undefined) apiData.icon = data.icon;
+  if (data.color !== undefined) apiData.color = data.color;
+  apiData.parent_archetype_id = data.parentArchetypeId ?? null;
+
+  const api = await peopleReportsApi.updateNeedsArchetype(id, apiData);
+  return mapNeedsArchetype(api);
+}
+
+export async function deleteNeedsArchetype(id: string): Promise<void> {
+  await peopleReportsApi.deleteNeedsArchetype(id);
+}
+
+export async function duplicateNeedsArchetype(
+  id: string,
+  newId: string
+): Promise<NeedsArchetype> {
+  const api = await peopleReportsApi.duplicateNeedsArchetype(id, newId);
+  return mapNeedsArchetype(api);
+}
+
+export async function calculateNeedsArchetypeUrgency(
+  id: string,
+  values: Record<string, unknown>
+): Promise<{ urgency: string; reason: string }> {
+  return peopleReportsApi.calculateNeedsArchetypeUrgency(id, values);
 }

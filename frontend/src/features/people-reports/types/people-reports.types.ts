@@ -1,7 +1,7 @@
 import type { Coordinates } from "../../../shared/types/common.types";
 
 export interface Need {
-  label: string;
+  archetypeId: string;
   priority: number;
 }
 
@@ -21,9 +21,7 @@ export interface PeopleReport {
     adult: number;
     elderly: number;
   };
-  genderCounts: {
-    women: number;
-  };
+  genderCounts: { women: number };
   servicesAccess: {
     water: boolean;
     electricity: boolean;
@@ -33,9 +31,8 @@ export interface PeopleReport {
     injured: number;
     disabled: number;
     bedridden: number;
-    chronicDisease: Record<string, number>; // Chronic Disease type - count map
+    chronicDisease: Record<string, number>;
   };
   details: string;
   timestamp: string;
-  disasterId?: string;
 }

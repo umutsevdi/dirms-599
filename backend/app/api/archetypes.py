@@ -70,6 +70,22 @@ def list_archetypes(
                 "field_schema": a.field_schema or [],
             })
 
+    if category in (None, "need"):
+        needs_results = ArchetypeService.list_needs_archetypes(
+            db, source=source, search=search
+        )
+        for a in needs_results:
+            results.append({
+                "type": "need",
+                "id": a.id,
+                "name": a.name,
+                "category": a.category,
+                "source": a.source.value if a.source else a.source,
+                "version": a.version,
+                "parent_archetype_id": a.parent_archetype_id,
+                "urgency_rules": a.urgency_rules or [],
+            })
+
     return results
 
 

@@ -63,7 +63,7 @@ export interface ApiInventoryArchetypeResponse {
 }
 
 export interface ApiArchetypeListEntry {
-  type: "incident" | "inventory";
+  type: "incident" | "inventory" | "need";
   id: string;
   name: string;
   category: string;
@@ -73,6 +73,7 @@ export interface ApiArchetypeListEntry {
   resolves_needs?: string[];
   target_demographics?: string[];
   field_schema?: { field: string; label: string; type: string }[];
+  urgency_rules?: ApiUrgencyRuleItem[];
 }
 
 export interface ApiIncidentArchetypeCreate {
@@ -289,4 +290,154 @@ export interface ApiIncidentUpdate {
   status?: string;
   description?: string;
   affected_radius?: number;
+}
+
+export interface ApiPeopleReportArchetypeResponse {
+  id: string;
+  name: string;
+  description?: string;
+  category: string;
+  source: ArchetypeSource;
+  field_schema: ApiFieldSchemaItem[];
+  urgency_rules: ApiUrgencyRuleItem[];
+  implications: Record<string, unknown>;
+  default_report_urgency?: UrgencyLevel;
+  wikidata_id?: string;
+  parent_archetype_id?: string;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+  version: number;
+}
+
+export interface ApiPeopleReportArchetypeCreate {
+  id: string;
+  name: string;
+  description?: string;
+  field_schema: ApiFieldSchemaItem[];
+  urgency_rules: ApiUrgencyRuleItem[];
+  implications: Record<string, unknown>;
+  default_report_urgency?: UrgencyLevel;
+  parent_archetype_id?: string;
+}
+
+export interface ApiPeopleReportArchetypeUpdate {
+  name?: string;
+  description?: string;
+  field_schema?: ApiFieldSchemaItem[];
+  urgency_rules?: ApiUrgencyRuleItem[];
+  implications?: Record<string, unknown>;
+  default_report_urgency?: UrgencyLevel;
+  parent_archetype_id?: string | null;
+}
+
+export interface ApiNeedsArchetypeResponse {
+  id: string;
+  name: string;
+  description?: string;
+  category: string;
+  source: ArchetypeSource;
+  urgency_rules: ApiUrgencyRuleItem[];
+  icon?: string;
+  color?: string;
+  wikidata_id?: string;
+  parent_archetype_id?: string;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+  version: number;
+}
+
+export interface ApiNeedsArchetypeCreate {
+  id: string;
+  name: string;
+  description?: string;
+  urgency_rules: ApiUrgencyRuleItem[];
+  icon?: string;
+  color?: string;
+  parent_archetype_id?: string;
+}
+
+export interface ApiNeedsArchetypeUpdate {
+  name?: string;
+  description?: string;
+  urgency_rules?: ApiUrgencyRuleItem[];
+  icon?: string;
+  color?: string;
+  parent_archetype_id?: string | null;
+}
+
+export interface ApiPeopleReportResponse {
+  id: string;
+  reporter_name: string;
+  reporter_phone?: string;
+  reporter_contact_method?: string;
+  reporter_contact_details?: string;
+  location_lat: number;
+  location_lng: number;
+  location_address: string;
+  counts_baby: number;
+  counts_child: number;
+  counts_adult: number;
+  counts_elderly: number;
+  counts_women: number;
+  status_missing: number;
+  status_injured: number;
+  status_disabled: number;
+  status_bedridden: number;
+  services_access: { water: boolean; electricity: boolean };
+  chronic_diseases: Record<string, number>;
+  needs: Array<{ archetype_id: string; priority: number }>;
+  details?: string;
+  timestamp: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiPeopleReportCreate {
+  reporter_name: string;
+  reporter_phone?: string;
+  reporter_contact_method?: string;
+  reporter_contact_details?: string;
+  location_lat: number;
+  location_lng: number;
+  location_address: string;
+  counts_baby?: number;
+  counts_child?: number;
+  counts_adult?: number;
+  counts_elderly?: number;
+  counts_women?: number;
+  status_missing?: number;
+  status_injured?: number;
+  status_disabled?: number;
+  status_bedridden?: number;
+  services_access?: { water: boolean; electricity: boolean };
+  chronic_diseases?: Record<string, number>;
+  needs?: Array<{ archetype_id: string; priority: number }>;
+  details?: string;
+  timestamp: string;
+}
+
+export interface ApiPeopleReportUpdate {
+  reporter_name?: string;
+  reporter_phone?: string;
+  reporter_contact_method?: string;
+  reporter_contact_details?: string;
+  location_lat?: number;
+  location_lng?: number;
+  location_address?: string;
+  counts_baby?: number;
+  counts_child?: number;
+  counts_adult?: number;
+  counts_elderly?: number;
+  counts_women?: number;
+  status_missing?: number;
+  status_injured?: number;
+  status_disabled?: number;
+  status_bedridden?: number;
+  services_access?: { water: boolean; electricity: boolean };
+  chronic_diseases?: Record<string, number>;
+  needs?: Array<{ archetype_id: string; priority: number }>;
+  details?: string;
+  timestamp?: string;
 }

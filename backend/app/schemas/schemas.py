@@ -381,3 +381,111 @@ class IncidentResponse(IncidentBase):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# ---------------------------------------------------------------------------
+# Needs Archetype Schemas
+# ---------------------------------------------------------------------------
+
+class NeedsArchetypeBase(BaseModel):
+    id: str
+    name: str
+    description: Optional[str] = None
+    category: str = "need"
+    source: ArchetypeSource = ArchetypeSource.SYSTEM
+    urgency_rules: list[UrgencyRuleItem] = []
+    icon: Optional[str] = None
+    color: Optional[str] = None
+    wikidata_id: Optional[str] = None
+    parent_archetype_id: Optional[str] = None
+
+
+class NeedsArchetypeCreate(BaseModel):
+    id: str
+    name: str
+    description: Optional[str] = None
+    urgency_rules: list[UrgencyRuleItem] = []
+    icon: Optional[str] = None
+    color: Optional[str] = None
+    wikidata_id: Optional[str] = None
+    parent_archetype_id: Optional[str] = None
+
+
+class NeedsArchetypeUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    urgency_rules: Optional[list[UrgencyRuleItem]] = None
+    icon: Optional[str] = None
+    color: Optional[str] = None
+    parent_archetype_id: Optional[str] = None
+
+
+class NeedsArchetypeResponse(NeedsArchetypeBase):
+    created_by: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    version: int
+    model_config = ConfigDict(from_attributes=True)
+
+
+# ---------------------------------------------------------------------------
+# People Report Schemas
+# ---------------------------------------------------------------------------
+
+class PeopleReportBase(BaseModel):
+    reporter_name: str
+    reporter_phone: Optional[str] = None
+    reporter_contact_method: Optional[str] = None
+    reporter_contact_details: Optional[str] = None
+    location_lat: float
+    location_lng: float
+    location_address: str
+    counts_baby: int = 0
+    counts_child: int = 0
+    counts_adult: int = 0
+    counts_elderly: int = 0
+    counts_women: int = 0
+    status_missing: int = 0
+    status_injured: int = 0
+    status_disabled: int = 0
+    status_bedridden: int = 0
+    services_access: dict[str, Any] = {"water": True, "electricity": True}
+    chronic_diseases: dict[str, int] = {}
+    needs: list[dict[str, Any]] = []
+    details: Optional[str] = None
+    timestamp: datetime
+
+
+class PeopleReportCreate(PeopleReportBase):
+    pass
+
+
+class PeopleReportUpdate(BaseModel):
+    reporter_name: Optional[str] = None
+    reporter_phone: Optional[str] = None
+    reporter_contact_method: Optional[str] = None
+    reporter_contact_details: Optional[str] = None
+    location_lat: Optional[float] = None
+    location_lng: Optional[float] = None
+    location_address: Optional[str] = None
+    counts_baby: Optional[int] = None
+    counts_child: Optional[int] = None
+    counts_adult: Optional[int] = None
+    counts_elderly: Optional[int] = None
+    counts_women: Optional[int] = None
+    status_missing: Optional[int] = None
+    status_injured: Optional[int] = None
+    status_disabled: Optional[int] = None
+    status_bedridden: Optional[int] = None
+    services_access: Optional[dict[str, Any]] = None
+    chronic_diseases: Optional[dict[str, int]] = None
+    needs: Optional[list[dict[str, Any]]] = None
+    details: Optional[str] = None
+    timestamp: Optional[datetime] = None
+
+
+class PeopleReportResponse(PeopleReportBase):
+    id: str
+    created_at: datetime
+    updated_at: datetime
+    model_config = ConfigDict(from_attributes=True)

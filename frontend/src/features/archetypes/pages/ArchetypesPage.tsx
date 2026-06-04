@@ -40,6 +40,7 @@ export default function ArchetypesPage() {
             >
               <MenuItem value="">Tümü</MenuItem>
               <MenuItem value="incident">Olay</MenuItem>
+              <MenuItem value="need">İhtiyaç</MenuItem>
               <MenuItem value="food">Gıda</MenuItem>
               <MenuItem value="medical">Tıbbi</MenuItem>
               <MenuItem value="shelter">Barınma</MenuItem>

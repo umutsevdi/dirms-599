@@ -64,8 +64,10 @@ export default function ArchetypeList({ onSelect, search, categoryFilter, source
     try {
       if (entry.type === "incident") {
         await archetypeService.duplicateIncidentArchetype(entry.id, newId);
-      } else {
+      } else if (entry.type === "inventory") {
         await archetypeService.duplicateInventoryArchetype(entry.id, newId);
+      } else {
+        await archetypeService.duplicateNeedsArchetype(entry.id, newId);
       }
       loadEntries();
     } catch (err: unknown) {
@@ -79,8 +81,10 @@ export default function ArchetypeList({ onSelect, search, categoryFilter, source
     try {
       if (entry.type === "incident") {
         await archetypeService.deleteIncidentArchetype(entry.id);
-      } else {
+      } else if (entry.type === "inventory") {
         await archetypeService.deleteInventoryArchetype(entry.id);
+      } else {
+        await archetypeService.deleteNeedsArchetype(entry.id);
       }
       loadEntries();
     } catch (err: unknown) {
@@ -99,6 +103,7 @@ export default function ArchetypeList({ onSelect, search, categoryFilter, source
     if (activeTab === 0) return true;
     if (activeTab === 1) return e.type === "incident";
     if (activeTab === 2) return e.type === "inventory";
+    if (activeTab === 3) return e.type === "need";
     return true;
   });
 
@@ -120,6 +125,7 @@ export default function ArchetypeList({ onSelect, search, categoryFilter, source
         <Tab label="Tümü" />
         <Tab label="Olay" />
         <Tab label="Envanter" />
+        <Tab label="İhtiyaç" />
       </Tabs>
 
       <TableContainer component={Paper}>
@@ -153,9 +159,9 @@ export default function ArchetypeList({ onSelect, search, categoryFilter, source
                 >
                   <TableCell>
                     <Chip
-                      label={entry.type === "incident" ? "Olay" : "Envanter"}
+                      label={entry.type === "incident" ? "Olay" : entry.type === "inventory" ? "Envanter" : "İhtiyaç"}
                       size="small"
-                      color={entry.type === "incident" ? "error" : "info"}
+                      color={entry.type === "incident" ? "error" : entry.type === "inventory" ? "info" : "success"}
                     />
                   </TableCell>
                   <TableCell sx={{ fontFamily: "monospace", fontSize: "0.8rem" }}>

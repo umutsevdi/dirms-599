@@ -191,6 +191,41 @@ class InventoryArchetype(Base):
     creator = relationship("Employee", foreign_keys=[created_by])
 
 
+class NeedsArchetype(Base):
+    __tablename__ = "needs_archetypes"
+
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    category = Column(String, nullable=False, default="need")
+    source = Column(SQLEnum(ArchetypeSource), nullable=False, default=ArchetypeSource.SYSTEM)
+
+    urgency_rules = Column(JSONB, nullable=False, server_default="[]")
+    icon = Column(String, nullable=True)
+    color = Column(String, nullable=True)
+
+    wikidata_id = Column(String, nullable=True)
+
+    parent_archetype_id = Column(String, ForeignKey("needs_archetypes.id"), nullable=True)
+    created_by = Column(String, ForeignKey("employees.id"), nullable=True)
+
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+    version = Column(Integer, nullable=False, default=1)
+
+    parent = relationship(
+        "NeedsArchetype",
+        remote_side=[id],
+        foreign_keys=[parent_archetype_id],
+        backref="children",
+    )
+    creator = relationship("Employee", foreign_keys=[created_by])
+
+
 class InventoryStatus(str, enum.Enum):
     AVAILABLE = "available"
     DEPLOYED = "deployed"
@@ -261,3 +296,43 @@ class Inventory(Base):
     )
 
     archetype = relationship("InventoryArchetype")
+
+
+class PeopleReport(Base):
+    __tablename__ = "people_reports"
+
+    id = Column(String, primary_key=True, default=lambda: f"rpt-{uuid.uuid4().hex[:8]}")
+
+    reporter_name = Column(String, nullable=False)
+    reporter_phone = Column(String, nullable=True)
+    reporter_contact_method = Column(String, nullable=True)
+    reporter_contact_details = Column(String, nullable=True)
+
+    location_lat = Column(Float, nullable=False)
+    location_lng = Column(Float, nullable=False)
+    location_address = Column(String, nullable=False)
+
+    counts_baby = Column(Integer, nullable=False, default=0)
+    counts_child = Column(Integer, nullable=False, default=0)
+    counts_adult = Column(Integer, nullable=False, default=0)
+    counts_elderly = Column(Integer, nullable=False, default=0)
+    counts_women = Column(Integer, nullable=False, default=0)
+
+    status_missing = Column(Integer, nullable=False, default=0)
+    status_injured = Column(Integer, nullable=False, default=0)
+    status_disabled = Column(Integer, nullable=False, default=0)
+    status_bedridden = Column(Integer, nullable=False, default=0)
+
+    services_access = Column(JSONB, nullable=False, server_default='{"water": true, "electricity": true}')
+    chronic_diseases = Column(JSONB, nullable=False, server_default="{}")
+    needs = Column(JSONB, nullable=False, server_default="[]")
+
+    details = Column(Text, nullable=True)
+    timestamp = Column(DateTime(timezone=True), nullable=False)
+
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )

@@ -29,6 +29,7 @@ import BoltIcon from "@mui/icons-material/Bolt";
 import type { Disaster } from "../types/disasters.types";
 import type { PeopleReport } from "../../people-reports/types/people-reports.types";
 import { layout, sizing, getAgeGroupChipStyles } from "../../../theme";
+import { getNeedName } from "../../../shared/constants/needs";
 
 interface MapInfoBoardProps {
   disaster: Disaster | null;
@@ -96,11 +97,11 @@ const aggregateReports = (reports: PeopleReport[]): AggregatedPeopleReport => {
 
   // Collect all unique needs with lowest priority
   const allNeeds = reports.flatMap((r) => r.needs);
-  const uniqueNeeds = Array.from(new Set(allNeeds.map((n) => n.label))).map(
-    (label) => ({
-      label,
+  const uniqueNeeds = Array.from(new Set(allNeeds.map((n) => n.archetypeId))).map(
+    (archetypeId) => ({
+      archetypeId,
       priority: Math.min(
-        ...allNeeds.filter((n) => n.label === label).map((n) => n.priority)
+        ...allNeeds.filter((n) => n.archetypeId === archetypeId).map((n) => n.priority)
       ),
     })
   );
@@ -672,8 +673,8 @@ const MapInfoBoard = ({
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {sortedNeeds.map((need) => (
                   <Chip
-                    key={need.label}
-                    label={need.label}
+                    key={need.archetypeId}
+                    label={getNeedName(need.archetypeId)}
                     size="small"
                     variant="outlined"
                     sx={{ height: 28 }}
@@ -1082,8 +1083,8 @@ const MapInfoBoard = ({
                           >
                             {sortedNeeds.map((need) => (
                               <Chip
-                                key={need.label}
-                                label={need.label}
+                                key={need.archetypeId}
+                                label={getNeedName(need.archetypeId)}
                                 size="small"
                                 variant="outlined"
                                 sx={{ height: 24 }}

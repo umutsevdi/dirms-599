@@ -6,6 +6,7 @@ from sqlalchemy import or_
 from app.db.models import (
     IncidentArchetype,
     InventoryArchetype,
+    NeedsArchetype,
     ArchetypeSource,
 )
 
@@ -363,6 +364,143 @@ class ArchetypeService:
         db: Session, archetype_id: str
     ) -> list[InventoryArchetype]:
         archetype = ArchetypeService.get_inventory_archetype(db, archetype_id)
+        if not archetype:
+            return []
+        return archetype.children or []
+
+    # -------------------------------------------------------------------------
+    # Needs Archetype CRUD
+    # -------------------------------------------------------------------------
+
+    @staticmethod
+    def list_needs_archetypes(
+        db: Session,
+        source: Optional[str] = None,
+        search: Optional[str] = None,
+    ) -> list[NeedsArchetype]:
+        query = db.query(NeedsArchetype)
+        if source:
+            query = query.filter(NeedsArchetype.source == source)
+        if search:
+            query = query.filter(
+                or_(
+                    NeedsArchetype.name.ilike(f"%{search}%"),
+                    NeedsArchetype.description.ilike(f"%{search}%"),
+                    NeedsArchetype.id.ilike(f"%{search}%"),
+                )
+            )
+        return query.order_by(NeedsArchetype.name).all()
+
+    @staticmethod
+    def get_needs_archetype(
+        db: Session, archetype_id: str
+    ) -> Optional[NeedsArchetype]:
+        return (
+            db.query(NeedsArchetype)
+            .filter(NeedsArchetype.id == archetype_id)
+            .first()
+        )
+
+    @staticmethod
+    def create_needs_archetype(
+        db: Session,
+        data: dict[str, Any],
+        created_by: Optional[str] = None,
+    ) -> NeedsArchetype:
+        archetype = NeedsArchetype(
+            id=data["id"],
+            name=data["name"],
+            description=data.get("description"),
+            source=data.get("source", ArchetypeSource.USER),
+            urgency_rules=data.get("urgency_rules", []),
+            icon=data.get("icon"),
+            color=data.get("color"),
+            wikidata_id=data.get("wikidata_id"),
+            parent_archetype_id=data.get("parent_archetype_id"),
+            created_by=created_by,
+        )
+        db.add(archetype)
+        db.commit()
+        db.refresh(archetype)
+        return archetype
+
+    @staticmethod
+    def update_needs_archetype(
+        db: Session,
+        archetype_id: str,
+        data: dict[str, Any],
+    ) -> Optional[NeedsArchetype]:
+        archetype = ArchetypeService.get_needs_archetype(db, archetype_id)
+        if not archetype:
+            return None
+
+        nullable_fields = {"parent_archetype_id", "description", "wikidata_id", "icon", "color"}
+        for field, value in data.items():
+            if value is not None or field in nullable_fields:
+                setattr(archetype, field, value)
+
+        archetype.updated_at = datetime.now(timezone.utc)
+        archetype.version += 1
+
+        db.commit()
+        db.refresh(archetype)
+        return archetype
+
+    @staticmethod
+    def delete_needs_archetype(
+        db: Session, archetype_id: str
+    ) -> bool:
+        archetype = ArchetypeService.get_needs_archetype(db, archetype_id)
+        if not archetype:
+            return False
+        db.delete(archetype)
+        db.commit()
+        return True
+
+    @staticmethod
+    def duplicate_needs_archetype(
+        db: Session,
+        archetype_id: str,
+        new_id: str,
+        created_by: Optional[str] = None,
+    ) -> Optional[NeedsArchetype]:
+        original = ArchetypeService.get_needs_archetype(db, archetype_id)
+        if not original:
+            return None
+
+        data = {
+            "id": new_id,
+            "name": f"{original.name} (Copy)",
+            "description": original.description,
+            "source": ArchetypeSource.USER,
+            "urgency_rules": original.urgency_rules,
+            "icon": original.icon,
+            "color": original.color,
+            "wikidata_id": original.wikidata_id,
+            "parent_archetype_id": archetype_id,
+        }
+        return ArchetypeService.create_needs_archetype(db, data, created_by)
+
+    @staticmethod
+    def get_base_needs_archetype(
+        db: Session, archetype: NeedsArchetype
+    ) -> NeedsArchetype:
+        while archetype.parent_archetype_id:
+            parent = (
+                db.query(NeedsArchetype)
+                .filter(NeedsArchetype.id == archetype.parent_archetype_id)
+                .first()
+            )
+            if not parent:
+                break
+            archetype = parent
+        return archetype
+
+    @staticmethod
+    def get_overrides_needs(
+        db: Session, archetype_id: str
+    ) -> list[NeedsArchetype]:
+        archetype = ArchetypeService.get_needs_archetype(db, archetype_id)
         if not archetype:
             return []
         return archetype.children or []

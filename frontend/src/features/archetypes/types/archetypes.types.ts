@@ -62,10 +62,27 @@ export interface InventoryArchetype {
   version: number;
 }
 
-export type AnyArchetype = IncidentArchetype | InventoryArchetype;
+export interface NeedsArchetype {
+  id: string;
+  name: string;
+  description?: string;
+  category: "need";
+  source: ArchetypeSource;
+  urgencyRules: ArchetypeUrgencyRule[];
+  icon?: string;
+  color?: string;
+  wikidataId?: string;
+  parentArchetypeId?: string | null;
+  createdBy?: string;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+export type AnyArchetype = IncidentArchetype | InventoryArchetype | NeedsArchetype;
 
 export interface ArchetypeListEntry {
-  type: "incident" | "inventory";
+  type: "incident" | "inventory" | "need";
   id: string;
   name: string;
   category: string;
@@ -75,4 +92,7 @@ export interface ArchetypeListEntry {
   resolvesNeeds?: string[];
   targetDemographics?: string[];
   fieldSchema?: { field: string; label: string; type: string }[];
+  urgencyRules?: { field: string; operator: string; value: unknown; setUrgency: string; message: string }[];
+  icon?: string;
+  color?: string;
 }

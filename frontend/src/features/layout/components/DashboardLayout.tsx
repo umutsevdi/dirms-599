@@ -2,9 +2,9 @@ import { useState, useRef, useCallback } from "react";
 import { useNominatim } from "../../../shared/hooks/useNominatim";
 import { useIncidents } from "../../disasters/hooks/useIncidents";
 import { useInventory } from "../../inventory/hooks/useInventory";
-import { Box } from "@mui/material";
+import { usePeopleReports } from "../../people-reports/hooks/usePeopleReports";
+import { Box, CircularProgress } from "@mui/material";
 import { layout, colors } from "../../../theme";
-import { peopleReports as actualPeopleReports } from "../../../mocks";
 import DisasterMap from "../../disasters/components/DisasterMap";
 import Header from "./Header";
 import InventoryDialog from "../../inventory/components/dialogs/InventoryDialog";
@@ -32,14 +32,13 @@ const DEFAULT_PANEL_HEIGHT_PERCENT = layout.panel.defaultHeightPercent;
 const DashboardLayout = () => {
   const { items: disasters, saveItem: saveIncident } = useIncidents();
   const { items: inventoryItems, saveItem: saveInventoryItem } = useInventory();
+  const { reports: peopleReports, saveReport: savePeopleReport, loading: peopleLoading } = usePeopleReports();
   const [mapCenter, setMapCenter] = useState<Coordinates>({
     lat: 39.9334,
     lng: 32.8597,
     address: "",
   });
   const [mapZoom, setMapZoom] = useState(6);
-  const [peopleReports, setPeopleReports] =
-    useState<PeopleReport[]>(actualPeopleReports);
   const [sidePanelWidth, setSidePanelWidth] = useState<number>(DEFAULT_PANEL);
   const [bottomPanelHeightPercent, setBottomPanelHeightPercent] = useState<number>(DEFAULT_PANEL_HEIGHT_PERCENT);
   const [addIncidentMode, setAddIncidentMode] = useState(false);
@@ -264,18 +263,14 @@ const DashboardLayout = () => {
     await saveInventoryItem(item);
   };
 
-  const handleSavePeople = (report: PeopleReport) => {
+  const handleSavePeople = async (report: PeopleReport) => {
     if (pendingCoords) {
       report.location = {
         ...pendingCoords,
         address: pendingAddress || pendingCoords.address || "",
       };
     }
-    setPeopleReports((prev) => {
-      const existing = prev.find((r) => r.id === report.id);
-      if (existing) return prev.map((r) => (r.id === report.id ? report : r));
-      return [...prev, report];
-    });
+    await savePeopleReport(report);
     setPendingCoords(null);
     setPendingAddress("");
   };
@@ -345,10 +340,9 @@ const DashboardLayout = () => {
     : null;
 
   // displayedPeopleReports is now the single source of truth for people report display
+  // People reports are independent of disasters (no disasterId linkage)
 
-  const selectedReportsFromDisaster = selectedDisasterMarker
-    ? peopleReports.filter((r) => r.disasterId === selectedDisasterMarker.id)
-    : [];
+  const selectedReportsFromDisaster: PeopleReport[] = [];
 
   return (
     <Box

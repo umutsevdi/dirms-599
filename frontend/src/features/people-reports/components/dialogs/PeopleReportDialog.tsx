@@ -18,6 +18,9 @@ import {
   MenuItem,
   Select,
   Switch,
+  FormControl,
+  InputLabel,
+  Autocomplete,
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
@@ -29,7 +32,8 @@ import AddIcon from "@mui/icons-material/Add";
 import { useNominatim } from "../../../../shared/hooks/useNominatim";
 import type { Coordinates } from "../../../../shared/types/common.types";
 import type { PeopleReport, Need } from "../../types/people-reports.types";
-import { NEED_OPTIONS, CONTACT_METHOD_OPTIONS } from "../../../../shared/constants/options";
+import { CONTACT_METHOD_OPTIONS } from "../../../../shared/constants/options";
+import * as peopleReportsApi from "../../../../shared/api/peopleReports";
 
 interface PeopleReportDialogProps {
   report?: PeopleReport | null;
@@ -88,6 +92,18 @@ const PeopleReportDialog = ({
   const [newDiseaseCount, setNewDiseaseCount] = useState(1);
   const [details, setDetails] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [needsArchetypes, setNeedsArchetypes] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
+
+  useEffect(() => {
+    peopleReportsApi
+      .listNeedsArchetypes()
+      .then((list) =>
+        setNeedsArchetypes(list.map((a) => ({ id: a.id, name: a.name })))
+      )
+      .catch(() => setNeedsArchetypes([]));
+  }, []);
 
   const { results, loading, search } = useNominatim();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -161,15 +177,15 @@ const PeopleReportDialog = ({
     setShowSuggestions(false);
   };
 
-  const addNeed = (label: string) => {
-    if (needs.some((n) => n.label === label)) return;
+  const addNeed = (archetypeId: string) => {
+    if (needs.some((n) => n.archetypeId === archetypeId)) return;
     const maxPriority =
       needs.length > 0 ? Math.max(...needs.map((n) => n.priority)) : 0;
-    setNeeds((prev) => [...prev, { label, priority: maxPriority + 1 }]);
+    setNeeds((prev) => [...prev, { archetypeId, priority: maxPriority + 1 }]);
   };
 
-  const removeNeed = (label: string) => {
-    setNeeds((prev) => prev.filter((n) => n.label !== label));
+  const removeNeed = (archetypeId: string) => {
+    setNeeds((prev) => prev.filter((n) => n.archetypeId !== archetypeId));
   };
 
   const moveNeed = (index: number, direction: "up" | "down") => {
@@ -185,7 +201,6 @@ const PeopleReportDialog = ({
     });
   };
 
-  // Chronic disease management functions
   const addChronicDisease = () => {
     const trimmedName = newDiseaseName.trim();
     if (!trimmedName || newDiseaseCount <= 0) return;
@@ -221,7 +236,7 @@ const PeopleReportDialog = ({
     if (!reporter.name || !locationCoords) return;
 
     const newReport: PeopleReport = {
-      id: report?.id || `report-${Date.now()}`,
+      id: report?.id || `new-${Date.now()}`,
       reporter: {
         name: reporter.name,
         phoneNumber: reporter.phoneNumber || undefined,
@@ -242,7 +257,6 @@ const PeopleReportDialog = ({
       },
       details,
       timestamp: new Date().toISOString(),
-      disasterId: report?.disasterId,
     };
     onSave(newReport);
     onClose();
@@ -332,7 +346,111 @@ const PeopleReportDialog = ({
             )}
           </Box>
 
-          {/* Services Access Section */}
+          <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              İhtiyaçlar
+            </Typography>
+            <Autocomplete
+              multiple
+              options={needsArchetypes}
+              getOptionLabel={(o) => o.name}
+              value={needsArchetypes.filter((a) =>
+                needs.some((n) => n.archetypeId === a.id)
+              )}
+              onChange={(_, newValue) => {
+                const currentIds = new Set(needs.map((n) => n.archetypeId));
+                const newIds = new Set(newValue.map((a) => a.id));
+                for (const a of newValue) {
+                  if (!currentIds.has(a.id)) addNeed(a.id);
+                }
+                for (const id of currentIds) {
+                  if (!newIds.has(id)) removeNeed(id);
+                }
+              }}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    label={option.name}
+                    {...getTagProps({ index })}
+                    size="small"
+                  />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField {...params} placeholder="İhtiyaç ekle..." size="small" />
+              )}
+              fullWidth
+            />
+
+            {sortedNeeds.length > 0 && (
+              <Paper variant="outlined" sx={{ p: 1, mt: 1 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", mb: 1 }}
+                >
+                  Öncelik Sırası
+                </Typography>
+                {sortedNeeds.map((need, index) => {
+                  const archetype = needsArchetypes.find(
+                    (a) => a.id === need.archetypeId
+                  );
+                  return (
+                    <Box
+                      key={need.archetypeId}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        py: 0.5,
+                        borderBottom: index < sortedNeeds.length - 1 ? 1 : 0,
+                        borderColor: "divider",
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          minWidth: 24,
+                          fontWeight: "bold",
+                          color: "primary.main",
+                        }}
+                      >
+                        {index + 1}
+                      </Typography>
+                      <Chip
+                        label={archetype?.name || need.archetypeId}
+                        size="small"
+                        variant="outlined"
+                        sx={{ flex: 1 }}
+                      />
+                      <IconButton
+                        size="small"
+                        onClick={() => moveNeed(index, "up")}
+                        disabled={index === 0}
+                      >
+                        <ArrowUpwardIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => moveNeed(index, "down")}
+                        disabled={index === sortedNeeds.length - 1}
+                      >
+                        <ArrowDownwardIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => removeNeed(need.archetypeId)}
+                        color="error"
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  );
+                })}
+              </Paper>
+            )}
+          </Box>
+
           <Box>
             <Typography
               variant="caption"
@@ -511,92 +629,6 @@ const PeopleReportDialog = ({
 
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              İhtiyaçlar
-            </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
-              {NEED_OPTIONS.map((need) => (
-                <Chip
-                  key={need}
-                  label={need}
-                  onClick={() => addNeed(need)}
-                  color={
-                    needs.some((n) => n.label === need) ? "primary" : "default"
-                  }
-                  variant={
-                    needs.some((n) => n.label === need) ? "filled" : "outlined"
-                  }
-                  clickable
-                  sx={{ userSelect: "none" }}
-                />
-              ))}
-            </Box>
-
-            {sortedNeeds.length > 0 && (
-              <Paper variant="outlined" sx={{ p: 1 }}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 1 }}
-                >
-                  Öncelik Sırası
-                </Typography>
-                {sortedNeeds.map((need, index) => (
-                  <Box
-                    key={need.label}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      py: 0.5,
-                      borderBottom: index < sortedNeeds.length - 1 ? 1 : 0,
-                      borderColor: "divider",
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        minWidth: 24,
-                        fontWeight: "bold",
-                        color: "primary.main",
-                      }}
-                    >
-                      {index + 1}
-                    </Typography>
-                    <Chip
-                      label={need.label}
-                      size="small"
-                      variant="outlined"
-                      sx={{ flex: 1 }}
-                    />
-                    <IconButton
-                      size="small"
-                      onClick={() => moveNeed(index, "up")}
-                      disabled={index === 0}
-                    >
-                      <ArrowUpwardIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => moveNeed(index, "down")}
-                      disabled={index === sortedNeeds.length - 1}
-                    >
-                      <ArrowDownwardIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => removeNeed(need.label)}
-                      color="error"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                ))}
-              </Paper>
-            )}
-          </Box>
-
-          <Box>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
               Durum
             </Typography>
             <Box
@@ -665,13 +697,11 @@ const PeopleReportDialog = ({
             </Box>
           </Box>
 
-          {/* Chronic Diseases Section */}
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
               Kronik Hastalıklar
             </Typography>
 
-            {/* Existing diseases list */}
             {Object.keys(chronicDiseases).length > 0 && (
               <Box sx={{ mb: 2 }}>
                 {Object.entries(chronicDiseases).map(([disease, count]) => (
@@ -718,7 +748,6 @@ const PeopleReportDialog = ({
               </Box>
             )}
 
-            {/* Add new disease */}
             <Box
               sx={{
                 display: "flex",

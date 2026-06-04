@@ -31,6 +31,7 @@ import * as archetypeService from "../services/archetypeService";
 import type {
   IncidentArchetype,
   InventoryArchetype,
+  NeedsArchetype,
   ArchetypeListEntry,
 } from "../types/archetypes.types";
 
@@ -44,8 +45,9 @@ interface ArchetypeEditorProps {
 export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: ArchetypeEditorProps) {
   const [incidentArchetype, setIncidentArchetype] = useState<IncidentArchetype | null>(null);
   const [inventoryArchetype, setInventoryArchetype] = useState<InventoryArchetype | null>(null);
-  const [parentArchetype, setParentArchetype] = useState<IncidentArchetype | InventoryArchetype | null>(null);
-  const [ancestorArchetypes, setAncestorArchetypes] = useState<(IncidentArchetype | InventoryArchetype)[]>([]);
+  const [needsArchetype, setNeedsArchetype] = useState<NeedsArchetype | null>(null);
+  const [parentArchetype, setParentArchetype] = useState<IncidentArchetype | InventoryArchetype | NeedsArchetype | null>(null);
+  const [ancestorArchetypes, setAncestorArchetypes] = useState<(IncidentArchetype | InventoryArchetype | NeedsArchetype)[]>([]);
   const [allArchetypes, setAllArchetypes] = useState<ArchetypeListEntry[]>([]);
   const [childArchetypes, setChildArchetypes] = useState<ArchetypeListEntry[]>([]);
   const [loading, setLoading] = useState(mode === "edit");
@@ -69,13 +71,16 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
           if (entry.type === "incident") {
             const data = await archetypeService.fetchIncidentArchetype(entry.id);
             setIncidentArchetype(data);
-          } else {
+          } else if (entry.type === "inventory") {
             const data = await archetypeService.fetchInventoryArchetype(entry.id);
             setInventoryArchetype(data);
+          } else {
+            const data = await archetypeService.fetchNeedsArchetype(entry.id);
+            setNeedsArchetype(data);
           }
 
           if (entry.parentArchetypeId) {
-            const ancestors: (IncidentArchetype | InventoryArchetype)[] = [];
+            const ancestors: (IncidentArchetype | InventoryArchetype | NeedsArchetype)[] = [];
             let currentParentId: string | null | undefined = entry.parentArchetypeId;
             while (currentParentId) {
               const parentEntry = all.find((a) => a.id === currentParentId);
@@ -105,7 +110,7 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
   const inheritedKeys = useMemo((): InheritedKeys | null => {
     if (mode !== "edit" || !parentArchetype) return null;
 
-    const currentArchetype = entry?.type === "incident" ? incidentArchetype : inventoryArchetype;
+    const currentArchetype = entry?.type === "incident" ? incidentArchetype : entry?.type === "inventory" ? inventoryArchetype : needsArchetype;
     if (!currentArchetype) return null;
 
     const parentFields = new Set(parentArchetype.fieldSchema.map((f) => f.field));
@@ -122,7 +127,7 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
       fieldKeys: parentFields,
       ruleKeys: parentRules,
     };
-  }, [mode, entry, parentArchetype, incidentArchetype, inventoryArchetype]);
+  }, [mode, entry, parentArchetype, incidentArchetype, inventoryArchetype, needsArchetype]);
 
   const { knownNeeds, knownDemographics, knownFieldNames } = useMemo(() => {
     const needs = new Set<string>();
@@ -134,12 +139,12 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
       a.targetDemographics?.forEach((d) => demographics.add(d));
     });
 
-    const current = entry?.type === "incident" ? incidentArchetype : inventoryArchetype;
+    const current = entry?.type === "incident" ? incidentArchetype : entry?.type === "inventory" ? inventoryArchetype : needsArchetype;
     if (current) {
       current.fieldSchema.forEach((f) => { if (f.field) fields.add(f.field); });
     }
 
-    const collectParentFields = (parent: IncidentArchetype | InventoryArchetype | null) => {
+    const collectParentFields = (parent: IncidentArchetype | InventoryArchetype | NeedsArchetype | null) => {
       if (!parent) return;
       parent.fieldSchema.forEach((f) => { if (f.field) fields.add(f.field); });
     };
@@ -179,7 +184,7 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
             defaultReportUrgency: formData.defaultReportUrgency,
             parentArchetypeId: formData.parentArchetypeId,
           });
-        } else {
+        } else if (formData.type === "inventory") {
           await archetypeService.createInventoryArchetype({
             id: formData.id,
             name: formData.name,
@@ -190,6 +195,16 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
             resolvesNeeds: formData.resolvesNeeds,
             targetDemographics: formData.targetDemographics,
             quantityUnit: formData.quantityUnit,
+            parentArchetypeId: formData.parentArchetypeId,
+          });
+        } else {
+          await archetypeService.createNeedsArchetype({
+            id: formData.id,
+            name: formData.name,
+            description: formData.description || undefined,
+            urgencyRules: formData.urgencyRules,
+            icon: formData.icon || undefined,
+            color: formData.color || undefined,
             parentArchetypeId: formData.parentArchetypeId,
           });
         }
@@ -207,7 +222,7 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
             defaultReportUrgency: formData.defaultReportUrgency,
             parentArchetypeId: formData.parentArchetypeId,
           });
-        } else {
+        } else if (entry.type === "inventory") {
           await archetypeService.updateInventoryArchetype(entry.id, {
             name: formData.name,
             description: formData.description || undefined,
@@ -216,6 +231,15 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
             resolvesNeeds: formData.resolvesNeeds,
             targetDemographics: formData.targetDemographics,
             quantityUnit: formData.quantityUnit,
+            parentArchetypeId: formData.parentArchetypeId,
+          });
+        } else {
+          await archetypeService.updateNeedsArchetype(entry.id, {
+            name: formData.name,
+            description: formData.description || undefined,
+            urgencyRules: formData.urgencyRules,
+            icon: formData.icon || undefined,
+            color: formData.color || undefined,
             parentArchetypeId: formData.parentArchetypeId,
           });
         }
@@ -241,8 +265,10 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
 
       if (entry.type === "incident") {
         result = await archetypeService.calculateIncidentUrgency(entry.id, values);
-      } else {
+      } else if (entry.type === "inventory") {
         result = await archetypeService.calculateInventoryArchetypeUrgency(entry.id, values);
+      } else {
+        result = await archetypeService.calculateNeedsArchetypeUrgency(entry.id, values);
       }
       setTestResult(result);
     } catch (err: unknown) {
@@ -258,7 +284,7 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
   const isReadOnly = mode === "edit" && entry?.source === "system";
 
   const currentArchetype = mode === "edit"
-    ? (entry?.type === "incident" ? incidentArchetype : inventoryArchetype)
+    ? (entry?.type === "incident" ? incidentArchetype : entry?.type === "inventory" ? inventoryArchetype : needsArchetype)
     : null;
 
   const formData: ArchetypeFormData | undefined = useMemo(() => {
@@ -294,6 +320,8 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
       resolvesNeeds: entry.type === "inventory" ? (currentArchetype as InventoryArchetype).resolvesNeeds : [],
       targetDemographics: entry.type === "inventory" ? (currentArchetype as InventoryArchetype).targetDemographics : [],
       parentArchetypeId: currentArchetype.parentArchetypeId ?? null,
+      icon: entry.type === "need" ? (currentArchetype as NeedsArchetype).icon : undefined,
+      color: entry.type === "need" ? (currentArchetype as NeedsArchetype).color : undefined,
     };
   }, [mode, entry, currentArchetype]);
 
@@ -446,7 +474,7 @@ export default function ArchetypeEditor({ entry, mode, onClose, onSaved }: Arche
                     primaryTypographyProps={{ variant: "body2" }}
                     secondaryTypographyProps={{ variant: "caption" }}
                   />
-                  <Chip label={child.type === "incident" ? "Olay" : "Envanter"} size="small" sx={{ ml: 1 }} />
+                  <Chip label={child.type === "incident" ? "Olay" : child.type === "inventory" ? "Envanter" : "İhtiyaç"} size="small" sx={{ ml: 1 }} />
                 </ListItem>
               ))}
             </List>
