@@ -1,11 +1,12 @@
-export type ArchetypeCategory = "incident" | "food" | "medical";
+export type InventoryCategory = "food" | "medical" | "shelter" | "clothing" | "equipment" | "hygiene" | "other";
+export type ArchetypeCategory = "incident" | InventoryCategory;
 export type ArchetypeSource = "system" | "wikidata" | "user";
 export type UrgencyLevel = "critical" | "high" | "medium" | "low";
 
 export interface ArchetypeFieldSchema {
   field: string;
   label: string;
-  type: "number" | "text" | "select" | "boolean";
+  type: "number" | "text" | "boolean";
   required: boolean;
   options?: string[];
   defaultValue?: string | number | boolean;
@@ -30,7 +31,7 @@ export interface IncidentArchetype {
   implications: Record<string, unknown>;
   defaultReportUrgency?: UrgencyLevel;
   wikidataId?: string;
-  parentArchetypeId?: string;
+  parentArchetypeId?: string | null;
   createdBy?: string;
   createdAt: string;
   updatedAt: string;
@@ -41,7 +42,7 @@ export interface InventoryArchetype {
   id: string;
   name: string;
   description?: string;
-  category: "food" | "medical";
+  category: InventoryCategory;
   source: ArchetypeSource;
   fieldSchema: ArchetypeFieldSchema[];
   urgencyRules: ArchetypeUrgencyRule[];
@@ -54,7 +55,7 @@ export interface InventoryArchetype {
   brand?: Record<string, unknown>;
   learning?: Record<string, unknown>;
   wikidataId?: string;
-  parentArchetypeId?: string;
+  parentArchetypeId?: string | null;
   createdBy?: string;
   createdAt: string;
   updatedAt: string;
@@ -70,5 +71,8 @@ export interface ArchetypeListEntry {
   category: string;
   source: ArchetypeSource;
   version: number;
-  parentArchetypeId?: string;
+  parentArchetypeId?: string | null;
+  resolvesNeeds?: string[];
+  targetDemographics?: string[];
+  fieldSchema?: { field: string; label: string; type: string }[];
 }

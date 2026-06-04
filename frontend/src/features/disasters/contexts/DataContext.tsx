@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import type { Disaster } from "../types/disasters.types";
-import { sampleDisasters } from "../../../mocks/disasters";
+import { useIncidents } from "../hooks/useIncidents";
 
 interface DataContextType {
   disasters: Disaster[];
@@ -16,15 +16,18 @@ interface DataProviderProps {
 }
 
 export const DataProvider = ({ children }: DataProviderProps) => {
-  const [disasters, setDisastersState] = useState<Disaster[]>(sampleDisasters);
+  const { items: disasters, saveItem, refresh } = useIncidents();
 
   const setDisasters = (
     value: Disaster[] | ((prev: Disaster[]) => Disaster[])
   ) => {
     if (typeof value === "function") {
-      setDisastersState((prev) => value(prev));
+      const updater = value as (prev: Disaster[]) => Disaster[];
+      const current = disasters;
+      const next = updater(current);
+      next.forEach((d) => saveItem(d));
     } else {
-      setDisastersState(value);
+      value.forEach((d) => saveItem(d));
     }
   };
 

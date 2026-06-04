@@ -1,17 +1,5 @@
 import type { InventoryGroup } from "../../features/inventory/types/inventory.types";
 
-// Incident type options for IncidentDialog
-export const INCIDENT_TYPES = [
-  "Deprem",
-  "Sel",
-  "Orman Yangını",
-  "Heyelan",
-  "Kasırga",
-  "Hortum",
-  "Tsunami",
-  "Diğer",
-];
-
 // Need options for PeopleReportDialog
 export const NEED_OPTIONS = [
   "Su",
@@ -48,7 +36,6 @@ export const GROUP_OPTIONS: { value: InventoryGroup; label: string }[] = [
 ];
 
 export default {
-  INCIDENT_TYPES,
   NEED_OPTIONS,
   CONTACT_METHOD_OPTIONS,
   AVAILABLE_NEEDS,

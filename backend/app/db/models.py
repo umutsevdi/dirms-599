@@ -198,6 +198,42 @@ class InventoryStatus(str, enum.Enum):
     EXPIRED = "expired"
 
 
+class IncidentSeverity(str, enum.Enum):
+    LOW = "düşük"
+    MEDIUM = "orta"
+    CRITICAL = "kritik"
+
+
+class IncidentStatus(str, enum.Enum):
+    ACTIVE = "aktif"
+    CONTAINED = "kontrol-altında"
+    RESOLVED = "çözüldü"
+
+
+class Incident(Base):
+    __tablename__ = "incidents"
+
+    id = Column(String, primary_key=True, default=lambda: f"d-{uuid.uuid4().hex[:8]}")
+    type = Column(String, nullable=False)
+
+    location_lat = Column(Float, nullable=False)
+    location_lng = Column(Float, nullable=False)
+    location_address = Column(String, nullable=False)
+
+    severity = Column(SQLEnum(IncidentSeverity), nullable=False)
+    status = Column(SQLEnum(IncidentStatus), nullable=False, default=IncidentStatus.ACTIVE)
+    timestamp = Column(DateTime(timezone=True), nullable=False)
+    description = Column(Text, nullable=False)
+    affected_radius = Column(Integer, nullable=True)
+
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+
 class Inventory(Base):
     __tablename__ = "inventory"
 

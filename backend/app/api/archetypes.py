@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from app.api.deps import get_current_user, get_current_admin_user, get_db
+from app.api.deps import get_current_user, get_db
 from app.db.models import Employee
 from app.schemas.schemas import (
     IncidentArchetypeCreate,
@@ -26,7 +26,7 @@ router = APIRouter(prefix="/archetypes", tags=["Archetypes"])
 
 @router.get("", response_model=list[dict])
 def list_archetypes(
-    category: Optional[str] = Query(None, description="incident, food, or medical"),
+    category: Optional[str] = Query(None, description="incident, food, medical, shelter, clothing, equipment, hygiene, other"),
     source: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
     db: Session = Depends(get_db),
@@ -47,11 +47,12 @@ def list_archetypes(
                 "source": a.source.value if a.source else a.source,
                 "version": a.version,
                 "parent_archetype_id": a.parent_archetype_id,
+                "field_schema": a.field_schema or [],
             })
 
-    if category in (None, "food", "medical"):
+    if category in (None, "food", "medical", "shelter", "clothing", "equipment", "hygiene", "other"):
         inventory_results = ArchetypeService.list_inventory_archetypes(
-            db, category=category if category in ("food", "medical") else None,
+            db, category=category if category in ("food", "medical", "shelter", "clothing", "equipment", "hygiene", "other") else None,
             source=source,
             search=search,
         )
@@ -64,6 +65,9 @@ def list_archetypes(
                 "source": a.source.value if a.source else a.source,
                 "version": a.version,
                 "parent_archetype_id": a.parent_archetype_id,
+                "resolves_needs": a.resolves_needs or [],
+                "target_demographics": a.target_demographics or [],
+                "field_schema": a.field_schema or [],
             })
 
     return results
@@ -111,7 +115,7 @@ def get_inventory_archetype(
 def create_incident_archetype(
     data: IncidentArchetypeCreate,
     db: Session = Depends(get_db),
-    current_user: Employee = Depends(get_current_admin_user),
+    current_user: Employee = Depends(get_current_user),
 ):
     existing = ArchetypeService.get_incident_archetype(db, data.id)
     if existing:
@@ -143,7 +147,7 @@ def create_incident_archetype(
 def create_inventory_archetype(
     data: InventoryArchetypeCreate,
     db: Session = Depends(get_db),
-    current_user: Employee = Depends(get_current_admin_user),
+    current_user: Employee = Depends(get_current_user),
 ):
     existing = ArchetypeService.get_inventory_archetype(db, data.id)
     if existing:
@@ -176,7 +180,7 @@ def update_incident_archetype(
     archetype_id: str,
     data: IncidentArchetypeUpdate,
     db: Session = Depends(get_db),
-    current_user: Employee = Depends(get_current_admin_user),
+    current_user: Employee = Depends(get_current_user),
 ):
     archetype = ArchetypeService.get_incident_archetype(db, archetype_id)
     if not archetype:
@@ -201,7 +205,7 @@ def update_inventory_archetype(
     archetype_id: str,
     data: InventoryArchetypeUpdate,
     db: Session = Depends(get_db),
-    current_user: Employee = Depends(get_current_admin_user),
+    current_user: Employee = Depends(get_current_user),
 ):
     archetype = ArchetypeService.get_inventory_archetype(db, archetype_id)
     if not archetype:
@@ -229,7 +233,7 @@ def update_inventory_archetype(
 def delete_incident_archetype(
     archetype_id: str,
     db: Session = Depends(get_db),
-    current_user: Employee = Depends(get_current_admin_user),
+    current_user: Employee = Depends(get_current_user),
 ):
     archetype = ArchetypeService.get_incident_archetype(db, archetype_id)
     if not archetype:
@@ -252,7 +256,7 @@ def delete_incident_archetype(
 def delete_inventory_archetype(
     archetype_id: str,
     db: Session = Depends(get_db),
-    current_user: Employee = Depends(get_current_admin_user),
+    current_user: Employee = Depends(get_current_user),
 ):
     archetype = ArchetypeService.get_inventory_archetype(db, archetype_id)
     if not archetype:

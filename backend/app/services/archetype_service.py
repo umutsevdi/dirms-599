@@ -79,8 +79,9 @@ class ArchetypeService:
         if not archetype:
             return None
 
+        nullable_fields = {"parent_archetype_id", "description", "wikidata_id", "default_report_urgency"}
         for field, value in data.items():
-            if value is not None:
+            if value is not None or field in nullable_fields:
                 setattr(archetype, field, value)
 
         archetype.updated_at = datetime.now(timezone.utc)
@@ -203,8 +204,9 @@ class ArchetypeService:
         if not archetype:
             return None
 
+        nullable_fields = {"parent_archetype_id", "description", "wikidata_id", "physical_properties", "food_properties", "medical_properties", "brand", "learning"}
         for field, value in data.items():
-            if value is not None:
+            if value is not None or field in nullable_fields:
                 setattr(archetype, field, value)
 
         archetype.updated_at = datetime.now(timezone.utc)

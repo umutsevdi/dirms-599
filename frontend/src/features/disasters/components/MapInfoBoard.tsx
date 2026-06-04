@@ -726,12 +726,11 @@ const MapInfoBoard = ({
     severity: string
   ): "error" | "warning" | "success" | "info" => {
     const colors: Record<string, "error" | "warning" | "success" | "info"> = {
-      critical: "error",
-      high: "error",
-      medium: "warning",
-      low: "success",
+      "kritik": "error",
+      "orta": "warning",
+      "düşük": "success",
     };
-    return colors[severity];
+    return colors[severity] || "default";
   };
 
   const getStatusColor = (status: string): "error" | "warning" | "success" => {

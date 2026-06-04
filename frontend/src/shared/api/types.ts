@@ -6,7 +6,7 @@ export type EmployeeRole = "ADMIN" | "USER";
 export interface ApiFieldSchemaItem {
   field: string;
   label: string;
-  type: "number" | "text" | "select" | "boolean";
+  type: "number" | "text" | "boolean";
   required: boolean;
   options?: string[];
   defaultValue?: string | number | boolean;
@@ -42,7 +42,7 @@ export interface ApiInventoryArchetypeResponse {
   id: string;
   name: string;
   description?: string;
-  category: "food" | "medical";
+  category: "food" | "medical" | "shelter" | "clothing" | "equipment" | "hygiene" | "other";
   source: ArchetypeSource;
   field_schema: ApiFieldSchemaItem[];
   urgency_rules: ApiUrgencyRuleItem[];
@@ -70,6 +70,9 @@ export interface ApiArchetypeListEntry {
   source: ArchetypeSource;
   version: number;
   parent_archetype_id?: string;
+  resolves_needs?: string[];
+  target_demographics?: string[];
+  field_schema?: { field: string; label: string; type: string }[];
 }
 
 export interface ApiIncidentArchetypeCreate {
@@ -80,13 +83,14 @@ export interface ApiIncidentArchetypeCreate {
   urgency_rules: ApiUrgencyRuleItem[];
   implications: Record<string, unknown>;
   default_report_urgency?: UrgencyLevel;
+  parent_archetype_id?: string;
 }
 
 export interface ApiInventoryArchetypeCreate {
   id: string;
   name: string;
   description?: string;
-  category: "food" | "medical";
+  category: "food" | "medical" | "shelter" | "clothing" | "equipment" | "hygiene" | "other";
   field_schema: ApiFieldSchemaItem[];
   urgency_rules: ApiUrgencyRuleItem[];
   resolves_needs: string[];
@@ -97,6 +101,7 @@ export interface ApiInventoryArchetypeCreate {
   medical_properties?: Record<string, unknown>;
   brand?: Record<string, unknown>;
   learning?: Record<string, unknown>;
+  parent_archetype_id?: string;
 }
 
 export interface ApiIncidentArchetypeUpdate {
@@ -106,6 +111,7 @@ export interface ApiIncidentArchetypeUpdate {
   urgency_rules?: ApiUrgencyRuleItem[];
   implications?: Record<string, unknown>;
   default_report_urgency?: UrgencyLevel;
+  parent_archetype_id?: string | null;
 }
 
 export interface ApiInventoryArchetypeUpdate {
@@ -121,6 +127,7 @@ export interface ApiInventoryArchetypeUpdate {
   medical_properties?: Record<string, unknown>;
   brand?: Record<string, unknown>;
   learning?: Record<string, unknown>;
+  parent_archetype_id?: string | null;
 }
 
 export interface ApiInventoryResponse {
@@ -244,4 +251,42 @@ export interface ApiSuccessResponse {
 export interface ApiUrgencyResult {
   urgency: string;
   reason: string;
+}
+
+export interface ApiIncidentResponse {
+  id: string;
+  type: string;
+  location_lat: number;
+  location_lng: number;
+  location_address: string;
+  severity: string;
+  status: string;
+  timestamp: string;
+  description: string;
+  affected_radius: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiIncidentCreate {
+  type: string;
+  location_lat: number;
+  location_lng: number;
+  location_address: string;
+  severity: string;
+  status: string;
+  timestamp: string;
+  description: string;
+  affected_radius?: number;
+}
+
+export interface ApiIncidentUpdate {
+  type?: string;
+  location_lat?: number;
+  location_lng?: number;
+  location_address?: string;
+  severity?: string;
+  status?: string;
+  description?: string;
+  affected_radius?: number;
 }

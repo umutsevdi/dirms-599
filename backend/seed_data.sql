@@ -450,3 +450,63 @@ INSERT INTO inventory (
  'AVAILABLE',
  '{"cozer": ["Elektrik", "Barınma"], "grup": "genel", "orijinal_ad": "Acil Durum Jeneratörleri"}'::jsonb,
  NOW(), NOW());
+
+-- ============================================================================
+-- 6. OLAYLAR (Incidents / Disasters)
+-- Frontend mock verisinden (sampleDisasters) birebir eşlenmiştir
+-- ============================================================================
+
+INSERT INTO incidents (
+    id, type, location_lat, location_lng, location_address,
+    severity, status, timestamp, description, affected_radius,
+    created_at, updated_at
+) VALUES
+('d-1', 'Hasarlı Hastane', 37.7645, 38.6432, 'Adıyaman, Kahta, Devlet Hastanesi',
+ 'CRITICAL', 'ACTIVE', '2026-02-06T04:30:00Z',
+ 'Hastane binası ağır hasar gördü, acil servisler çadır tesise taşındı. Yoğun bakım ve ameliyathane üniteleri çalışmıyor.',
+ 1000, NOW(), NOW()),
+
+('d-2', 'Çökmüş Okul', 37.8238, 37.5415, 'Adıyaman, Gölbaşı, İlkokul',
+ 'CRITICAL', 'ACTIVE', '2026-02-06T04:17:00Z',
+ 'Üç katlı okul binası tamamen çöktü. Olası sağ kurtulanlar için arama kurtarma operasyonları devam ediyor.',
+ 800, NOW(), NOW()),
+
+('d-3', 'Hasarlı Yol', 38.0456, 39.0234, 'Adıyaman, Gerger, Ana Karayolu D-360',
+ 'CRITICAL', 'ACTIVE', '2026-02-06T04:45:00Z',
+ 'Gerger''i Adıyaman şehir merkezine bağlayan ana karayolu 3 noktada çöktü. 50 metrelik bölüm tamamen kullanılamaz. Alternatif dağ yolları gerekiyor.',
+ 500, NOW(), NOW()),
+
+('d-4', 'Hasarlı Cami', 37.8156, 38.5845, 'Adıyaman, Kahta, Merkez Cami',
+ 'MEDIUM', 'ACTIVE', '2026-02-06T04:20:00Z',
+ 'Minare namaz salonunun üzerine çöktü. Ana kubbe çatladı, bina kullanım için güvensiz. Dini hizmetler askıya alındı.',
+ 300, NOW(), NOW()),
+
+('d-5', 'Gaz Kaçağı', 37.7345, 37.6212, 'Adıyaman, Gölbaşı, Doğalgaz Boru Hattı',
+ 'CRITICAL', 'CONTAINED', '2026-02-06T05:00:00Z',
+ 'Yer hareketleri nedeniyle büyük gaz boru hattı patladı. 2 km yarıçapındaki alan tahliye edildi. Yangın riski azaltıldı, onarımlar bekleniyor.',
+ 2000, NOW(), NOW()),
+
+('d-6', 'Elektrik Kesintisi', 38.1156, 38.6876, 'Adıyaman, Sincik, Elektrik Trafo Merkezi',
+ 'MEDIUM', 'ACTIVE', '2026-02-06T04:15:00Z',
+ 'Ana elektrik trafo merkezi hasar gördü. 15 köy elektriksiz. Jeneratör sevkiyatı devam ediyor ancak kapasite yetersiz.',
+ 8000, NOW(), NOW()),
+
+('d-7', 'Hasarlı Köprü', 37.6925, 38.7035, 'Adıyaman, Kahta, Atatürk Barajı Köprüsü Giriş Yolu',
+ 'CRITICAL', 'ACTIVE', '2026-02-06T04:25:00Z',
+ 'Köprü girişi çöktü, köprü yapısı hasar gördü. Kuzey yakası topluluklarına tek erişim kesildi. Feribot hizmeti düzenleniyor.',
+ 1200, NOW(), NOW()),
+
+('d-8', 'Kirli Su', 37.9548, 38.4523, 'Adıyaman, Kahta, Belediye Su Arıtma Tesisi',
+ 'MEDIUM', 'ACTIVE', '2026-02-06T06:30:00Z',
+ 'Su arıtma tesisi hasar gördü, filtrasyon sistemi devre dışı. 8 köye arıtılmamış su veriliyor. Kaynatma tavsiyesi yürürlükte.',
+ 5000, NOW(), NOW()),
+
+('d-9', 'Çökmüş Bina', 36.0865, 35.9823, 'Hatay, Samandağ, Konut Apartman Kompleksi',
+ 'CRITICAL', 'ACTIVE', '2026-02-06T04:18:00Z',
+ '5 katlı konut binası yığın halinde çöktü. 30''dan fazla sakinin içeride mahsur kaldığı tahmin ediliyor. Uluslararası kurtarma ekipleri bölgeye sevk edildi.',
+ 600, NOW(), NOW()),
+
+('d-10', 'Heyelan', 36.7423, 37.1389, 'Kilis, Merkez, Bölge Yolu D-850',
+ 'MEDIUM', 'CONTAINED', '2026-02-06T05:15:00Z',
+ 'Dağ yamacı ana erişim yolunun üzerine çöktü. 200 metrelik bölüm enkaz altında kaldı. Ağır makineler yolu temizliyor, tahmini 48 saat.',
+ 400, NOW(), NOW());

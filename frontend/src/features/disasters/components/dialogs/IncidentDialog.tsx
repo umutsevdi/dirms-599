@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import type { Disaster } from "../../types/disasters.types";
 import type { Coordinates } from "../../../../shared/types/common.types";
-import { INCIDENT_TYPES } from "../../../../shared/constants/options";
 
 interface IncidentDialogProps {
   action: "add" | "edit";
@@ -46,7 +45,6 @@ const IncidentDialog = ({
   useEffect(() => {
     if (isOpen) {
       if (action === "edit" && disaster) {
-        // Populate fields from existing disaster
         setType(disaster.type);
         setSeverity(disaster.severity);
         setStatus(disaster.status);
@@ -56,7 +54,6 @@ const IncidentDialog = ({
         );
         setAddress(disaster.address);
       } else {
-        // Reset for new incident
         setType("");
         setSeverity("düşük");
         setStatus("aktif");
@@ -115,21 +112,14 @@ const IncidentDialog = ({
             </Box>
           )}
 
-          <FormControl fullWidth required>
-            <InputLabel id="type-label">Hasar</InputLabel>
-            <Select
-              labelId="type-label"
-              label="Incident Type"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            >
-              {INCIDENT_TYPES.map((t) => (
-                <MenuItem key={t} value={t}>
-                  {t}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <TextField
+            label="Hasar Türü"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            placeholder="örn. Hasarlı Hastane, Çökmüş Bina..."
+            fullWidth
+            required
+          />
 
           <TextField
             label="Konum"
@@ -149,9 +139,9 @@ const IncidentDialog = ({
                 setSeverity(e.target.value as Disaster["severity"])
               }
             >
-              <MenuItem value="low">Düşük</MenuItem>
-              <MenuItem value="moderate">Orta</MenuItem>
-              <MenuItem value="critical">Kritik</MenuItem>
+              <MenuItem value="düşük">Düşük</MenuItem>
+              <MenuItem value="orta">Orta</MenuItem>
+              <MenuItem value="kritik">Kritik</MenuItem>
             </Select>
           </FormControl>
 
@@ -163,9 +153,9 @@ const IncidentDialog = ({
               value={status}
               onChange={(e) => setStatus(e.target.value as Disaster["status"])}
             >
-              <MenuItem value="active">Aktif</MenuItem>
-              <MenuItem value="contained">Kontrol Altında</MenuItem>
-              <MenuItem value="resolved">Çözüldü</MenuItem>
+              <MenuItem value="aktif">Aktif</MenuItem>
+              <MenuItem value="kontrol-altında">Kontrol Altında</MenuItem>
+              <MenuItem value="çözüldü">Çözüldü</MenuItem>
             </Select>
           </FormControl>
 

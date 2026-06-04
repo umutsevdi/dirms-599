@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Any
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
-from app.db.models import EntityType, EmployeeRole, ArchetypeSource, UrgencyLevel, InventoryStatus
+from app.db.models import EntityType, EmployeeRole, ArchetypeSource, UrgencyLevel, InventoryStatus, IncidentSeverity, IncidentStatus
 
 
 class EntityBase(BaseModel):
@@ -185,6 +185,7 @@ class IncidentArchetypeCreate(BaseModel):
     implications: dict[str, Any] = {}
     default_report_urgency: Optional[UrgencyLevel] = None
     wikidata_id: Optional[str] = None
+    parent_archetype_id: Optional[str] = None
 
 
 class IncidentArchetypeUpdate(BaseModel):
@@ -194,6 +195,7 @@ class IncidentArchetypeUpdate(BaseModel):
     urgency_rules: Optional[list[UrgencyRuleItem]] = None
     implications: Optional[dict[str, Any]] = None
     default_report_urgency: Optional[UrgencyLevel] = None
+    parent_archetype_id: Optional[str] = None
 
 
 class IncidentArchetypeResponse(IncidentArchetypeBase):
@@ -241,6 +243,7 @@ class InventoryArchetypeCreate(BaseModel):
     brand: Optional[dict[str, Any]] = None
     learning: Optional[dict[str, Any]] = None
     wikidata_id: Optional[str] = None
+    parent_archetype_id: Optional[str] = None
 
 
 class InventoryArchetypeUpdate(BaseModel):
@@ -256,6 +259,7 @@ class InventoryArchetypeUpdate(BaseModel):
     medical_properties: Optional[dict[str, Any]] = None
     brand: Optional[dict[str, Any]] = None
     learning: Optional[dict[str, Any]] = None
+    parent_archetype_id: Optional[str] = None
 
 
 class InventoryArchetypeResponse(InventoryArchetypeBase):
@@ -338,3 +342,42 @@ class UrgencyCalculationRequest(BaseModel):
 class UrgencyCalculationResponse(BaseModel):
     urgency: str
     reason: str
+
+
+# ---------------------------------------------------------------------------
+# Incident Schemas
+# ---------------------------------------------------------------------------
+
+class IncidentBase(BaseModel):
+    type: str
+    location_lat: float
+    location_lng: float
+    location_address: str
+    severity: IncidentSeverity
+    status: IncidentStatus = IncidentStatus.ACTIVE
+    timestamp: datetime
+    description: str
+    affected_radius: Optional[int] = None
+
+
+class IncidentCreate(IncidentBase):
+    pass
+
+
+class IncidentUpdate(BaseModel):
+    type: Optional[str] = None
+    location_lat: Optional[float] = None
+    location_lng: Optional[float] = None
+    location_address: Optional[str] = None
+    severity: Optional[IncidentSeverity] = None
+    status: Optional[IncidentStatus] = None
+    description: Optional[str] = None
+    affected_radius: Optional[int] = None
+
+
+class IncidentResponse(IncidentBase):
+    id: str
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Paper,
@@ -9,36 +9,31 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Chip,
   Button,
   Tabs,
   Tab,
   CircularProgress,
   Alert,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import LinkIcon from "@mui/icons-material/Link";
 import DeleteIcon from "@mui/icons-material/Delete";
 import * as archetypeService from "../services/archetypeService";
 import type { ArchetypeListEntry, ArchetypeSource } from "../types/archetypes.types";
 
 interface ArchetypeListProps {
   onSelect: (entry: ArchetypeListEntry) => void;
-  isAdmin: boolean;
+  search: string;
+  categoryFilter: string;
+  sourceFilter: string;
 }
 
-export default function ArchetypeList({ onSelect, isAdmin }: ArchetypeListProps) {
+export default function ArchetypeList({ onSelect, search, categoryFilter, sourceFilter }: ArchetypeListProps) {
   const [entries, setEntries] = useState<ArchetypeListEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [sourceFilter, setSourceFilter] = useState("");
   const [activeTab, setActiveTab] = useState(0);
 
   const loadEntries = useCallback(async () => {
@@ -53,7 +48,7 @@ export default function ArchetypeList({ onSelect, isAdmin }: ArchetypeListProps)
       setEntries(data);
     } catch (err: unknown) {
       const e = err as { detail?: string };
-      setError(e.detail || "Failed to load archetypes");
+      setError(e.detail || "Arketipler yüklenemedi");
     } finally {
       setLoading(false);
     }
@@ -64,7 +59,7 @@ export default function ArchetypeList({ onSelect, isAdmin }: ArchetypeListProps)
   }, [loadEntries]);
 
   const handleDuplicate = async (entry: ArchetypeListEntry) => {
-    const newId = prompt("Enter new archetype ID:");
+    const newId = prompt("Yeni arketip ID'sini girin:");
     if (!newId) return;
     try {
       if (entry.type === "incident") {
@@ -75,12 +70,12 @@ export default function ArchetypeList({ onSelect, isAdmin }: ArchetypeListProps)
       loadEntries();
     } catch (err: unknown) {
       const e = err as { detail?: string };
-      alert(e.detail || "Failed to duplicate archetype");
+      alert(e.detail || "Arketip kopyalanamadı");
     }
   };
 
   const handleDelete = async (entry: ArchetypeListEntry) => {
-    if (!confirm(`Delete archetype "${entry.name}"?`)) return;
+    if (!confirm(`"${entry.name}" arketipini silmek istediğinize emin misiniz?`)) return;
     try {
       if (entry.type === "incident") {
         await archetypeService.deleteIncidentArchetype(entry.id);
@@ -90,9 +85,15 @@ export default function ArchetypeList({ onSelect, isAdmin }: ArchetypeListProps)
       loadEntries();
     } catch (err: unknown) {
       const e = err as { detail?: string };
-      alert(e.detail || "Failed to delete archetype");
+      alert(e.detail || "Arketip silinemedi");
     }
   };
+
+  const nameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    entries.forEach((e) => map.set(e.id, e.name));
+    return map;
+  }, [entries]);
 
   const filteredEntries = entries.filter((e) => {
     if (activeTab === 0) return true;
@@ -113,45 +114,7 @@ export default function ArchetypeList({ onSelect, isAdmin }: ArchetypeListProps)
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>Arketipler</Typography>
-
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-
-      <Box sx={{ display: "flex", gap: 2, mb: 2, flexWrap: "wrap", alignItems: "center" }}>
-        <TextField
-          size="small"
-          placeholder="Ara..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          sx={{ width: 200 }}
-        />
-        <FormControl size="small" sx={{ width: 150 }}>
-          <InputLabel>Kategori</InputLabel>
-          <Select
-            value={categoryFilter}
-            label="Kategori"
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
-            <MenuItem value="">Tümü</MenuItem>
-            <MenuItem value="incident">Olay</MenuItem>
-            <MenuItem value="food">Gıda</MenuItem>
-            <MenuItem value="medical">Tıbbi</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl size="small" sx={{ width: 150 }}>
-          <InputLabel>Kaynak</InputLabel>
-          <Select
-            value={sourceFilter}
-            label="Kaynak"
-            onChange={(e) => setSourceFilter(e.target.value)}
-          >
-            <MenuItem value="">Tümü</MenuItem>
-            <MenuItem value="system">Sistem</MenuItem>
-            <MenuItem value="wikidata">Wikidata</MenuItem>
-            <MenuItem value="user">Kullanıcı</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
 
       <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)} sx={{ mb: 2 }}>
         <Tab label="Tümü" />
@@ -167,6 +130,7 @@ export default function ArchetypeList({ onSelect, isAdmin }: ArchetypeListProps)
               <TableCell>ID</TableCell>
               <TableCell>Ad</TableCell>
               <TableCell>Kategori</TableCell>
+              <TableCell>Üst Arketip</TableCell>
               <TableCell>Kaynak</TableCell>
               <TableCell>Versiyon</TableCell>
               <TableCell align="right">İşlem</TableCell>
@@ -175,7 +139,7 @@ export default function ArchetypeList({ onSelect, isAdmin }: ArchetypeListProps)
           <TableBody>
             {filteredEntries.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} align="center" sx={{ py: 4, color: "text.secondary" }}>
+                <TableCell colSpan={8} align="center" sx={{ py: 4, color: "text.secondary" }}>
                   Arketip bulunamadı
                 </TableCell>
               </TableRow>
@@ -200,6 +164,18 @@ export default function ArchetypeList({ onSelect, isAdmin }: ArchetypeListProps)
                   <TableCell sx={{ fontWeight: "medium" }}>{entry.name}</TableCell>
                   <TableCell>{entry.category}</TableCell>
                   <TableCell>
+                    {entry.parentArchetypeId ? (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <LinkIcon fontSize="small" sx={{ fontSize: 14, color: "text.secondary" }} />
+                        <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+                          {nameMap.get(entry.parentArchetypeId) || entry.parentArchetypeId}
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Typography variant="caption" color="text.disabled">—</Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>
                     <Chip
                       label={entry.source}
                       size="small"
@@ -215,7 +191,7 @@ export default function ArchetypeList({ onSelect, isAdmin }: ArchetypeListProps)
                     <Button size="small" startIcon={<ContentCopyIcon />} onClick={() => handleDuplicate(entry)}>
                       Kopyala
                     </Button>
-                    {entry.source !== "system" && isAdmin && (
+                    {entry.source !== "system" && (
                       <Button size="small" color="error" startIcon={<DeleteIcon />} onClick={() => handleDelete(entry)}>
                         Sil
                       </Button>

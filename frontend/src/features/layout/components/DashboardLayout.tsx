@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { useNominatim } from "../../../shared/hooks/useNominatim";
-import { useData } from "../../disasters/contexts/DataContext";
+import { useIncidents } from "../../disasters/hooks/useIncidents";
 import { useInventory } from "../../inventory/hooks/useInventory";
 import { Box } from "@mui/material";
 import { layout, colors } from "../../../theme";
@@ -30,7 +30,7 @@ const MAX_PANEL_HEIGHT_PERCENT = layout.panel.maxHeightPercent;
 const DEFAULT_PANEL_HEIGHT_PERCENT = layout.panel.defaultHeightPercent;
 
 const DashboardLayout = () => {
-  const { disasters, setDisasters } = useData();
+  const { items: disasters, saveItem: saveIncident } = useIncidents();
   const { items: inventoryItems, saveItem: saveInventoryItem } = useInventory();
   const [mapCenter, setMapCenter] = useState<Coordinates>({
     lat: 39.9334,
@@ -280,13 +280,8 @@ const DashboardLayout = () => {
     setPendingAddress("");
   };
 
-  const handleSaveIncident = (incident: Disaster) => {
-    setDisasters((prev) => {
-      const existing = prev.find((d) => d.id === incident.id);
-      if (existing)
-        return prev.map((d) => (d.id === incident.id ? incident : d));
-      return [...prev, incident];
-    });
+  const handleSaveIncident = async (incident: Disaster) => {
+    await saveIncident(incident);
     setPendingCoords(null);
     setPendingAddress("");
     setEditingDisaster(null);

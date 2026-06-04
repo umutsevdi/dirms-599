@@ -45,6 +45,9 @@ function mapListEntry(api: ApiArchetypeListEntry): ArchetypeListEntry {
     source: api.source,
     version: api.version,
     parentArchetypeId: api.parent_archetype_id,
+    resolvesNeeds: api.resolves_needs,
+    targetDemographics: api.target_demographics,
+    fieldSchema: api.field_schema,
   };
 }
 
@@ -113,8 +116,31 @@ export async function fetchInventoryArchetype(id: string): Promise<InventoryArch
   return mapInventoryArchetype(api);
 }
 
+export async function fetchParentArchetype(
+  entry: ArchetypeListEntry
+): Promise<IncidentArchetype | InventoryArchetype | null> {
+  if (!entry.parentArchetypeId) return null;
+  try {
+    if (entry.type === "incident") {
+      return await fetchIncidentArchetype(entry.parentArchetypeId);
+    }
+    return await fetchInventoryArchetype(entry.parentArchetypeId);
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchChildArchetypes(
+  entry: ArchetypeListEntry
+): Promise<ArchetypeListEntry[]> {
+  const all = await fetchArchetypeList();
+  return all.filter(
+    (a) => a.parentArchetypeId === entry.id && a.type === entry.type
+  );
+}
+
 export async function createIncidentArchetype(
-  data: Omit<IncidentArchetype, "source" | "createdBy" | "createdAt" | "updatedAt" | "version" | "parentArchetypeId" | "wikidataId">
+  data: Omit<IncidentArchetype, "source" | "createdBy" | "createdAt" | "updatedAt" | "version" | "wikidataId">
 ): Promise<IncidentArchetype> {
   const apiData: ApiIncidentArchetypeCreate = {
     id: data.id,
@@ -137,13 +163,14 @@ export async function createIncidentArchetype(
     })),
     implications: data.implications,
     default_report_urgency: data.defaultReportUrgency,
+    parent_archetype_id: data.parentArchetypeId,
   };
   const api = await archetypesApi.createIncidentArchetype(apiData);
   return mapIncidentArchetype(api);
 }
 
 export async function createInventoryArchetype(
-  data: Omit<InventoryArchetype, "source" | "createdBy" | "createdAt" | "updatedAt" | "version" | "parentArchetypeId" | "wikidataId">
+  data: Omit<InventoryArchetype, "source" | "createdBy" | "createdAt" | "updatedAt" | "version" | "wikidataId">
 ): Promise<InventoryArchetype> {
   const apiData: ApiInventoryArchetypeCreate = {
     id: data.id,
@@ -173,6 +200,7 @@ export async function createInventoryArchetype(
     medical_properties: data.medicalProperties,
     brand: data.brand,
     learning: data.learning,
+    parent_archetype_id: data.parentArchetypeId,
   };
   const api = await archetypesApi.createInventoryArchetype(apiData);
   return mapInventoryArchetype(api);
@@ -202,6 +230,7 @@ export async function updateIncidentArchetype(
   }));
   if (data.implications) apiData.implications = data.implications;
   if (data.defaultReportUrgency) apiData.default_report_urgency = data.defaultReportUrgency;
+  apiData.parent_archetype_id = data.parentArchetypeId ?? null;
 
   const api = await archetypesApi.updateIncidentArchetype(id, apiData);
   return mapIncidentArchetype(api);
@@ -237,6 +266,7 @@ export async function updateInventoryArchetype(
   if (data.medicalProperties) apiData.medical_properties = data.medicalProperties;
   if (data.brand) apiData.brand = data.brand;
   if (data.learning) apiData.learning = data.learning;
+  apiData.parent_archetype_id = data.parentArchetypeId ?? null;
 
   const api = await archetypesApi.updateInventoryArchetype(id, apiData);
   return mapInventoryArchetype(api);

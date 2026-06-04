@@ -19,6 +19,7 @@ import { sizing } from "../../../theme";
 import BusinessIcon from "@mui/icons-material/Business";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import BuildIcon from "@mui/icons-material/Build";
 import DisasterTimer from "../../disasters/components/DisasterTimer";
 
 interface HeaderProps {
@@ -185,6 +186,15 @@ export default function Header({
                 </Box>
 
                 <Divider />
+
+                <MenuItem
+                  onClick={() => (window.location.href = "/archetypes")}
+                >
+                  <ListItemIcon>
+                    <BuildIcon fontSize="small" />
+                  </ListItemIcon>
+                  Arketip Yönetimi
+                </MenuItem>
 
                 <MenuItem
                   onClick={() => (window.location.href = "/organization")}
