@@ -20,8 +20,9 @@ import {
   CircularProgress,
 } from "@mui/material";
 import type { InventoryItem, InventoryGroup, InventoryArchetypeDsl } from "../../types/inventory.types";
-import { AVAILABLE_NEEDS, GROUP_OPTIONS } from "../../../../shared/constants/options";
+import { GROUP_OPTIONS } from "../../../../shared/constants/options";
 import { listInventoryArchetypes, fetchInventoryArchetypeWithInheritance } from "../../services/inventoryService";
+import { useNeedsArchetypes, getNeedName } from "../../../../features/needs/services/needsService";
 
 interface InventoryDialogProps {
   action: "add" | "edit";
@@ -44,6 +45,7 @@ const InventoryDialog = ({
   onClose,
   onSave,
 }: InventoryDialogProps) => {
+  const { needsArchetypes, loading: loadingNeeds } = useNeedsArchetypes();
   const [quantity, setQuantity] = useState("1");
   const [resolves, setResolves] = useState<string[]>([]);
   const [group, setGroup] = useState<InventoryGroup>("genel");
@@ -160,10 +162,12 @@ const InventoryDialog = ({
     e.preventDefault();
     if (!selectedArchetype) return;
 
+    const displayName = selectedArchetype.name;
+
     const newItem: InventoryItem = {
       id: item?.id || `inv-${Date.now()}`,
       archetypeId: selectedArchetype.id,
-      name: selectedArchetype.name,
+      name: displayName,
       quantity: parseInt(quantity) || 1,
       resolves,
       group: group === "genel" ? undefined : group,
@@ -316,18 +320,24 @@ const InventoryDialog = ({
             >
               Bu ürünün giderebileceği ihtiyaçları seçiniz.
             </Typography>
-            <FormGroup row sx={{ gap: 1, flexWrap: "wrap" }}>
-              {AVAILABLE_NEEDS.map((need) => (
-                <Chip
-                  key={need}
-                  label={need}
-                  onClick={() => handleToggleNeed(need)}
-                  color={resolves.includes(need) ? "primary" : "default"}
-                  variant={resolves.includes(need) ? "filled" : "outlined"}
-                  sx={{ cursor: "pointer" }}
-                />
-              ))}
-            </FormGroup>
+            {loadingNeeds ? (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
+                <CircularProgress size={20} />
+              </Box>
+            ) : (
+              <FormGroup row sx={{ gap: 1, flexWrap: "wrap" }}>
+                {needsArchetypes.map((need) => (
+                  <Chip
+                    key={need.id}
+                    label={need.name}
+                    onClick={() => handleToggleNeed(need.id)}
+                    color={resolves.includes(need.id) ? "primary" : "default"}
+                    variant={resolves.includes(need.id) ? "filled" : "outlined"}
+                    sx={{ cursor: "pointer" }}
+                  />
+                ))}
+              </FormGroup>
+            )}
           </Box>
 
           {loadingDsl && (

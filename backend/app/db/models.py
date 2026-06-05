@@ -249,6 +249,7 @@ class Incident(Base):
     __tablename__ = "incidents"
 
     id = Column(String, primary_key=True, default=lambda: f"d-{uuid.uuid4().hex[:8]}")
+    archetype_id = Column(String, ForeignKey("incident_archetypes.id"), nullable=True)
     type = Column(String, nullable=False)
 
     location_lat = Column(Float, nullable=False)
@@ -261,12 +262,16 @@ class Incident(Base):
     description = Column(Text, nullable=False)
     affected_radius = Column(Integer, nullable=True)
 
+    archetype_values = Column(JSONB, nullable=False, server_default="{}")
+
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
+
+    archetype = relationship("IncidentArchetype")
 
 
 class Inventory(Base):

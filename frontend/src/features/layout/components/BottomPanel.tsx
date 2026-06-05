@@ -19,7 +19,7 @@ import AddIcon from "@mui/icons-material/Add";
 import type { Disaster } from "../../disasters/types/disasters.types";
 import type { InventoryItem } from "../../inventory/types/inventory.types";
 import type { PeopleReport } from "../../people-reports/types/people-reports.types";
-import { getNeedName } from "../../../shared/constants/needs";
+import { getNeedName } from "../../../features/needs/services/needsService";
 
 interface BottomPanelProps {
   disasters: Disaster[];

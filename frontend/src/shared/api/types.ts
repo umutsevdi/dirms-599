@@ -256,6 +256,7 @@ export interface ApiUrgencyResult {
 
 export interface ApiIncidentResponse {
   id: string;
+  archetype_id?: string;
   type: string;
   location_lat: number;
   location_lng: number;
@@ -265,11 +266,13 @@ export interface ApiIncidentResponse {
   timestamp: string;
   description: string;
   affected_radius: number | null;
+  archetype_values: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
 
 export interface ApiIncidentCreate {
+  archetype_id?: string;
   type: string;
   location_lat: number;
   location_lng: number;
@@ -279,9 +282,11 @@ export interface ApiIncidentCreate {
   timestamp: string;
   description: string;
   affected_radius?: number;
+  archetype_values?: Record<string, unknown>;
 }
 
 export interface ApiIncidentUpdate {
+  archetype_id?: string;
   type?: string;
   location_lat?: number;
   location_lng?: number;
@@ -290,6 +295,7 @@ export interface ApiIncidentUpdate {
   status?: string;
   description?: string;
   affected_radius?: number;
+  archetype_values?: Record<string, unknown>;
 }
 
 export interface ApiPeopleReportArchetypeResponse {

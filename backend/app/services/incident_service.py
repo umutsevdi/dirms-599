@@ -44,6 +44,7 @@ class IncidentService:
         data: dict,
     ) -> Incident:
         incident = Incident(
+            archetype_id=data.get("archetype_id"),
             type=data["type"],
             location_lat=data["location_lat"],
             location_lng=data["location_lng"],
@@ -53,6 +54,7 @@ class IncidentService:
             timestamp=data["timestamp"],
             description=data["description"],
             affected_radius=data.get("affected_radius"),
+            archetype_values=data.get("archetype_values", {}),
         )
         db.add(incident)
         db.commit()

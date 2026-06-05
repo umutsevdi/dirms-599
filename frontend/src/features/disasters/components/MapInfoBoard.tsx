@@ -39,7 +39,7 @@ import type { Disaster } from "../types/disasters.types";
 import type { PeopleReport } from "../../people-reports/types/people-reports.types";
 import type { InventoryItem, InventoryArchetypeDsl } from "../../inventory/types/inventory.types";
 import { layout, sizing, getAgeGroupChipStyles } from "../../../theme";
-import { getNeedName } from "../../../shared/constants/needs";
+import { getNeedName } from "../../../features/needs/services/needsService";
 
 interface MapInfoBoardProps {
   disaster: Disaster | null;
@@ -1192,6 +1192,27 @@ const MapInfoBoard = ({
             </Box>
           )}
         </Box>
+
+        {disaster.archetypeId && disaster.archetypeValues && Object.keys(disaster.archetypeValues).length > 0 && (
+          <>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
+              Arketip Alanları
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+              {Object.entries(disaster.archetypeValues).map(([key, value]) => (
+                <Box key={key} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+                    {key}
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontFamily: "monospace" }}>
+                    {typeof value === "boolean" ? (value ? "Evet" : "Hayır") : String(value)}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </>
+        )}
 
         {totalPeople > 0 && (
           <>

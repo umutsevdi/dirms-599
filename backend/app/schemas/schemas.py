@@ -349,6 +349,7 @@ class UrgencyCalculationResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 class IncidentBase(BaseModel):
+    archetype_id: Optional[str] = None
     type: str
     location_lat: float
     location_lng: float
@@ -358,6 +359,7 @@ class IncidentBase(BaseModel):
     timestamp: datetime
     description: str
     affected_radius: Optional[int] = None
+    archetype_values: dict[str, Any] = {}
 
 
 class IncidentCreate(IncidentBase):
@@ -365,6 +367,7 @@ class IncidentCreate(IncidentBase):
 
 
 class IncidentUpdate(BaseModel):
+    archetype_id: Optional[str] = None
     type: Optional[str] = None
     location_lat: Optional[float] = None
     location_lng: Optional[float] = None
@@ -373,6 +376,7 @@ class IncidentUpdate(BaseModel):
     status: Optional[IncidentStatus] = None
     description: Optional[str] = None
     affected_radius: Optional[int] = None
+    archetype_values: Optional[dict[str, Any]] = None
 
 
 class IncidentResponse(IncidentBase):
