@@ -1,8 +1,9 @@
-import type { InventoryItem, InventoryGroup } from "../types/inventory.types";
+import type { InventoryItem, InventoryGroup, InventoryArchetypeDsl } from "../types/inventory.types";
 import type {
   ApiInventoryResponse,
   ApiInventoryCreate,
   ApiInventoryUpdate,
+  ApiInventoryArchetypeResponse,
 } from "../../../shared/api/types";
 import * as inventoryApi from "../../../shared/api/inventory";
 import * as archetypesApi from "../../../shared/api/archetypes";
@@ -22,7 +23,7 @@ function resolveArchetypeId(item: InventoryItem): string {
   if (name.includes("hijyen")) return "kadin-hijyen-kitleri";
   if (name.includes("yasli") || name.includes("bakim")) return "yasli-bakim-malzemeleri";
   if (name.includes("jenerator")) return "acil-durum-jeneratorleri";
-  return DEFAULT_ARCHETYPE_ID;
+  return item.archetypeId || DEFAULT_ARCHETYPE_ID;
 }
 
 export function toApiCreate(
@@ -31,7 +32,7 @@ export function toApiCreate(
 ): ApiInventoryCreate {
   const loc = location || DEPOT_LOCATIONS.default;
   return {
-    archetype_id: resolveArchetypeId(item),
+    archetype_id: item.archetypeId || resolveArchetypeId(item),
     quantity: item.quantity,
     location_lat: loc.lat,
     location_lng: loc.lng,
@@ -41,6 +42,7 @@ export function toApiCreate(
       cozer: item.resolves,
       grup: item.group || "genel",
       orijinal_ad: item.name,
+      ...(item.archetypeValues || {}),
     },
   };
 }
@@ -55,6 +57,7 @@ export function toApiUpdate(
       cozer: item.resolves,
       grup: item.group || "genel",
       orijinal_ad: item.name,
+      ...(item.archetypeValues || {}),
     },
   };
   if (location) {
@@ -67,12 +70,24 @@ export function toApiUpdate(
 
 export function toFrontendItem(api: ApiInventoryResponse): InventoryItem {
   const values = api.archetype_values as Record<string, unknown>;
+  const { cozer, grup, orijinal_ad, ...restValues } = values;
   return {
     id: api.id,
-    name: (values.orijinal_ad as string) || api.archetype_id,
+    archetypeId: api.archetype_id,
+    name: (orijinal_ad as string) || api.archetype_id,
     quantity: api.quantity,
-    resolves: (values.cozer as string[]) || [],
-    group: (values.grup as InventoryGroup) || undefined,
+    resolves: (cozer as string[]) || [],
+    group: (grup as InventoryGroup) || undefined,
+    archetypeValues: Object.keys(restValues).length > 0 ? restValues : undefined,
+    location: {
+      lat: api.location_lat,
+      lng: api.location_lng,
+      address: api.location_address || "",
+    },
+    status: api.status as InventoryItem["status"],
+    notes: api.notes || undefined,
+    createdAt: api.created_at,
+    updatedAt: api.updated_at,
   };
 }
 
@@ -111,9 +126,17 @@ export async function saveInventoryItem(
   const existing = await inventoryApi.listInventory();
   const found = existing.find((i) => i.id === item.id);
   if (found) {
-    return updateInventoryItem(item.id, item, location);
+    const apiData = toApiUpdate(item, location);
+    console.log("Updating inventory - API data:", JSON.stringify(apiData, null, 2));
+    const updated = await inventoryApi.updateInventory(item.id, apiData);
+    console.log("Updated inventory response:", updated);
+    return toFrontendItem(updated);
   }
-  return createInventoryItem(item, location);
+  const apiData = toApiCreate(item, location);
+  console.log("Creating inventory - API data:", JSON.stringify(apiData, null, 2));
+  const created = await inventoryApi.createInventory(apiData);
+  console.log("Created inventory response:", created);
+  return toFrontendItem(created);
 }
 
 export async function findArchetypeByName(name: string): Promise<string | null> {
@@ -126,4 +149,123 @@ export async function findArchetypeByName(name: string): Promise<string | null> 
   } catch {
     return null;
   }
+}
+
+export async function listInventoryArchetypes(): Promise<InventoryArchetypeDsl[]> {
+  const allArchetypes = await archetypesApi.listArchetypes();
+  return allArchetypes
+    .filter((a) => a.type === "inventory")
+    .map((a) => ({
+      id: a.id,
+      name: a.name,
+      description: "",
+      category: a.category,
+      source: a.source,
+      fieldSchema: (a.field_schema || []).map((f) => ({
+        field: f.field,
+        label: f.label,
+        type: f.type,
+        required: false,
+      })),
+      urgencyRules: (a.urgency_rules || []).map((r) => ({
+        field: r.field,
+        operator: r.operator,
+        value: r.value,
+        setUrgency: r.setUrgency,
+        message: r.message,
+      })),
+      resolvesNeeds: a.resolves_needs || [],
+      targetDemographics: a.target_demographics || [],
+      quantityUnit: "adet",
+      version: a.version,
+    }));
+}
+
+function mapApiArchetypeToDsl(api: ApiInventoryArchetypeResponse): InventoryArchetypeDsl {
+  return {
+    id: api.id,
+    name: api.name,
+    description: api.description,
+    category: api.category,
+    source: api.source,
+    fieldSchema: api.field_schema || [],
+    urgencyRules: api.urgency_rules || [],
+    resolvesNeeds: api.resolves_needs || [],
+    targetDemographics: api.target_demographics || [],
+    physicalProperties: api.physical_properties,
+    quantityUnit: api.quantity_unit,
+    foodProperties: api.food_properties,
+    medicalProperties: api.medical_properties,
+    parentArchetypeId: api.parent_archetype_id || undefined,
+    version: api.version,
+  };
+}
+
+export async function fetchInventoryArchetypeWithInheritance(
+  archetypeId: string
+): Promise<{ dsl: InventoryArchetypeDsl; chain: InventoryArchetypeDsl[] }> {
+  const chain: InventoryArchetypeDsl[] = [];
+  let currentId: string | undefined = archetypeId;
+
+  while (currentId) {
+    const api = await archetypesApi.getInventoryArchetype(currentId);
+    const dsl = mapApiArchetypeToDsl(api);
+    chain.push(dsl);
+    currentId = dsl.parentArchetypeId;
+  }
+
+  const child = chain[0];
+  const parent = chain.length > 1 ? chain[1] : null;
+
+  const merged: InventoryArchetypeDsl = {
+    ...child,
+    fieldSchema: mergeFieldSchemas(parent?.fieldSchema || [], child.fieldSchema),
+    urgencyRules: parent?.urgencyRules
+      ? mergeUrgencyRules(parent.urgencyRules, child.urgencyRules)
+      : child.urgencyRules,
+    resolvesNeeds: [
+      ...new Set([
+        ...(parent?.resolvesNeeds || []),
+        ...child.resolvesNeeds,
+      ]),
+    ],
+    targetDemographics: [
+      ...new Set([
+        ...(parent?.targetDemographics || []),
+        ...child.targetDemographics,
+      ]),
+    ],
+  };
+
+  return { dsl: merged, chain };
+}
+
+function mergeFieldSchemas(
+  parentFields: InventoryArchetypeDsl["fieldSchema"],
+  childFields: InventoryArchetypeDsl["fieldSchema"]
+): InventoryArchetypeDsl["fieldSchema"] {
+  const fieldMap = new Map<string, InventoryArchetypeDsl["fieldSchema"][number]>();
+  for (const f of parentFields) {
+    fieldMap.set(f.field, f);
+  }
+  for (const f of childFields) {
+    fieldMap.set(f.field, { ...fieldMap.get(f.field), ...f });
+  }
+  return Array.from(fieldMap.values());
+}
+
+function mergeUrgencyRules(
+  parentRules: InventoryArchetypeDsl["urgencyRules"],
+  childRules: InventoryArchetypeDsl["urgencyRules"]
+): InventoryArchetypeDsl["urgencyRules"] {
+  const ruleKey = (r: InventoryArchetypeDsl["urgencyRules"][number]) =>
+    `${r.field}|${r.operator}|${r.value}`;
+  const ruleMap = new Map<string, InventoryArchetypeDsl["urgencyRules"][number]>();
+  for (const r of parentRules) {
+    ruleMap.set(ruleKey(r), r);
+  }
+  for (const r of childRules) {
+    ruleMap.set(ruleKey(r), r);
+  }
+  return Array.from(ruleMap.values());
 }

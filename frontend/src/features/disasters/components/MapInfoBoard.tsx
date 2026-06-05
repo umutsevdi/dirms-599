@@ -7,6 +7,14 @@ import {
   IconButton,
   Divider,
   LinearProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -26,8 +34,10 @@ import ChatIcon from "@mui/icons-material/Chat";
 import WomanIcon from "@mui/icons-material/Female";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import BoltIcon from "@mui/icons-material/Bolt";
+import InventoryIcon from "@mui/icons-material/Inventory";
 import type { Disaster } from "../types/disasters.types";
 import type { PeopleReport } from "../../people-reports/types/people-reports.types";
+import type { InventoryItem, InventoryArchetypeDsl } from "../../inventory/types/inventory.types";
 import { layout, sizing, getAgeGroupChipStyles } from "../../../theme";
 import { getNeedName } from "../../../shared/constants/needs";
 
@@ -35,6 +45,10 @@ interface MapInfoBoardProps {
   disaster: Disaster | null;
   peopleReports: PeopleReport[];
   reports: PeopleReport[];
+  inventoryItem: InventoryItem | null;
+  inventoryArchetypeDsl: InventoryArchetypeDsl | null;
+  inventoryArchetypeChain: InventoryArchetypeDsl[];
+  inventoryDslLoading: boolean;
   onClose: () => void;
 }
 
@@ -170,9 +184,13 @@ const MapInfoBoard = ({
   disaster,
   peopleReports,
   reports,
+  inventoryItem,
+  inventoryArchetypeDsl,
+  inventoryArchetypeChain,
+  inventoryDslLoading,
   onClose,
 }: MapInfoBoardProps) => {
-  if (!disaster && peopleReports.length === 0) return null;
+  if (!disaster && peopleReports.length === 0 && !inventoryItem) return null;
 
   if (peopleReports.length > 0 && !disaster) {
     const isCluster = peopleReports.length > 1;
@@ -715,6 +733,328 @@ const MapInfoBoard = ({
                 )}
               </Box>
             </Box>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (inventoryItem && !disaster && peopleReports.length === 0) {
+    const statusColors: Record<string, "success" | "warning" | "info" | "default"> = {
+      available: "success",
+      deployed: "warning",
+      reserved: "info",
+      expired: "default",
+    };
+    const statusLabels: Record<string, string> = {
+      available: "Mevcut",
+      deployed: "Dağıtıldı",
+      reserved: "Rezerve",
+      expired: "Süresi Doldu",
+    };
+    const urgencyLabels: Record<string, string> = {
+      critical: "KRİTİK",
+      high: "YÜKSEK",
+      medium: "ORTA",
+      low: "DÜŞÜK",
+    };
+    const urgencyColors: Record<string, "error" | "warning" | "info" | "success"> = {
+      critical: "error",
+      high: "warning",
+      medium: "info",
+      low: "success",
+    };
+
+    const currentUrgency = inventoryArchetypeDsl?.urgencyRules
+      ? (() => {
+          for (const rule of inventoryArchetypeDsl.urgencyRules) {
+            if (rule.field === "quantity") {
+              const val = rule.value as number;
+              const op = rule.operator;
+              if (
+                (op === "<" && inventoryItem.quantity < val) ||
+                (op === ">" && inventoryItem.quantity > val) ||
+                (op === "<=" && inventoryItem.quantity <= val) ||
+                (op === ">=" && inventoryItem.quantity >= val) ||
+                (op === "=" && inventoryItem.quantity === val)
+              ) {
+                return { urgency: rule.setUrgency, message: rule.message };
+              }
+            }
+          }
+          return { urgency: "medium", message: "Varsayılan aciliyet" };
+        })()
+      : null;
+
+    return (
+      <Card
+        sx={{
+          position: "absolute",
+          top: layout.spacing.md,
+          right: layout.spacing.md,
+          zIndex: layout.zIndex.mapOverlay,
+          width: layout.panel.infoBoardWidth,
+          maxHeight: `calc(100% - ${layout.spacing.xl}px)`,
+          overflow: "auto",
+          boxShadow: 3,
+        }}
+      >
+        <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+            }}
+          >
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                Envanter
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {inventoryArchetypeDsl?.name || inventoryItem.name}
+              </Typography>
+            </Box>
+            <IconButton
+              size="small"
+              onClick={onClose}
+              sx={{ mt: -0.5, mr: -0.5 }}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
+
+          <Divider sx={{ my: 1.5 }} />
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75, mb: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <InventoryIcon fontSize="small" color="action" />
+              <Typography variant="body2">
+                Miktar: <b>{inventoryItem.quantity}</b>
+                {inventoryArchetypeDsl?.quantityUnit && ` ${inventoryArchetypeDsl.quantityUnit}`}
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+              {inventoryItem.status && (
+                <Chip
+                  label={statusLabels[inventoryItem.status] || inventoryItem.status}
+                  size="small"
+                  color={statusColors[inventoryItem.status] || "default"}
+                />
+              )}
+              {currentUrgency && (
+                <Chip
+                  label={urgencyLabels[currentUrgency.urgency] || currentUrgency.urgency}
+                  size="small"
+                  color={urgencyColors[currentUrgency.urgency] || "default"}
+                />
+              )}
+            </Box>
+          </Box>
+
+          {inventoryItem.location?.address && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
+              <LocationOnIcon fontSize="small" color="action" />
+              <Typography variant="body2">
+                {inventoryItem.location.address}
+              </Typography>
+            </Box>
+          )}
+
+          {inventoryItem.resolves.length > 0 && (
+            <Box sx={{ mb: 1.5 }}>
+              <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: "bold" }}>
+                Karşılanan İhtiyaçlar
+              </Typography>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {inventoryItem.resolves.map((need) => (
+                  <Chip
+                    key={need}
+                    label={need}
+                    size="small"
+                    variant="outlined"
+                    sx={{ height: 28 }}
+                  />
+                ))}
+              </Box>
+            </Box>
+          )}
+
+          {inventoryItem.group && (
+            <Box sx={{ mb: 1.5 }}>
+              <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: "bold" }}>
+                Hedef Kitle
+              </Typography>
+              <Chip
+                label={inventoryItem.group}
+                size="small"
+                color="info"
+                sx={{ textTransform: "capitalize" }}
+              />
+            </Box>
+          )}
+
+          {inventoryArchetypeChain.length > 1 && (
+            <Box sx={{ mb: 1.5 }}>
+              <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: "bold" }}>
+                Kalıtım
+              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexWrap: "wrap" }}>
+                {inventoryArchetypeChain.map((dsl, idx) => (
+                  <Box key={dsl.id} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    {idx > 0 && (
+                      <Typography variant="caption" color="text.secondary">
+                        →
+                      </Typography>
+                    )}
+                    <Chip
+                      label={dsl.name}
+                      size="small"
+                      variant={idx === 0 ? "filled" : "outlined"}
+                      sx={{ height: 24, fontSize: "0.7rem" }}
+                    />
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          )}
+
+          {inventoryArchetypeDsl?.description && (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 1.5, lineHeight: 1.5 }}
+            >
+              {inventoryArchetypeDsl.description}
+            </Typography>
+          )}
+
+          {currentUrgency && (
+            <Box
+              sx={{
+                p: 1,
+                mb: 1.5,
+                borderRadius: 1,
+                bgcolor: `${urgencyColors[currentUrgency.urgency] || "default"}.lighter`,
+              }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+                {currentUrgency.message}
+              </Typography>
+            </Box>
+          )}
+
+          {inventoryDslLoading && (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+              <CircularProgress size={24} />
+            </Box>
+          )}
+
+          {!inventoryDslLoading && inventoryArchetypeDsl && (
+            <>
+              {inventoryArchetypeDsl.fieldSchema.length > 0 && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
+                    Alan Şeması ({inventoryArchetypeDsl.fieldSchema.length})
+                  </Typography>
+                  <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 200 }}>
+                    <Table size="small" stickyHeader>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Etiket</TableCell>
+                          <TableCell>Tip</TableCell>
+                          <TableCell>Zorunlu</TableCell>
+                          <TableCell>Varsayılan</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {inventoryArchetypeDsl.fieldSchema.map((field) => (
+                          <TableRow key={field.field}>
+                            <TableCell sx={{ fontWeight: "medium" }}>
+                              {field.label}
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={field.type}
+                                size="small"
+                                variant="outlined"
+                                sx={{ height: 20, fontSize: "0.65rem" }}
+                              />
+                            </TableCell>
+                            <TableCell>{field.required ? "Evet" : "—"}</TableCell>
+                            <TableCell>
+                              {field.defaultValue !== undefined
+                                ? String(field.defaultValue)
+                                : "—"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              )}
+
+              {inventoryArchetypeDsl.urgencyRules.length > 0 && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
+                    Aciliyet Kuralları ({inventoryArchetypeDsl.urgencyRules.length})
+                  </Typography>
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+                    {inventoryArchetypeDsl.urgencyRules.map((rule, idx) => (
+                      <Box
+                        key={idx}
+                        sx={{
+                          p: 1,
+                          borderRadius: 1,
+                          bgcolor: "action.hover",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 0.5,
+                        }}
+                      >
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontFamily: "monospace", fontWeight: "bold" }}
+                          >
+                            {rule.field} {rule.operator} {String(rule.value)}
+                          </Typography>
+                          <Chip
+                            label={urgencyLabels[rule.setUrgency] || rule.setUrgency}
+                            size="small"
+                            color={urgencyColors[rule.setUrgency] || "default"}
+                            sx={{ height: 20, fontSize: "0.65rem" }}
+                          />
+                        </Box>
+                        <Typography variant="caption" color="text.secondary">
+                          {rule.message}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              )}
+
+              {inventoryArchetypeDsl.targetDemographics.length > 0 && (
+                <Box sx={{ mb: 1.5 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: "bold" }}>
+                    Hedef Demografikler
+                  </Typography>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {inventoryArchetypeDsl.targetDemographics.map((demo) => (
+                      <Chip
+                        key={demo}
+                        label={demo}
+                        size="small"
+                        variant="outlined"
+                        sx={{ height: 24, textTransform: "capitalize" }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

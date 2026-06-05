@@ -27,6 +27,7 @@ interface BottomPanelProps {
   peopleReports: PeopleReport[];
   onAddInventory: () => void;
   onEditInventory: (item: InventoryItem) => void;
+  onSelectInventory: (item: InventoryItem | null) => void;
   onAddPeople: () => void;
   onEditPeople: (report: PeopleReport) => void;
   onSelectPeople: (report: PeopleReport | null) => void;
@@ -41,6 +42,7 @@ const BottomPanel = ({
   peopleReports,
   onAddInventory,
   onEditInventory,
+  onSelectInventory,
   onAddPeople,
   onEditPeople,
   onSelectPeople,
@@ -109,6 +111,10 @@ const BottomPanel = ({
     setSelectedInventoryId(newId);
     setSelectedPeopleId(null);
     setSelectedDisasterId(null);
+    const selected = newId === item.id ? item : null;
+    onSelectInventory(selected);
+    onSelectPeople(null);
+    onSelectDisaster(null);
   };
 
   const handleSelectDisasterRow = (disaster: Disaster) => {
@@ -369,6 +375,8 @@ const BottomPanel = ({
                   <TableRow>
                     <TableCell>Tür</TableCell>
                     <TableCell>Miktar</TableCell>
+                    <TableCell>Konum</TableCell>
+                    <TableCell>Durum</TableCell>
                     <TableCell>İhtiyaç</TableCell>
                     <TableCell>Hedef Kitle</TableCell>
                   </TableRow>
@@ -377,15 +385,31 @@ const BottomPanel = ({
                   {filteredInventory.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={4}
+                        colSpan={6}
                         sx={{ textAlign: "center", color: "text.secondary" }}
                       >
-                        No inventory items
+                        Envanter bulunamadı
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredInventory.map((item) => {
                       const isSelected = selectedInventoryId === item.id;
+                      const statusColors: Record<string, "success" | "warning" | "info" | "default"> = {
+                        available: "success",
+                        deployed: "warning",
+                        reserved: "info",
+                        expired: "default",
+                      };
+                      const statusLabels: Record<string, string> = {
+                        available: "Mevcut",
+                        deployed: "Dağıtıldı",
+                        reserved: "Rezerve",
+                        expired: "Süresi Doldu",
+                      };
+                      const loc = item.location;
+                      const locationDisplay = loc
+                        ? loc.address || `${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}`
+                        : "—";
                       return (
                         <TableRow
                           key={item.id}
@@ -398,6 +422,27 @@ const BottomPanel = ({
                             {item.name}
                           </TableCell>
                           <TableCell>{item.quantity}</TableCell>
+                          <TableCell
+                            sx={{
+                              maxWidth: 180,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {locationDisplay}
+                          </TableCell>
+                          <TableCell>
+                            {item.status ? (
+                              <Chip
+                                label={statusLabels[item.status] || item.status}
+                                size="small"
+                                color={statusColors[item.status] || "default"}
+                              />
+                            ) : (
+                              "—"
+                            )}
+                          </TableCell>
                           <TableCell>
                             <Box
                               sx={{

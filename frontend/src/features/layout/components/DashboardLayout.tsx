@@ -3,7 +3,7 @@ import { useNominatim } from "../../../shared/hooks/useNominatim";
 import { useIncidents } from "../../disasters/hooks/useIncidents";
 import { useInventory } from "../../inventory/hooks/useInventory";
 import { usePeopleReports } from "../../people-reports/hooks/usePeopleReports";
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
 import { layout, colors } from "../../../theme";
 import DisasterMap from "../../disasters/components/DisasterMap";
 import Header from "./Header";
@@ -16,8 +16,9 @@ import SidePanel from "./SidePanel";
 import BottomPanel from "./BottomPanel";
 import type { Coordinates } from "../../../shared/types/common.types";
 import type { Disaster, MapMarker } from "../../disasters/types/disasters.types";
-import type { InventoryItem } from "../../inventory/types/inventory.types";
+import type { InventoryItem, InventoryArchetypeDsl } from "../../inventory/types/inventory.types";
 import type { PeopleReport } from "../../people-reports/types/people-reports.types";
+import { fetchInventoryArchetypeWithInheritance } from "../../inventory/services/inventoryService";
 
 // Use theme layout constants for panel sizing
 const MIN_PANEL = layout.panel.minWidth;
@@ -49,6 +50,15 @@ const DashboardLayout = () => {
   const [displayedPeopleReports, setDisplayedPeopleReports] = useState<
     PeopleReport[]
   >([]);
+
+  const [selectedInventoryItem, setSelectedInventoryItem] =
+    useState<InventoryItem | null>(null);
+  const [inventoryArchetypeDsl, setInventoryArchetypeDsl] =
+    useState<InventoryArchetypeDsl | null>(null);
+  const [inventoryArchetypeChain, setInventoryArchetypeChain] = useState<
+    InventoryArchetypeDsl[]
+  >([]);
+  const [inventoryDslLoading, setInventoryDslLoading] = useState(false);
 
   const [inventoryDialog, setInventoryDialog] = useState<{
     open: boolean;
@@ -171,12 +181,14 @@ const DashboardLayout = () => {
     if (marker.type === "disaster") {
       setSelectedDisasterMarker(marker);
       setDisplayedPeopleReports([]);
+      setSelectedInventoryItem(null);
     } else if (marker.type === "people") {
       const report = peopleReports.find((r) => r.id === marker.id);
       if (report) {
         setDisplayedPeopleReports([report]);
       }
       setSelectedDisasterMarker(null);
+      setSelectedInventoryItem(null);
     }
   };
 
@@ -242,6 +254,7 @@ const DashboardLayout = () => {
         type: "disaster",
       });
       setDisplayedPeopleReports([]);
+      setSelectedInventoryItem(null);
       setMapCenter(disaster.location);
       setMapZoom(12);
       if (mapRef.current) {
@@ -251,6 +264,34 @@ const DashboardLayout = () => {
       setSelectedDisasterMarker(null);
     }
   };
+
+  const handleSelectInventory = useCallback(
+    async (item: InventoryItem | null) => {
+      if (item) {
+        setSelectedInventoryItem(item);
+        setSelectedDisasterMarker(null);
+        setDisplayedPeopleReports([]);
+        setInventoryDslLoading(true);
+        try {
+          const { dsl, chain } = await fetchInventoryArchetypeWithInheritance(
+            item.archetypeId
+          );
+          setInventoryArchetypeDsl(dsl);
+          setInventoryArchetypeChain(chain);
+        } catch {
+          setInventoryArchetypeDsl(null);
+          setInventoryArchetypeChain([]);
+        } finally {
+          setInventoryDslLoading(false);
+        }
+      } else {
+        setSelectedInventoryItem(null);
+        setInventoryArchetypeDsl(null);
+        setInventoryArchetypeChain([]);
+      }
+    },
+    []
+  );
 
   const handleClusterClick = (reports: PeopleReport[]) => {
     if (reports.length === 0) return;
@@ -428,9 +469,16 @@ const DashboardLayout = () => {
               disaster={selectedDisasterFromMarker}
               peopleReports={displayedPeopleReports}
               reports={selectedReportsFromDisaster}
+              inventoryItem={selectedInventoryItem}
+              inventoryArchetypeDsl={inventoryArchetypeDsl}
+              inventoryArchetypeChain={inventoryArchetypeChain}
+              inventoryDslLoading={inventoryDslLoading}
               onClose={() => {
                 setSelectedDisasterMarker(null);
                 setDisplayedPeopleReports([]);
+                setSelectedInventoryItem(null);
+                setInventoryArchetypeDsl(null);
+                setInventoryArchetypeChain([]);
               }}
             />
           </Box>
@@ -469,6 +517,7 @@ const DashboardLayout = () => {
               peopleReports={peopleReports}
               onAddInventory={handleAddInventory}
               onEditInventory={handleEditInventory}
+              onSelectInventory={handleSelectInventory}
               onAddPeople={handleAddPeople}
               onEditPeople={handleEditPeople}
               onSelectPeople={handleSelectPeople}
